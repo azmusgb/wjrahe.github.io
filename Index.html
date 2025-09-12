@@ -361,148 +361,151 @@ function colorPick(key, table, fallback){
 }
 
 function updateSvg(v){
-  const svg=$('svgPreview'); if(!svg) return;
-  svg.innerHTML='';
-  const NS='http://www.w3.org/2000/svg';
+  const svg = $('svgPreview');
+  if (!svg) return;
+  svg.innerHTML = '';
 
-  const plateFill=colorPick(v.plate_color,[['black','#121316'],['navy','#0b2346'],['crimson','#5c0b12'],['gray','#2a2f3a'],['white','#f3f6f9'],['forest','#0f2c1b']], '#121316');
-  const rimColor =colorPick(v.rim_finish ,[['gold','#FFD54A'],['silver','#C0C7CE'],['steel','#B0B7C3'],['bronze','#C18B52'],['obsidian','#000']], '#66d7ff');
-  const textFill=colorPick(v.text_colors,[['white','#fff'],['gold','#FFD54A'],['silver','#C0C7CE'],['cyan','#6ee7ff'],['red','#e43b44'],['black','#000']], '#fff');
-  const symColor =colorPick(v.symbol_color,[['red','#e43b44'],['silver','#C0C7CE'],['gold','#FFD54A'],['white','#fff'],['blue','#3b6ee4'],['cyan','#6ee7ff']], '#6ee7ff');
-
-  const defs=document.createElementNS(NS,'defs'); svg.appendChild(defs);
-
-  // Subtle glow filters (kept simple for crispness)
-  const glow=document.createElementNS(NS,'filter'); glow.id='glow';
-  glow.innerHTML='<feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>';
-  defs.appendChild(glow);
-
-  const saberGrad=document.createElementNS(NS,'linearGradient'); saberGrad.id='saber';
-  saberGrad.setAttribute('x1','0%');saberGrad.setAttribute('y1','0%');saberGrad.setAttribute('x2','100%');saberGrad.setAttribute('y2','0%');
-  saberGrad.innerHTML='<stop offset="0%" stop-color="#fff"/><stop offset="50%" stop-color="#bff3ff"/><stop offset="100%" stop-color="#6ee7ff"/>';
-  defs.appendChild(saberGrad);
-
-  const rimGrad=document.createElementNS(NS,'linearGradient'); rimGrad.id='rimGrad';
-  rimGrad.setAttribute('x1','0%');rimGrad.setAttribute('y1','0%');rimGrad.setAttribute('x2','100%');rimGrad.setAttribute('y2','100%');
-  rimGrad.innerHTML=`<stop offset="0%" stop-color="${rimColor}"/><stop offset="100%" stop-color="${rimColor}" stop-opacity=".8"/>`;
-  defs.appendChild(rimGrad);
-
-  // Arc path for text
-  const arc=document.createElementNS(NS,'path'); arc.id='topArc';
-  arc.setAttribute('d','M 40 120 A 110 110 0 0 1 260 120'); defs.appendChild(arc);
-
-  // Plate
-  const plate=document.createElementNS(NS,'circle');
-  plate.setAttribute('cx','150'); plate.setAttribute('cy','150'); plate.setAttribute('r','120');
-  plate.setAttribute('fill',plateFill); plate.setAttribute('stroke',rimColor); plate.setAttribute('stroke-width','6'); svg.appendChild(plate);
-
-  const rimOuter=document.createElementNS(NS,'circle');
-  rimOuter.setAttribute('cx','150'); rimOuter.setAttribute('cy','150'); rimOuter.setAttribute('r','136');
-  rimOuter.setAttribute('fill','none'); rimOuter.setAttribute('stroke','url(#rimGrad)'); rimOuter.setAttribute('stroke-width','3'); rimOuter.setAttribute('opacity','.9'); svg.appendChild(rimOuter);
-
-  const rimInner=document.createElementNS(NS,'circle');
-  rimInner.setAttribute('cx','150'); rimInner.setAttribute('cy','150'); rimInner.setAttribute('r','132');
-  rimInner.setAttribute('fill','none'); rimInner.setAttribute('stroke','#ffffff'); rimInner.setAttribute('stroke-opacity','.08'); rimInner.setAttribute('stroke-width','2'); svg.appendChild(rimInner);
-
-  // Badge rings
-  if ((v.badge_elements||'').toLowerCase().includes('ring')){
-    [90,70,50].forEach((r,i)=>{const c=document.createElementNS(NS,'circle'); c.setAttribute('cx','150'); c.setAttribute('cy','150'); c.setAttribute('r',r); c.setAttribute('fill','none'); c.setAttribute('stroke',rimColor); c.setAttribute('stroke-width','1'); if(i===1)c.setAttribute('stroke-dasharray','6,6'); svg.appendChild(c);});
-  }
-
-  // Main symbol
-  const g=document.createElementNS(NS,'g'); svg.appendChild(g);
-  const ms=(v.main_symbol||'').toLowerCase();
-  if (ms.includes('death')){
-    // Death Star
-    const body=document.createElementNS(NS,'circle'); body.setAttribute('cx','150'); body.setAttribute('cy','150'); body.setAttribute('r','58'); body.setAttribute('fill',symColor); body.setAttribute('stroke','#222'); body.setAttribute('stroke-width','1.4'); g.appendChild(body);
-    const trench=document.createElementNS(NS,'rect'); trench.setAttribute('x','95'); trench.setAttribute('y','147'); trench.setAttribute('width','110'); trench.setAttribute('height','6'); trench.setAttribute('fill','#1c1f29'); trench.setAttribute('opacity','.75'); g.appendChild(trench);
-    const dish=document.createElementNS(NS,'circle'); dish.setAttribute('cx','178'); dish.setAttribute('cy','130'); dish.setAttribute('r','12'); dish.setAttribute('fill', plateFill==='#121316' ? '#0a0a0a' : '#111'); dish.setAttribute('stroke','#444'); g.appendChild(dish);
-    for(let i=0;i<8;i++){const a=i*22.5*Math.PI/180, r1=35, r2=58; const x1=150+r1*Math.cos(a), y1=150+r1*Math.sin(a); const x2=150+r2*Math.cos(a), y2=150+r2*Math.sin(a); const ln=document.createElementNS(NS,'line'); ln.setAttribute('x1',x1); ln.setAttribute('y1',y1); ln.setAttribute('x2',x2); ln.setAttribute('y2',y2); ln.setAttribute('stroke','#2a2f3a'); ln.setAttribute('stroke-width','1'); g.appendChild(ln);}
-  } else if (ms.includes('jedi')){
-    // Jedi Crest
-    const crest=document.createElementNS(NS,'path'); crest.setAttribute('d','M150 110 L168 96 L168 140 L182 154 L168 168 L168 210 L150 194 L132 210 L132 168 L118 154 L132 140 L132 96 Z'); crest.setAttribute('fill',symColor); g.appendChild(crest);
-  } else if (ms.includes('imperial')||ms.includes('cog')){
-    // Imperial Cog
-    const cog=document.createElementNS(NS,'circle'); cog.setAttribute('cx','150'); cog.setAttribute('cy','150'); cog.setAttribute('r','46'); cog.setAttribute('fill',symColor); cog.setAttribute('stroke','#222'); cog.setAttribute('stroke-width','1.2'); g.appendChild(cog);
-    for(let i=0;i<8;i++){const a=i*45*Math.PI/180, r1=46, r2=58; const x1=150+r1*Math.cos(a), y1=150+r1*Math.sin(a); const x2=150+r2*Math.cos(a), y2=150+r2*Math.sin(a); const ln=document.createElementNS(NS,'line'); ln.setAttribute('x1',x1); ln.setAttribute('y1',y1); ln.setAttribute('x2',x2); ln.setAttribute('y2',y2); ln.setAttribute('stroke',symColor); ln.setAttribute('stroke-width','6'); g.appendChild(ln);}
-  } else {
-    // Default star
-    const star=document.createElementNS(NS,'path'); star.setAttribute('d','M150,102 L164,136 L201,139 L172,162 L180,197 L150,179 L120,197 L128,162 L99,139 L136,136 Z'); star.setAttribute('fill',symColor); g.appendChild(star);
-  }
-
-  // Secondary emblem
-  if ((v.secondary_symbol||'').trim()){
-    const sec=document.createElementNS(NS,'circle'); sec.setAttribute('cx','210'); sec.setAttribute('cy','105'); sec.setAttribute('r','9'); sec.setAttribute('fill',symColor); sec.setAttribute('filter','url(#glow)'); svg.appendChild(sec);
-  }
-
-  // Sabers (OLED-friendly bloom)
-  const saber=(x1,y1,x2,y2)=>{
-    const b=document.createElementNS(NS,'line'); 
-    b.setAttribute('x1',x1); b.setAttribute('y1',y1); b.setAttribute('x2',x2); b.setAttribute('y2',y2); 
-    b.setAttribute('stroke','#6ee7ff'); b.setAttribute('stroke-width','8'); b.setAttribute('opacity','.35'); 
-    b.setAttribute('filter','url(#glow)'); svg.appendChild(b); 
-    
-    const core=document.createElementNS(NS,'line'); 
-    core.setAttribute('x1',x1); core.setAttribute('y1',y1); core.setAttribute('x2',x2); core.setAttribute('y2',y2); 
-    core.setAttribute('stroke','url(#saber)'); core.setAttribute('stroke-width','3'); 
-    svg.appendChild(core);
+  // --- helpers --------------------------------------------------------------
+  const NS = 'http://www.w3.org/2000/svg';
+  const hp = n => Math.round(n) + 0.5;                 // half-pixel snap for crisp 1–2px strokes
+  const make = (name, attrs = {}, parent = svg) => {
+    const el = document.createElementNS(NS, name);
+    for (const [k, val] of Object.entries(attrs)) el.setAttribute(k, String(val));
+    parent.appendChild(el);
+    return el;
   };
-  
-  const s=(v.sabers_desc||'').toLowerCase();
-  if (s.includes('cross')||/\bx\b/.test(s)){
+  const colorPick = (key, table, fallback) => {
+    key = (key || '').toLowerCase();
+    for (const [k, v2] of table) if (k && key.includes(k)) return v2;
+    return fallback;
+  };
+
+  // --- palette --------------------------------------------------------------
+  const plateFill = colorPick(v.plate_color, [['black','#121316'],['navy','#0b2346'],['crimson','#5c0b12'],['gray','#2a2f3a'],['white','#f3f6f9'],['forest','#0f2c1b']], '#121316');
+  const rimColor  = colorPick(v.rim_finish , [['gold','#ffd54a'],['silver','#c0c7ce'],['steel','#b0b7c3'],['bronze','#c18b52'],['obsidian','#000']], '#9ad6ff');
+  const textFill  = colorPick(v.text_colors,[['white','#fff'],['gold','#ffd54a'],['silver','#c0c7ce'],['cyan','#6ee7ff'],['red','#e43b44'],['black','#000']], '#fff');
+  const symColor  = colorPick(v.symbol_color,[['red','#e43b44'],['silver','#c0c7ce'],['gold','#ffd54a'],['white','#fff'],['blue','#3b6ee4'],['cyan','#6ee7ff']], '#6ee7ff');
+
+  // --- defs (NO heavy blurs; keep crisp) -----------------------------------
+  const defs = make('defs');
+  const lgRim = make('linearGradient', { id:'rimGrad', x1:'0%', y1:'0%', x2:'100%', y2:'100%' }, defs);
+  lgRim.innerHTML = `<stop offset="0%" stop-color="${rimColor}"/><stop offset="100%" stop-color="${rimColor}" stop-opacity=".82"/>`;
+
+  // saber gradient core
+  const lgSaber = make('linearGradient', { id:'saberCore', x1:'0%', y1:'0%', x2:'100%', y2:'0%' }, defs);
+  lgSaber.innerHTML = `<stop offset="0%" stop-color="#fff"/><stop offset="50%" stop-color="#c7f3ff"/><stop offset="100%" stop-color="#6ee7ff"/>`;
+
+  // text arc path
+  const arc = make('path', { id:'topArc', d:'M 36 120 A 114 114 0 0 1 264 120', pathLength:'1000' }, defs);
+
+  // --- base plate & rims ----------------------------------------------------
+  make('circle', { cx:150, cy:150, r:120, fill:plateFill, stroke:rimColor, 'stroke-width':6 });
+
+  // snap outer decorative rims to half-pixels
+  make('circle', { cx:150, cy:150, r:hp(136), fill:'none', stroke:'url(#rimGrad)', 'stroke-width':3, opacity:.92 });
+  make('circle', { cx:150, cy:150, r:hp(132), fill:'none', stroke:'#fff', 'stroke-opacity':.08, 'stroke-width':2 });
+
+  // inner tick ring (adds precision look)
+  const ticks = make('g', { 'stroke': '#8fd6ff', 'stroke-width': 1, 'fill':'none' });
+  for (let i = 0; i < 48; i++) {
+    const a = (i * 7.5) * Math.PI / 180;
+    const r1 = 106, r2 = i % 2 ? 109 : 111;
+    const x1 = 150 + r1 * Math.cos(a), y1 = 150 + r1 * Math.sin(a);
+    const x2 = 150 + r2 * Math.cos(a), y2 = 150 + r2 * Math.sin(a);
+    make('line', { x1: hp(x1), y1: hp(y1), x2: hp(x2), y2: hp(y2) }, ticks);
+  }
+
+  // optional badge rings
+  if ((v.badge_elements||'').toLowerCase().includes('ring')){
+    [90,72,54].forEach((r,i)=>{
+      make('circle',{ cx:150, cy:150, r:hp(r), fill:'none', stroke: i===1 ? '#7fbbe0' : rimColor, 'stroke-width':1, 'stroke-dasharray': i===1 ? '6 6' : null });
+    });
+  }
+
+  // --- main symbol group ----------------------------------------------------
+  const g = make('g');
+
+  const ms = (v.main_symbol||'').toLowerCase();
+  if (ms.includes('death')) {
+    // Death Star (clean geometry; panel lines snapped)
+    make('circle', { cx:150, cy:150, r:58, fill:symColor, stroke:'#222', 'stroke-width':1.4 }, g);
+    // equatorial trench (masked cut)
+    make('line',   { x1: hp(96), y1: hp(150), x2: hp(204), y2: hp(150), stroke: plateFill==='#121316' ? '#0a0a0a' : '#111', 'stroke-width':6 }, g);
+    // targeting dish
+    make('circle', { cx:178, cy:130, r:12, fill: plateFill==='#121316' ? '#0a0a0a' : '#111', stroke:'#3b3f48', 'stroke-width':1 }, g);
+    // radial panels
+    for (let i = 0; i < 10; i++) {
+      const a = (i * 18) * Math.PI/180, r1=34, r2=58;
+      const x1 = 150 + r1*Math.cos(a), y1 = 150 + r1*Math.sin(a);
+      const x2 = 150 + r2*Math.cos(a), y2 = 150 + r2*Math.sin(a);
+      make('line', { x1: hp(x1), y1: hp(y1), x2: hp(x2), y2: hp(y2), stroke:'#27303d', 'stroke-width':1 }, g);
+    }
+    // lower panel arc
+    make('path', { d:'M 115 180 A 45 45 0 0 0 185 180', stroke:'#27303d', 'stroke-width':1, fill:'none' }, g);
+  } else if (ms.includes('jedi')) {
+    make('path', { d:'M150 108 L168 96 L168 140 L182 154 L168 168 L168 210 L150 194 L132 210 L132 168 L118 154 L132 140 L132 96 Z', fill:symColor }, g);
+  } else if (ms.includes('imperial') || ms.includes('cog')) {
+    make('circle', { cx:150, cy:150, r:46, fill:symColor, stroke:'#222', 'stroke-width':1.2 }, g);
+    for (let i=0;i<8;i++){
+      const a = i*45*Math.PI/180, r1=46, r2=58;
+      const x1 = 150 + r1*Math.cos(a), y1 = 150 + r1*Math.sin(a);
+      const x2 = 150 + r2*Math.cos(a), y2 = 150 + r2*Math.sin(a);
+      make('line', { x1: hp(x1), y1: hp(y1), x2: hp(x2), y2: hp(y2), stroke: symColor, 'stroke-width': 6, 'stroke-linecap':'butt' }, g);
+    }
+  } else {
+    make('path', { d:'M150,102 L164,136 L201,139 L172,162 L180,197 L150,179 L120,197 L128,162 L99,139 L136,136 Z', fill:symColor }, g);
+  }
+
+  // secondary emblem (small jewel)
+  if ((v.secondary_symbol||'').trim()){
+    make('circle', { cx:210, cy:105, r:9, fill:symColor, stroke:'#203040', 'stroke-width':0.75 });
+  }
+
+  // --- sabers: crisp glow without blur filters ------------------------------
+  const saber = (x1,y1,x2,y2)=>{
+    // soft aura (wide, low alpha)
+    make('line', { x1, y1, x2, y2, stroke:'#9feaff', 'stroke-opacity':0.22, 'stroke-width':10, 'stroke-linecap':'round' });
+    // mid aura
+    make('line', { x1, y1, x2, y2, stroke:'#79e4ff', 'stroke-opacity':0.35, 'stroke-width':6,  'stroke-linecap':'round' });
+    // core
+    make('line', { x1, y1, x2, y2, stroke:'url(#saberCore)', 'stroke-width':3, 'stroke-linecap':'round' });
+  };
+  const s = (v.sabers_desc||'').toLowerCase();
+  if (s.includes('cross') || /\bx\b/.test(s)) {
     saber(105,105,195,195); 
     saber(195,105,105,195);
-  }
-  else if (s.includes('three')||/\b3\b/.test(s)){
+  } else if (s.includes('three') || /\b3\b/.test(s)) {
     saber(95,210,205,210); 
     saber(115,225,185,165); 
     saber(185,225,115,165);
-  }
-  else if (s.includes('circle')){
-    for(let i=0;i<6;i++){
-      const a=i*60*Math.PI/180; 
+  } else if (s.includes('circle')) {
+    for (let i=0;i<6;i++){
+      const a=i*60*Math.PI/180;
       saber(150+40*Math.cos(a),150+40*Math.sin(a),150+80*Math.cos(a),150+80*Math.sin(a));
     }
-  }
-  else {
-    saber(150,120,150,225);
+  } else {
+    saber(150,118,150,226);
   }
 
-  // Aurebesh ring + vector dots
-  const aure=(v.aurebesh_style||'').toLowerCase();
-  if (aure.includes('glow')||aure.includes('aurebesh')||aure.includes('rune')||aure.includes('inscription')){
-    const ring=document.createElementNS(NS,'circle'); 
-    ring.setAttribute('cx','150'); ring.setAttribute('cy','150'); ring.setAttribute('r','108'); 
-    ring.setAttribute('fill','none'); ring.setAttribute('stroke','#6ee7ff'); ring.setAttribute('stroke-width','1'); 
-    ring.setAttribute('stroke-dasharray','6,6'); ring.setAttribute('opacity','.7'); 
-    ring.setAttribute('filter','url(#glow)'); svg.appendChild(ring);
-    
-    for(let i=0;i<16;i++){
-      const a=i*22.5*Math.PI/180, x=150+96*Math.cos(a), y=150+96*Math.sin(a), r=2.2; 
-      const dot=document.createElementNS(NS,'path'); 
-      dot.setAttribute('d',`M ${x-r} ${y} a ${r} ${r} 0 1 0 ${r*2} 0 a ${r} ${r} 0 1 0 ${-r*2} 0`);
-      dot.setAttribute('fill','#6ee7ff'); dot.setAttribute('opacity','.9'); 
-      dot.setAttribute('filter','url(#glow)'); svg.appendChild(dot);
+  // --- aurebesh ring & dots (subtle) ---------------------------------------
+  const aure = (v.aurebesh_style||'').toLowerCase();
+  if (aure.includes('glow') || aure.includes('aurebesh') || aure.includes('rune') || aure.includes('inscription')){
+    make('circle', { cx:150, cy:150, r:hp(108), fill:'none', stroke:'#6ee7ff', 'stroke-width':1, 'stroke-dasharray':'6 6', 'stroke-opacity':.75 });
+    const dots = make('g', { fill:'#6ee7ff' });
+    for (let i=0;i<16;i++){
+      const a=i*22.5*Math.PI/180, x=150+96*Math.cos(a), y=150+96*Math.sin(a);
+      make('circle', { cx: x, cy: y, r: 2 }, dots);
     }
   }
 
-  // Top arc text
+  // --- arc text (uses textLength to keep tracking tidy on narrow phones) ----
   if ((v.text_top||'').trim()){
-    const wantsOutline=(v.text_colors||'').toLowerCase().includes('outline') || plateFill==='#121316';
-    const txt=document.createElementNS(NS,'text'); 
-    txt.setAttribute('font-size','15'); txt.setAttribute('font-weight','800'); 
-    txt.setAttribute('fill',textFill); txt.setAttribute('letter-spacing','.6'); 
-    txt.setAttribute('text-anchor','middle'); 
-    if(wantsOutline){ 
-      txt.setAttribute('stroke','#000'); txt.setAttribute('stroke-width','1.1'); 
-      txt.setAttribute('paint-order','stroke'); 
-    }
-    const tp=document.createElementNS(NS,'textPath'); 
-    tp.setAttribute('href','#topArc'); tp.setAttribute('startOffset','50%'); 
-    const raw=v.text_top.length>26?v.text_top.slice(0,25)+'…':v.text_top; 
-    tp.textContent=raw.toUpperCase(); 
-    txt.appendChild(tp); 
-    svg.appendChild(txt);
+    const wantsOutline = (v.text_colors||'').toLowerCase().includes('outline') || plateFill==='#121316';
+    const text = make('text', { 'font-size':15, 'font-weight':800, fill:textFill, 'letter-spacing':.6, 'text-anchor':'middle' });
+    if (wantsOutline) text.setAttribute('stroke','#000'), text.setAttribute('stroke-width','1.1'), text.setAttribute('paint-order','stroke');
+    const tp = make('textPath', { href:'#topArc', startOffset:'50%', method:'align', spacing:'auto', textLength:'720' }, text);
+    const raw = v.text_top.length>28 ? v.text_top.slice(0,27)+'…' : v.text_top;
+    tp.textContent = raw.toUpperCase();
   }
 }
 
