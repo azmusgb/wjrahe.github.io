@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="color-scheme" content="dark light" />
-<title>Medallion Prompt Builder — Ultimate</title>
+<title>Medallion Prompt Builder — Ultimate+</title>
 
 <!-- Fonts (swap to avoid FOIT on mobile) -->
 <link href="https://fonts.cdnfonts.com/css/aurebesh" rel="stylesheet" />
@@ -33,7 +33,7 @@
   html,body{height:100%}
   body{
     margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 var(--sans);
-    -webkit-text-size-adjust:100%; /* iOS zoom quirks */
+    -webkit-text-size-adjust:100%;
     overflow-x:hidden;
   }
 
@@ -48,6 +48,7 @@
   .pill{padding:3px 8px;border-radius:999px;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;font-size:11px;font-weight:700}
   .theme-toggle{border:1px solid var(--line);color:var(--muted);background:var(--panel);border-radius:10px;padding:6px 10px;display:flex;gap:6px;align-items:center;cursor:pointer}
   .theme-toggle:hover{border-color:var(--accent);color:var(--accent)}
+  .kbd{font:11px var(--mono);border:1px solid var(--line);border-radius:6px;padding:2px 6px}
 
   /* App layout: Profiles | Builder | Output */
   .app{
@@ -91,7 +92,6 @@
   }
   .btn:hover,.chip:hover{border-color:var(--accent);color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
   .primary{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;border:none}
-  .kbd{font:11px var(--mono);border:1px solid var(--line);border-radius:6px;padding:2px 6px}
 
   .out-wrap{display:grid;gap:12px}
   .monobox{
@@ -101,7 +101,7 @@
   .preview{display:grid;gap:12px;justify-items:center;border:1px solid var(--line);border-radius:14px;padding:14px;background:color-mix(in oklab,var(--panel) 96%, black 4%)}
   #svgPreview{
     width:320px;height:320px;border-radius:50%;background:radial-gradient(ellipse at center, rgba(0,0,0,.0) 55%, rgba(0,0,0,.35) 100%);
-    box-shadow:0 0 28px rgba(110,231,255,.18);transition:transform .3s;will-change:transform;touch-action:manipulation; /* iOS wiggle fix */
+    box-shadow:0 0 28px rgba(110,231,255,.18);transition:transform .3s;will-change:transform;touch-action:manipulation;
   }
   .preview-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
   .zoom-btn{width:40px;height:40px;border-radius:50%;display:grid;place-items:center}
@@ -127,15 +127,21 @@
     #svgPreview { max-width: 100%; height: auto; }
     .monobox { font-size: 12px; line-height: 1.45; }
   }
+
+  /* Simple modal for import/export JSON */
+  dialog::backdrop{ background:rgba(0,0,0,.35) }
+  .modal-head{display:flex;gap:8px;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);padding:10px}
+  .modal-body{padding:10px}
+  .modal-actions{display:flex;gap:8px;justify-content:flex-end;padding:10px;border-top:1px solid var(--line)}
 </style>
 </head>
 <body>
 <header>
   <div class="brand">
-    <div class="logo">⚔️</div>
+    <div class="logo" aria-hidden="true">⚔️</div>
     <div>
       <div style="display:flex;align-items:center;gap:8px">
-        <strong>Medallion Prompt Builder</strong> <span class="pill">Ultimate</span>
+        <strong>Medallion Prompt Builder</strong> <span class="pill">Ultimate+</span>
       </div>
       <div class="subtle">Profiles • Builder • Live SVG • Exports</div>
     </div>
@@ -148,22 +154,30 @@
 <main class="app">
   <!-- LEFT: Profiles -->
   <aside class="aside card">
-    <h2><span class="material-icons" style="font-size:18px">view_carousel</span> Profiles</h2>
-    <div class="profiles">
-      <div class="profile" data-profile="fl_army"><div class="thumb">FL</div><div><strong>Florida + Army</strong><div class="subtle">Aurebesh rim • Crossed sabers</div><span class="tag">Preset</span></div></div>
-      <div class="profile" data-profile="det_wings"><div class="thumb">DET</div><div><strong>Detroit + Wings</strong><div class="subtle">Sports fusion • 3 beams</div><span class="tag">Preset</span></div></div>
-      <div class="profile" data-profile="jedi_generic"><div class="thumb">JEDI</div><div><strong>Galactic Jedi</strong><div class="subtle">Navy plate • Vertical glow</div><span class="tag">Preset</span></div></div>
+    <h2><span class="material-icons" style="font-size:18px" aria-hidden="true">view_carousel</span> Profiles</h2>
+    <div class="profiles" role="list">
+      <button class="profile" data-profile="fl_army" role="listitem" type="button" aria-label="Load profile Florida plus Army">
+        <div class="thumb">FL</div><div><strong>Florida + Army</strong><div class="subtle">Aurebesh rim • Crossed sabers</div><span class="tag">Preset</span></div>
+      </button>
+      <button class="profile" data-profile="det_wings" role="listitem" type="button" aria-label="Load profile Detroit Wings">
+        <div class="thumb">DET</div><div><strong>Detroit + Wings</strong><div class="subtle">Sports fusion • 3 beams</div><span class="tag">Preset</span></div>
+      </button>
+      <button class="profile" data-profile="jedi_generic" role="listitem" type="button" aria-label="Load profile Galactic Jedi">
+        <div class="thumb">JEDI</div><div><strong>Galactic Jedi</strong><div class="subtle">Navy plate • Vertical glow</div><span class="tag">Preset</span></div>
+      </button>
     </div>
     <div style="margin-top:12px" class="btns">
-      <button id="saveBtn" class="chip"><span class="material-icons">bookmark_add</span>Save Current</button>
-      <button id="loadBtn" class="chip"><span class="material-icons">folder_open</span>Load Saved</button>
-      <button id="randBtn" class="chip"><span class="material-icons">casino</span>Randomize</button>
+      <button id="saveBtn" class="chip" type="button"><span class="material-icons" aria-hidden="true">bookmark_add</span>Save Current</button>
+      <button id="loadBtn" class="chip" type="button"><span class="material-icons" aria-hidden="true">folder_open</span>Load Saved</button>
+      <button id="randBtn" class="chip" type="button"><span class="material-icons" aria-hidden="true">casino</span>Randomize</button>
+      <button id="exportJsonBtn" class="chip" type="button"><span class="material-icons" aria-hidden="true">ios_share</span>Export JSON</button>
+      <button id="importJsonBtn" class="chip" type="button"><span class="material-icons" aria-hidden="true">download</span>Import JSON</button>
     </div>
   </aside>
 
   <!-- MIDDLE: Builder -->
   <section class="card" aria-label="Builder">
-    <h2><span class="material-icons" style="font-size:18px">tune</span> Builder</h2>
+    <h2><span class="material-icons" style="font-size:18px" aria-hidden="true">tune</span> Builder</h2>
     <div class="tabs" role="tablist" aria-label="Sections">
       <button class="tab" id="tab-basic" role="tab" aria-controls="panel-basic" aria-selected="true" data-tab="basic">Basic</button>
       <button class="tab" id="tab-symbols" role="tab" aria-controls="panel-symbols" aria-selected="false" data-tab="symbols" tabindex="-1">Symbols</button>
@@ -172,53 +186,53 @@
 
     <div id="panel-basic" class="tab-panel" role="tabpanel" aria-labelledby="tab-basic">
       <div class="grid">
-        <div class="row"><label for="text_top">Top Text</label><input id="text_top" placeholder="SAINT CLOUD JEDI"></div>
-        <div class="row"><label for="rim_finish">Rim Finish</label><input id="rim_finish" placeholder="metallic silver"></div>
-        <div class="row"><label for="plate_color">Plate Color</label><input id="plate_color" placeholder="black"></div>
-        <div class="row"><label for="text_colors">Text Fill / Outline</label><input id="text_colors" placeholder="white with black outline"></div>
-        <div class="row"><label for="state_shape">Main Outline</label><input id="state_shape" placeholder="state of Florida"></div>
-        <div class="row"><label for="outline_color">Outline Color</label><input id="outline_color" placeholder="white"></div>
+        <div class="row"><label for="text_top">Top Text</label><input id="text_top" placeholder="SAINT CLOUD JEDI" autocomplete="off"></div>
+        <div class="row"><label for="rim_finish">Rim Finish</label><input id="rim_finish" placeholder="metallic silver" autocomplete="off"></div>
+        <div class="row"><label for="plate_color">Plate Color</label><input id="plate_color" placeholder="black" autocomplete="off"></div>
+        <div class="row"><label for="text_colors">Text Fill / Outline</label><input id="text_colors" placeholder="white with black outline" autocomplete="off"></div>
+        <div class="row"><label for="state_shape">Main Outline</label><input id="state_shape" placeholder="state of Florida" autocomplete="off"></div>
+        <div class="row"><label for="outline_color">Outline Color</label><input id="outline_color" placeholder="white" autocomplete="off"></div>
       </div>
     </div>
 
     <div id="panel-symbols" class="tab-panel" role="tabpanel" aria-labelledby="tab-symbols" hidden>
       <div class="grid">
-        <div class="row"><label for="main_symbol">Main Symbol</label><input id="main_symbol" placeholder="Death Star"></div>
-        <div class="row"><label for="symbol_color">Symbol Color</label><input id="symbol_color" placeholder="red with etched lines"></div>
-        <div class="row"><label for="badge_elements">Badge Elements</label><input id="badge_elements" placeholder="concentric rings"></div>
-        <div class="row"><label for="secondary_symbol">Secondary Symbol</label><input id="secondary_symbol" placeholder="Army star (optional)"></div>
-        <div class="row"><label for="aurebesh_style">Aurebesh Style</label><input id="aurebesh_style" placeholder="glowing Aurebesh along rim"></div>
-        <div class="row"><label for="sabers_desc">Lightsabers</label><input id="sabers_desc" placeholder="two crossed sabers glow"></div>
+        <div class="row"><label for="main_symbol">Main Symbol</label><input id="main_symbol" placeholder="Death Star" autocomplete="off"></div>
+        <div class="row"><label for="symbol_color">Symbol Color</label><input id="symbol_color" placeholder="red with etched lines" autocomplete="off"></div>
+        <div class="row"><label for="badge_elements">Badge Elements</label><input id="badge_elements" placeholder="concentric rings" autocomplete="off"></div>
+        <div class="row"><label for="secondary_symbol">Secondary Symbol</label><input id="secondary_symbol" placeholder="Army star (optional)" autocomplete="off"></div>
+        <div class="row"><label for="aurebesh_style">Aurebesh Style</label><input id="aurebesh_style" placeholder="glowing Aurebesh along rim" autocomplete="off"></div>
+        <div class="row"><label for="sabers_desc">Lightsabers</label><input id="sabers_desc" placeholder="two crossed sabers glow" autocomplete="off"></div>
       </div>
     </div>
 
     <div id="panel-advanced" class="tab-panel" role="tabpanel" aria-labelledby="tab-advanced" hidden>
-      <div class="row"><label for="style_keywords">Style Keywords</label><input id="style_keywords" placeholder="cinematic, heraldic, symmetrical"></div>
-      <div class="btns">
-        <button id="gen" class="btn primary"><span class="material-icons">bolt</span>Generate</button>
-        <button id="copyBtn" class="btn"><span class="material-icons">content_copy</span>Copy Text</button>
-        <button id="downloadBtn" class="btn"><span class="material-icons">save</span>Download TXT</button>
-        <button id="downloadSvgBtn" class="btn"><span class="material-icons">image</span>Export SVG</button>
-        <button id="downloadPngBtn" class="btn"><span class="material-icons">photo</span>Export PNG</button>
+      <div class="row"><label for="style_keywords">Style Keywords</label><input id="style_keywords" placeholder="cinematic, heraldic, symmetrical" autocomplete="off"></div>
+      <div class="btns" role="group" aria-label="Actions">
+        <button id="gen" class="btn primary" type="button"><span class="material-icons" aria-hidden="true">bolt</span>Generate</button>
+        <button id="copyBtn" class="btn" type="button"><span class="material-icons" aria-hidden="true">content_copy</span>Copy Text</button>
+        <button id="downloadBtn" class="btn" type="button"><span class="material-icons" aria-hidden="true">save</span>Download TXT</button>
+        <button id="downloadSvgBtn" class="btn" type="button"><span class="material-icons" aria-hidden="true">image</span>Export SVG</button>
+        <button id="downloadPngBtn" class="btn" type="button"><span class="material-icons" aria-hidden="true">photo</span>Export PNG</button>
       </div>
       <div class="subtle" style="margin-top:8px">Shortcuts: <span class="kbd">Ctrl/⌘ + Enter</span> generate • <span class="kbd">Ctrl/⌘ + C</span> copy</div>
     </div>
   </section>
 
   <!-- RIGHT: Output -->
-  <section class="card">
-    <h2><span class="material-icons" style="font-size:18px">visibility</span> Output</h2>
+  <section class="card" aria-label="Output">
+    <h2><span class="material-icons" style="font-size:18px" aria-hidden="true">visibility</span> Output</h2>
     <div class="out-wrap">
-      <div class="row"><label for="out">Generated Prompt</label><textarea id="out" spellcheck="false"></textarea></div>
-      <div class="preview">
+      <div class="row"><label for="out">Generated Prompt</label><textarea id="out" spellcheck="false" aria-describedby="preview"></textarea></div>
+      <div class="preview" aria-live="polite">
         <svg id="svgPreview" viewBox="0 0 300 300" role="img" aria-label="Medallion preview"></svg>
         <div class="preview-controls">
-          <button id="zoomOut" class="chip zoom-btn" type="button" aria-label="Zoom out"><span class="material-icons">remove</span></button>
+          <button id="zoomOut" class="chip zoom-btn" type="button" aria-label="Zoom out"><span class="material-icons" aria-hidden="true">remove</span></button>
           <span id="zoomLevel" class="subtle" aria-live="polite">100%</span>
-          <button id="zoomIn" class="chip zoom-btn" type="button" aria-label="Zoom in"><span class="material-icons">add</span></button>
-          <button id="rotateBtn" class="chip" type="button"><span class="material-icons">rotate_90_degrees_ccw</span>Rotate</button>
-          <button id="toggleSpin" class="chip" type="button"><span class="material-icons">rotate_right</span>Auto-Rotate</button>
-          <button id="resetView" class="chip" type="button"><span class="material-icons">restart_alt</span>Reset</button>
+          <button id="zoomIn" class="chip zoom-btn" type="button" aria-label="Zoom in"><span class="material-icons" aria-hidden="true">add</span></button>
+          <button id="rotateBtn" class="chip" type="button"><span class="material-icons" aria-hidden="true">rotate_90_degrees_ccw</span>Rotate</button>
+          <button id="toggleSpin" class="chip" type="button" aria-pressed="false"><span class="material-icons" aria-hidden="true">rotate_right</span>Auto-Rotate</button>
+          <button id="resetView" class="chip" type="button"><span class="material-icons" aria-hidden="true">restart_alt</span>Reset</button>
         </div>
       </div>
       <div class="row"><label>Text Preview</label><div id="preview" class="monobox"></div></div>
@@ -226,17 +240,49 @@
   </section>
 </main>
 
-<div id="toast" class="toast" role="status" aria-live="polite"><span class="material-icons">check_circle</span><span id="toastMsg">Done</span></div>
+<!-- Import/Export JSON Modal -->
+<dialog id="jsonModal" aria-labelledby="jsonTitle" aria-modal="true">
+  <div class="modal-head">
+    <strong id="jsonTitle">Import / Export JSON</strong>
+    <button id="closeJson" class="chip" type="button"><span class="material-icons" aria-hidden="true">close</span>Close</button>
+  </div>
+  <div class="modal-body">
+    <textarea id="jsonArea" class="monobox" style="min-height:180px" placeholder='Paste JSON here or edit and click "Apply"'></textarea>
+  </div>
+  <div class="modal-actions">
+    <button id="applyJson" class="btn primary" type="button"><span class="material-icons" aria-hidden="true">check</span>Apply</button>
+    <button id="copyJson" class="btn" type="button"><span class="material-icons" aria-hidden="true">content_copy</span>Copy</button>
+  </div>
+</dialog>
+
+<div id="toast" class="toast" role="status" aria-live="polite"><span class="material-icons" aria-hidden="true">check_circle</span><span id="toastMsg">Done</span></div>
 
 <script>
 /* ===== Utilities ===== */
 const $ = id => document.getElementById(id);
 const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
-const on = (el, ev, fn, opt) => el.addEventListener(ev, fn, opt||{passive:true});
+const on = (el, ev, fn, opt) => el && el.addEventListener(ev, fn, opt||{passive:true});
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const LSKEY_FORM = 'medallion:form:v2';
+const LSKEY_THEME = 'medallion:theme:light';
 function toast(msg, isError=false){ const el=$('toast'); el.classList.toggle('error',!!isError); $('toastMsg').textContent=msg; el.classList.add('show'); setTimeout(()=>el.classList.remove('show'), 2200); }
 
-/* ===== Theme ===== */
-on($('themeToggle'),'click',()=>{const light=document.body.classList.toggle('light-theme'); $('themeToggle').setAttribute('aria-pressed', String(light)); $('themeToggle').querySelector('.material-icons').textContent=light?'light_mode':'dark_mode'; $('themeLabel').textContent=light?'Light':'Dark';});
+/* ===== Theme (persist) ===== */
+(function initTheme(){
+  const stored = localStorage.getItem(LSKEY_THEME);
+  if (stored === '1') document.body.classList.add('light-theme');
+  const light = document.body.classList.contains('light-theme');
+  $('themeToggle').setAttribute('aria-pressed', String(light));
+  $('themeToggle').querySelector('.material-icons').textContent = light ? 'light_mode' : 'dark_mode';
+  $('themeLabel').textContent = light ? 'Light' : 'Dark';
+})();
+on($('themeToggle'),'click',()=>{
+  const light=document.body.classList.toggle('light-theme');
+  localStorage.setItem(LSKEY_THEME, light ? '1' : '0');
+  $('themeToggle').setAttribute('aria-pressed', String(light));
+  $('themeToggle').querySelector('.material-icons').textContent=light?'light_mode':'dark_mode';
+  $('themeLabel').textContent=light?'Light':'Dark';
+});
 
 /* ===== Tabs (ARIA) ===== */
 const tabs=[...document.querySelectorAll('.tab')];
@@ -251,9 +297,11 @@ const presets={
   det_wings:{text_top:"DETROIT JEDI",rim_finish:"polished steel",plate_color:"black",text_colors:"white",state_shape:"medallion field",outline_color:"red/black",main_symbol:"Death Star",symbol_color:"red etched",badge_elements:"concentric rings",secondary_symbol:"",aurebesh_style:"glowing inscriptions",sabers_desc:"three angled beams glow",style_keywords:"sports fusion, symmetrical"},
   jedi_generic:{text_top:"GALACTIC JEDI ORDER",rim_finish:"brushed silver",plate_color:"navy",text_colors:"silver outline",state_shape:"medallion field",outline_color:"white",main_symbol:"Jedi crest",symbol_color:"silver",badge_elements:"imperial ticks",secondary_symbol:"",aurebesh_style:"cyan glow runes",sabers_desc:"single vertical saber glow",style_keywords:"heraldic, luminous"}
 };
-document.querySelectorAll('.profile').forEach(card=>on(card,'click',()=>{const p=presets[card.dataset.profile]; if(p){fillForm(p); toast('Profile loaded');}}));
+document.querySelectorAll('.profile').forEach(card=>on(card,'click',()=>{const p=presets[card.dataset.profile]; if(p){fillForm(p,true); toast('Profile loaded');}}));
 
 /* ===== Form IO ===== */
+const FIELDS = ["text_top","rim_finish","plate_color","text_colors","state_shape","outline_color","main_symbol","symbol_color","badge_elements","secondary_symbol","aurebesh_style","sabers_desc","style_keywords"];
+
 function readForm(){
   const g=id=>(($(id)||{}).value||'').trim();
   return {
@@ -272,6 +320,24 @@ function readForm(){
     style_keywords: g('style_keywords')||"cinematic, heraldic, symmetrical"
   };
 }
+function fillForm(data, andGenerate=false){
+  FIELDS.forEach(k=>{ const el=$(k); if(el && data[k]!==undefined) el.value=data[k]; });
+  if (andGenerate) generate();
+}
+
+/* Autosave debounce */
+let saveT;
+function autosave(){
+  clearTimeout(saveT);
+  saveT = setTimeout(()=>{ try{ localStorage.setItem(LSKEY_FORM, JSON.stringify(readForm())); }catch{} }, 250);
+}
+
+/* Restore autosave on boot (if present) */
+(function restoreAuto(){
+  try{ const raw = localStorage.getItem(LSKEY_FORM); if(raw){ const obj = JSON.parse(raw); fillForm(obj,true); } }catch{}
+})();
+
+/* ===== Prompt Builder ===== */
 function buildPrompt(v){
   return [
     "Cinematic-style medallion pendant design.",
@@ -286,40 +352,46 @@ function buildPrompt(v){
 
 /* ===== SVG Preview ===== */
 let zoom=1, rotation=0, spinning=false;
-function colorPick(key, table, fallback){ key=(key||'').toLowerCase(); for(const [k,v] of table){ if(k && key.includes(k)) return v; } return fallback; }
+
+/* Color resolver with sensible fallbacks */
+function colorPick(key, table, fallback){ 
+  key=(key||'').toLowerCase();
+  for(const [k,v] of table) if(k && key.includes(k)) return v; 
+  return fallback; 
+}
 
 function updateSvg(v){
-  const svg=$('svgPreview'); svg.innerHTML='';
+  const svg=$('svgPreview'); if(!svg) return;
+  svg.innerHTML='';
   const NS='http://www.w3.org/2000/svg';
 
-  const plateFill=colorPick(v.plate_color,[['black','#121316'],['navy','#0b2346'],['crimson','#5c0b12'],['gray','#2a2f3a'],['white','#f3f6f9']], '#121316');
+  const plateFill=colorPick(v.plate_color,[['black','#121316'],['navy','#0b2346'],['crimson','#5c0b12'],['gray','#2a2f3a'],['white','#f3f6f9'],['forest','#0f2c1b']], '#121316');
   const rimColor =colorPick(v.rim_finish ,[['gold','#FFD54A'],['silver','#C0C7CE'],['steel','#B0B7C3'],['bronze','#C18B52'],['obsidian','#000']], '#66d7ff');
   const textFill=colorPick(v.text_colors,[['white','#fff'],['gold','#FFD54A'],['silver','#C0C7CE'],['cyan','#6ee7ff'],['red','#e43b44'],['black','#000']], '#fff');
   const symColor =colorPick(v.symbol_color,[['red','#e43b44'],['silver','#C0C7CE'],['gold','#FFD54A'],['white','#fff'],['blue','#3b6ee4'],['cyan','#6ee7ff']], '#6ee7ff');
 
   const defs=document.createElementNS(NS,'defs'); svg.appendChild(defs);
 
-  // Create filters for glow effects
+  // Subtle glow filters (kept simple for crispness)
   const glow=document.createElementNS(NS,'filter'); glow.id='glow';
-  glow.innerHTML='<feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>'; defs.appendChild(glow);
-  
-  const strongGlow=document.createElementNS(NS,'filter'); strongGlow.id='strongGlow';
-  strongGlow.innerHTML='<feGaussianBlur stdDeviation="5" result="blur"/><feComposite in="SourceGraphic" in2="blur" operator="over"/>'; defs.appendChild(strongGlow);
+  glow.innerHTML='<feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>';
+  defs.appendChild(glow);
 
-  // Create gradients
   const saberGrad=document.createElementNS(NS,'linearGradient'); saberGrad.id='saber';
   saberGrad.setAttribute('x1','0%');saberGrad.setAttribute('y1','0%');saberGrad.setAttribute('x2','100%');saberGrad.setAttribute('y2','0%');
-  saberGrad.innerHTML='<stop offset="0%" stop-color="#fff"/><stop offset="50%" stop-color="#bff3ff"/><stop offset="100%" stop-color="#6ee7ff"/>'; defs.appendChild(saberGrad);
+  saberGrad.innerHTML='<stop offset="0%" stop-color="#fff"/><stop offset="50%" stop-color="#bff3ff"/><stop offset="100%" stop-color="#6ee7ff"/>';
+  defs.appendChild(saberGrad);
 
   const rimGrad=document.createElementNS(NS,'linearGradient'); rimGrad.id='rimGrad';
   rimGrad.setAttribute('x1','0%');rimGrad.setAttribute('y1','0%');rimGrad.setAttribute('x2','100%');rimGrad.setAttribute('y2','100%');
-  rimGrad.innerHTML=`<stop offset="0%" stop-color="${rimColor}"/><stop offset="100%" stop-color="${rimColor}" stop-opacity=".8"/>`; defs.appendChild(rimGrad);
+  rimGrad.innerHTML=`<stop offset="0%" stop-color="${rimColor}"/><stop offset="100%" stop-color="${rimColor}" stop-opacity=".8"/>`;
+  defs.appendChild(rimGrad);
 
   // Arc path for text
   const arc=document.createElementNS(NS,'path'); arc.id='topArc';
   arc.setAttribute('d','M 40 120 A 110 110 0 0 1 260 120'); defs.appendChild(arc);
 
-  // Plate & depth rings
+  // Plate
   const plate=document.createElementNS(NS,'circle');
   plate.setAttribute('cx','150'); plate.setAttribute('cy','150'); plate.setAttribute('r','120');
   plate.setAttribute('fill',plateFill); plate.setAttribute('stroke',rimColor); plate.setAttribute('stroke-width','6'); svg.appendChild(plate);
@@ -352,7 +424,6 @@ function updateSvg(v){
   } else if (ms.includes('imperial')||ms.includes('cog')){
     // Imperial Cog
     const cog=document.createElementNS(NS,'circle'); cog.setAttribute('cx','150'); cog.setAttribute('cy','150'); cog.setAttribute('r','46'); cog.setAttribute('fill',symColor); cog.setAttribute('stroke','#222'); cog.setAttribute('stroke-width','1.2'); g.appendChild(cog);
-    // Add cog teeth
     for(let i=0;i<8;i++){const a=i*45*Math.PI/180, r1=46, r2=58; const x1=150+r1*Math.cos(a), y1=150+r1*Math.sin(a); const x2=150+r2*Math.cos(a), y2=150+r2*Math.sin(a); const ln=document.createElementNS(NS,'line'); ln.setAttribute('x1',x1); ln.setAttribute('y1',y1); ln.setAttribute('x2',x2); ln.setAttribute('y2',y2); ln.setAttribute('stroke',symColor); ln.setAttribute('stroke-width','6'); g.appendChild(ln);}
   } else {
     // Default star
@@ -426,7 +497,6 @@ function updateSvg(v){
       txt.setAttribute('stroke','#000'); txt.setAttribute('stroke-width','1.1'); 
       txt.setAttribute('paint-order','stroke'); 
     }
-    
     const tp=document.createElementNS(NS,'textPath'); 
     tp.setAttribute('href','#topArc'); tp.setAttribute('startOffset','50%'); 
     const raw=v.text_top.length>26?v.text_top.slice(0,25)+'…':v.text_top; 
@@ -437,13 +507,13 @@ function updateSvg(v){
 }
 
 /* ===== Controls / Generate ===== */
-function generate(){ const v=readForm(); $('out').value=buildPrompt(v); $('preview').textContent=$('out').value; updateSvg(v); }
+function generate(){ const v=readForm(); $('out').value=buildPrompt(v); $('preview').textContent=$('out').value; updateSvg(v); autosave(); }
 ['input','change'].forEach(ev=>{ document.querySelectorAll('input,select,textarea').forEach(el=>el.addEventListener(ev, generate, {passive:true})); });
 on($('gen'),'click',generate);
 
-/* Save / Load / Randomize */
+/* Save / Load / Randomize (local preset) */
 on($('saveBtn'),'click',()=>{localStorage.setItem('medallionPreset', JSON.stringify(readForm())); toast('Preset saved');});
-on($('loadBtn'),'click',()=>{const data=localStorage.getItem('medallionPreset'); if(!data) return toast('No saved preset',true); try{fillForm(JSON.parse(data)); toast('Preset loaded');}catch{toast('Load failed',true)};});
+on($('loadBtn'),'click',()=>{const data=localStorage.getItem('medallionPreset'); if(!data) return toast('No saved preset',true); try{fillForm(JSON.parse(data),true); toast('Preset loaded');}catch{toast('Load failed',true)};});
 on($('randBtn'),'click',()=>{const s=a=>a[Math.floor(Math.random()*a.length)]; fillForm({
   text_top:s(["STELLAR JEDI","IMPERIAL ORDER","REBEL ALLIANCE","SITH EMPIRE","CORELLIAN KNIGHTS"]),
   rim_finish:s(["metallic silver","polished gold","brushed steel","obsidian black","antique bronze"]),
@@ -458,14 +528,32 @@ on($('randBtn'),'click',()=>{const s=a=>a[Math.floor(Math.random()*a.length)]; f
   aurebesh_style:s(["glowing Aurebesh along rim","cyan inscriptions","luminous white runes","golden lettering","etched symbols"]),
   sabers_desc:s(["two crossed sabers glow","three angled beams glow","four sabers in X","single vertical saber glow","circle of sabers glow"]),
   style_keywords:s(["cinematic","formal","balanced symmetry","ancient relic","futuristic tech"])
-}); toast('Randomized');});
+}, true); toast('Randomized');});
+
+/* Import / Export JSON (modal) */
+const jsonModal = $('jsonModal');
+on($('exportJsonBtn'),'click',()=>{ $('jsonArea').value = JSON.stringify(readForm(), null, 2); jsonModal.showModal(); });
+on($('importJsonBtn'),'click',()=>{ $('jsonArea').value=''; jsonModal.showModal(); });
+on($('closeJson'),'click',()=>jsonModal.close());
+on($('copyJson'),'click',()=>{ navigator.clipboard?.writeText($('jsonArea').value||'').then(()=>toast('JSON copied')); });
+on($('applyJson'),'click',()=>{ try{ const obj=JSON.parse($('jsonArea').value||'{}'); fillForm(obj,true); jsonModal.close(); toast('JSON applied'); }catch{ toast('Invalid JSON', true); }});
 
 /* Copy / Export (TXT, SVG, PNG) */
 on($('copyBtn'),'click',()=>navigator.clipboard?.writeText($('out').value||'').then(()=>toast('Copied')));
 on($('downloadBtn'),'click',()=>{const blob=new Blob([$('out').value||''],{type:'text/plain'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='medallion_prompt.txt'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),500); toast('TXT downloaded');});
-on($('downloadSvgBtn'),'click',()=>{const svg=$('svgPreview'); if(!svg||!svg.outerHTML) return toast('Nothing to export',true); const xml=`<?xml version="1.0" encoding="UTF-8"?>\n`+svg.outerHTML; const blob=new Blob([xml],{type:'image/svg+xml'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='medallion_preview.svg'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),500); toast('SVG downloaded');});
+on($('downloadSvgBtn'),'click',()=>{const svg=$('svgPreview'); if(!svg||!svg.outerHTML) return toast('Nothing to export',true); 
+  // bake current rotation into exported SVG
+  const rot = rotation%360;
+  const cloned = svg.cloneNode(true);
+  if(rot){
+    const g=document.createElementNS('http://www.w3.org/2000/svg','g');
+    while(cloned.firstChild){ g.appendChild(cloned.firstChild); }
+    g.setAttribute('transform',`rotate(${rot} 150 150)`);
+    cloned.appendChild(g);
+  }
+  const xml=`<?xml version="1.0" encoding="UTF-8"?>\n`+cloned.outerHTML; 
+  const blob=new Blob([xml],{type:'image/svg+xml'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='medallion_preview.svg'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),500); toast('SVG downloaded');});
 on($('downloadPngBtn'),'click',()=>{const svg=$('svgPreview'); if(!svg) return;
-  // clone & bake rotation into export; zoom is a UI thing, export at full res
   const rot = rotation%360;
   const clone = svg.cloneNode(true);
   const g=document.createElementNS('http://www.w3.org/2000/svg','g');
@@ -490,23 +578,32 @@ on($('downloadPngBtn'),'click',()=>{const svg=$('svgPreview'); if(!svg) return;
 });
 
 /* View controls */
-function applyView(){ $('svgPreview').style.transform=`scale(${zoom}) rotate(${rotation}deg)`; $('zoomLevel').textContent=`${Math.round(zoom*100)}%`; }
+function applyView(){ $('svgPreview').style.transform=`scale(${zoom}) rotate(${rotation}deg)`; $('zoomLevel').textContent=`${Math.round(zoom*100)}%`; $('toggleSpin').setAttribute('aria-pressed', String(spinning)); }
 on($('zoomIn'),'click',()=>{zoom=clamp(Math.round((zoom+0.1)*10)/10,0.6,1.8); applyView();});
 on($('zoomOut'),'click',()=>{zoom=clamp(Math.round((zoom-0.1)*10)/10,0.6,1.8); applyView();});
 on($('rotateBtn'),'click',()=>{rotation=(rotation+45)%360; applyView();});
-on($('toggleSpin'),'click',e=>{spinning=!spinning; $('svgPreview').classList.toggle('spinning',spinning); e.currentTarget.querySelector('.material-icons').textContent=spinning?'pause':'rotate_right';});
+on($('toggleSpin'),'click',e=>{spinning=!spinning; $('svgPreview').classList.toggle('spinning',spinning); e.currentTarget.querySelector('.material-icons').textContent=spinning?'pause':'rotate_right'; applyView();});
 on($('resetView'),'click',()=>{zoom=1; rotation=0; spinning=false; $('svgPreview').classList.remove('spinning'); applyView();});
 
 /* Shortcuts */
-addEventListener('keydown',e=>{ if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){ e.preventDefault(); generate(); }
+addEventListener('keydown',e=>{ 
+  if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){ e.preventDefault(); generate(); }
   if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='c' && document.activeElement.id==='out'){ e.preventDefault(); navigator.clipboard?.writeText($('out').value||'').then(()=>toast('Copied')); }
 },{passive:true});
 
-/* Helpers */
-function fillForm(data){ for(const [k,v] of Object.entries(data)){ const el=$(k); if(el) el.value=v; } generate(); }
+/* Boot helpers */
+function ensureFirstGenerate(){
+  // ensure something is drawn even if restoreAuto found nothing
+  if(!$('out').value.trim()){ fillForm(presets.fl_army,true); }
+}
 
 /* Boot */
-(function boot(){ fillForm(presets.fl_army); })();
+(function boot(){ 
+  // wire form listeners for autosave
+  FIELDS.forEach(id=>{ const el=$(id); if(el){ el.addEventListener('input', autosave, {passive:true}); el.addEventListener('change', autosave, {passive:true}); } });
+  ensureFirstGenerate();
+  applyView();
+})();
 </script>
 </body>
 </html>
