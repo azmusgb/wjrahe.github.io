@@ -1187,150 +1187,266 @@ function generate(){
   $('out').value = txt;
   $('preview').innerHTML = "<span class='glow aurebesh'>" + txt + "</span>";
   
-  // Update SVG preview
-  updateSvgPreview(v);
-  
-  // Easter egg: Order 66
-  if(v.text_top.toLowerCase().includes("order 66")){
-    $('preview').style.color = "red";
-    $('preview').style.textShadow = "0 0 12px red";
-    document.body.style.animation = "pulse 0.5s infinite";
-    
-    // Add emergency alert style
-    setTimeout(() => {
-      document.body.style.animation = "";
-    }, 2000);
-  } else {
-    $('preview').style.color = "";
-    $('preview').style.textShadow = "";
+// SVG Preview Generation — hardened, ID-safe, defs-first, tolerant parsing
+function updateSvgPreview(values) {
+  const svg = $('svgPreview');
+  if (!svg) return;
+  svg.innerHTML = '';
+
+  // Safe lowercase parsing to make "includes" robust
+  const lc = s => (s || '').toString().toLowerCase();
+
+  // Resolve colors
+  const plateKey = lc(values.plate_color);
+  const rimKey   = lc(values.rim_finish);
+  const symKey   = lc(values.symbol_color);
+  const textKey  = lc(values.text_colors);
+  const badgeKey = lc(values.badge_elements);
+  const saberKey = lc(values.sabers_desc);
+  const aureKey  = lc(values.aurebesh_style);
+  const mainKey  = lc(values.main_symbol);
+
+  const pick = (key, table, fallback) => {
+    for (const [k, v] of table) if (key.includes(k)) return v;
+    return fallback;
+  };
+
+  const plateColor = pick(plateKey, [
+    ['black', '#111'], ['navy', '#001f3f'], ['crimson', '#900'],
+    ['gray', '#333'], ['grey', '#333'], ['green', '#063']
+  ], '#111');
+
+  const rimColor = pick(rimKey, [
+    ['gold', '#FFD700'], ['silver', '#C0C0C0'], ['bronze', '#CD7F32'],
+    ['obsidian', '#000'], ['steel', '#B0B7C3']
+  ], '#6ee7ff');
+
+  const symbolColor = pick(symKey, [
+    ['red', '#ff4444'], ['blue', '#4444ff'], ['green', '#44ff44'],
+    ['gold', '#FFD700'], ['silver', '#C0C0C0'], ['white', '#ffffff'],
+    ['etched', '#C0C0C0']
+  ], '#6ee7ff');
+
+  // Namespace + <defs> first
+  const NS = 'http://www.w3.org/2000/svg';
+  const defs = document.createElementNS(NS, 'defs');
+  svg.appendChild(defs);
+
+  // Always ensure a reusable glow filter exists before anything references it
+  const glowFilter = document.createElementNS(NS, 'filter');
+  glowFilter.setAttribute('id', 'glow');
+  glowFilter.setAttribute('x', '-50%');
+  glowFilter.setAttribute('y', '-50%');
+  glowFilter.setAttribute('width', '200%');
+  glowFilter.setAttribute('height', '200%');
+
+  const blur = document.createElementNS(NS, 'feGaussianBlur');
+  blur.setAttribute('stdDeviation', '3.5');
+  blur.setAttribute('result', 'coloredBlur');
+
+  const merge = document.createElementNS(NS, 'feMerge');
+  const mn1 = document.createElementNS(NS, 'feMergeNode');
+  mn1.setAttribute('in', 'coloredBlur');
+  const mn2 = document.createElementNS(NS, 'feMergeNode');
+  mn2.setAttribute('in', 'SourceGraphic');
+  merge.appendChild(mn1); merge.appendChild(mn2);
+
+  glowFilter.appendChild(blur);
+  glowFilter.appendChild(merge);
+  defs.appendChild(glowFilter);
+
+  // Rim gradient
+  const rimGradient = document.createElementNS(NS, 'linearGradient');
+  rimGradient.setAttribute('id', 'rimGradient');
+  rimGradient.setAttribute('x1', '0%');
+  rimGradient.setAttribute('y1', '0%');
+  rimGradient.setAttribute('x2', '100%');
+  rimGradient.setAttribute('y2', '100%');
+
+  const stop1 = document.createElementNS(NS, 'stop');
+  stop1.setAttribute('offset', '0%');
+  stop1.setAttribute('stop-color', rimColor);
+  const stop2 = document.createElementNS(NS, 'stop');
+  stop2.setAttribute('offset', '100%');
+  stop2.setAttribute('stop-color', rimColor === '#6ee7ff' ? '#22d3ee' : rimColor);
+  stop2.setAttribute('stop-opacity', '0.85');
+
+  rimGradient.appendChild(stop1);
+  rimGradient.appendChild(stop2);
+  defs.appendChild(rimGradient);
+
+  try {
+    // Plate
+    const plate = document.createElementNS(NS, 'circle');
+    plate.setAttribute('cx', '100');
+    plate.setAttribute('cy', '100');
+    plate.setAttribute('r',  '90');
+    plate.setAttribute('fill', plateColor);
+    plate.setAttribute('stroke', rimColor);
+    plate.setAttribute('stroke-width', '5');
+    svg.appendChild(plate);
+
+    // Outer rim
+    const rim = document.createElementNS(NS, 'circle');
+    rim.setAttribute('cx', '100');
+    rim.setAttribute('cy', '100');
+    rim.setAttribute('r',  '95');
+    rim.setAttribute('fill', 'none');
+    rim.setAttribute('stroke', 'url(#rimGradient)');
+    rim.setAttribute('stroke-width', '3');
+    svg.appendChild(rim);
+
+    // Badge rings
+    if (badgeKey.includes('ring')) {
+      for (let i = 0; i < 3; i++) {
+        const ring = document.createElementNS(NS, 'circle');
+        ring.setAttribute('cx', '100');
+        ring.setAttribute('cy', '100');
+        ring.setAttribute('r', String(70 - i * 15));
+        ring.setAttribute('fill', 'none');
+        ring.setAttribute('stroke', rimColor);
+        ring.setAttribute('stroke-width', '1');
+        if (i === 1) ring.setAttribute('stroke-dasharray', '5,5');
+        svg.appendChild(ring);
+      }
+    }
+
+    // Main symbol (very simple abstractions, not literal brand shapes)
+    const symbol = document.createElementNS(NS, 'path');
+    if (mainKey.includes('death star')) {
+      // Round-ish panel with a trench and dish box
+      symbol.setAttribute('d',
+        'M 70 70 Q 100 50 130 70 Q 145 100 130 130 Q 100 150 70 130 Q 55 100 70 70 Z ' + // body
+        'M 80 100 L 120 100' // trench hint
+      );
+      symbol.setAttribute('stroke', '#222');
+      symbol.setAttribute('stroke-width', '1.5');
+      symbol.setAttribute('fill', symbolColor);
+      svg.appendChild(symbol);
+
+      const dish = document.createElementNS(NS, 'rect');
+      dish.setAttribute('x', '92'); dish.setAttribute('y', '92');
+      dish.setAttribute('width', '16'); dish.setAttribute('height', '16');
+      dish.setAttribute('fill', '#111');
+      dish.setAttribute('stroke', '#444');
+      dish.setAttribute('stroke-width', '1');
+      svg.appendChild(dish);
+    } else if (mainKey.includes('jedi')) {
+      symbol.setAttribute('d', 'M 80 70 L 100 50 L 120 70 L 120 100 L 100 120 L 80 100 Z');
+      symbol.setAttribute('fill', symbolColor);
+      svg.appendChild(symbol);
+    } else if (mainKey.includes('imperial')) {
+      symbol.setAttribute('d', 'M 70 70 L 100 50 L 130 70 L 130 100 L 100 130 L 70 100 Z');
+      symbol.setAttribute('fill', symbolColor);
+      svg.appendChild(symbol);
+    } else {
+      // default star
+      symbol.setAttribute('d', 'M100,40 L110,60 L130,65 L115,80 L120,100 L100,90 L80,100 L85,80 L70,65 L90,60 Z');
+      symbol.setAttribute('fill', symbolColor);
+      svg.appendChild(symbol);
+    }
+
+    // Optional secondary symbol (generic dot)
+    if ((values.secondary_symbol || '').trim()) {
+      const sec = document.createElementNS(NS, 'circle');
+      sec.setAttribute('cx', '140');
+      sec.setAttribute('cy', '60');
+      sec.setAttribute('r',  '8');
+      sec.setAttribute('fill', symbolColor);
+      svg.appendChild(sec);
+    }
+
+    // Top arc text (simple straight baseline for now)
+    if ((values.text_top || '').trim()) {
+      const text = document.createElementNS(NS, 'text');
+      text.setAttribute('x', '100');
+      text.setAttribute('y', '40');
+      text.setAttribute('text-anchor', 'middle');
+      text.setAttribute('font-size', '10');
+      text.setAttribute('font-weight', '700');
+      text.setAttribute('font-family', 'Arial, sans-serif');
+
+      const fill = pick(textKey, [
+        ['white', '#ffffff'], ['gold', '#FFD700'], ['silver', '#C0C0C0'],
+        ['cyan', '#6ee7ff'], ['red', '#ff4444']
+      ], '#ffffff');
+      text.setAttribute('fill', fill);
+
+      if (textKey.includes('outline')) {
+        text.setAttribute('stroke', '#000');
+        text.setAttribute('stroke-width', '0.5');
+      }
+      if (textKey.includes('glow')) {
+        text.setAttribute('filter', 'url(#glow)');
+      }
+
+      const raw = values.text_top.toString();
+      text.textContent = raw.length > 18 ? raw.slice(0, 17) + '…' : raw;
+      svg.appendChild(text);
+    }
+
+    // Lightsabers
+    if (saberKey.includes('cross') || saberKey.includes('x')) {
+      const mkSaber = (x1, y1, x2, y2) => {
+        const l = document.createElementNS(NS, 'line');
+        l.setAttribute('x1', x1); l.setAttribute('y1', y1);
+        l.setAttribute('x2', x2); l.setAttribute('y2', y2);
+        l.setAttribute('stroke', '#6ee7ff');
+        l.setAttribute('stroke-width', '2');
+        if (saberKey.includes('glow')) l.setAttribute('filter', 'url(#glow)');
+        svg.appendChild(l);
+      };
+      mkSaber(60, 60, 140, 140);
+      mkSaber(140, 60, 60, 140);
+    } else if (saberKey.includes('three')) {
+      const positions = [[60,125, 140,125],[80,140, 120,80],[120,140, 80,80]];
+      positions.forEach(p => {
+        const l = document.createElementNS(NS, 'line');
+        l.setAttribute('x1', p[0]); l.setAttribute('y1', p[1]);
+        l.setAttribute('x2', p[2]); l.setAttribute('y2', p[3]);
+        l.setAttribute('stroke', '#6ee7ff');
+        l.setAttribute('stroke-width', '2');
+        if (saberKey.includes('glow')) l.setAttribute('filter', 'url(#glow)');
+        svg.appendChild(l);
+      });
+    }
+
+    // Aurebesh rim glow + ticks
+    if (aureKey.includes('glow') || aureKey.includes('inscription') || aureKey.includes('rune')) {
+      const glow = document.createElementNS(NS, 'circle');
+      glow.setAttribute('cx', '100');
+      glow.setAttribute('cy', '100');
+      glow.setAttribute('r',  '85');
+      glow.setAttribute('fill', 'none');
+      glow.setAttribute('stroke', '#6ee7ff');
+      glow.setAttribute('stroke-width', '1');
+      glow.setAttribute('stroke-dasharray', '5,5');
+      glow.setAttribute('opacity', '0.7');
+      glow.setAttribute('filter', 'url(#glow)');
+      svg.appendChild(glow);
+
+      for (let i = 0; i < 12; i++) {
+        const angle = (i * 30) * Math.PI / 180;
+        const x = 100 + 75 * Math.cos(angle);
+        const y = 100 + 75 * Math.sin(angle);
+
+        const char = document.createElementNS(NS, 'text');
+        char.setAttribute('x', x);
+        char.setAttribute('y', y);
+        char.setAttribute('text-anchor', 'middle');
+        char.setAttribute('fill', '#6ee7ff');
+        char.setAttribute('font-size', '6');
+        char.setAttribute('font-family', 'Aurebesh, sans-serif');
+        char.setAttribute('transform', `rotate(${i * 30 + 90}, ${x}, ${y})`);
+        char.textContent = '⦿';
+        svg.appendChild(char);
+      }
+    }
+  } catch (err) {
+    console.error('SVG preview error:', err);
+    showToast('SVG preview failed. See console.', 'error');
   }
 }
-
-['input','change'].forEach(ev => {
-  document.querySelectorAll('input').forEach(inp => inp.addEventListener(ev, generate));
-});
-
-// Keyboard shortcuts
-document.addEventListener('keydown', (e) => {
-  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-    e.preventDefault();
-    generate();
-  }
-  if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
-    if (document.activeElement.id === 'out') {
-      e.preventDefault();
-      $('out').select();
-      document.execCommand('copy');
-      showToast('Copied to clipboard!');
-    }
-  }
-});
-
-$('gen').addEventListener('click', generate);
-
-$('copyBtn').addEventListener('click', () => {
-  $('out').select();
-  document.execCommand('copy');
-  showToast('Copied to clipboard!');
-});
-
-$('downloadBtn').addEventListener('click', () => {
-  const blob = new Blob([$('out').value || ""], {type: 'text/plain'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'medallion_prompt.txt';
-  a.click();
-  URL.revokeObjectURL(a.href);
-  showToast('Download started!');
-});
-
-$('saveBtn').addEventListener('click', () => {
-  localStorage.setItem('medallionPreset', JSON.stringify(readForm()));
-  showToast('Preset saved locally!');
-});
-
-$('loadBtn').addEventListener('click', () => {
-  const data = localStorage.getItem('medallionPreset');
-  if (data) {
-    const d = JSON.parse(data);
-    for (const [k, v] of Object.entries(d)) {
-      if ($(k)) $(k).value = v;
-    }
-    generate();
-    showToast('Preset loaded!');
-  } else {
-    showToast('No saved preset found!', 'error');
-  }
-});
-
-// Randomizer
-const sample = arr => arr[Math.floor(Math.random() * arr.length)];
-$('randBtn').addEventListener('click', () => {
-  $('text_top').value = sample(["STELLAR JEDI", "IMPERIAL ORDER", "GALACTIC KNIGHTS", "REBEL ALLIANCE", "SITH EMPIRE"]);
-  $('rim_finish').value = sample(["metallic silver", "brushed steel", "ancient bronze", "obsidian black", "polished gold"]);
-  $('plate_color').value = sample(["black", "navy", "crimson", "deep gray", "forest green"]);
-  $('text_colors').value = sample(["white w/ black outline", "gold fill", "glowing cyan", "silver embossed", "red on black"]);
-  $('state_shape').value = sample(["Death Star silhouette", "state of Florida", "planet outline", "Imperial cog", "Rebel crest"]);
-  $('outline_color').value = sample(["silver", "white", "red glow", "gold trim", "blue neon"]);
-  $('main_symbol').value = sample(["Death Star", "Jedi crest", "Imperial cog", "Millennium Falcon", "Lightsaber"]);
-  $('symbol_color').value = sample(["etched silver", "red + black detail", "glowing white", "gold leaf", "blue crystal"]);
-  $('badge_elements').value = sample(["rings", "spokes", "insignia ticks", "binary stars", "orbital lines"]);
-  $('secondary_symbol').value = sample(["Army star", "none", "Jedi logo", "TIE fighter", "droid outline"]);
-  $('aurebesh_style').value = sample(["glowing rim text", "cyan inscriptions", "luminous white runes", "golden lettering", "etched symbols"]);
-  $('sabers_desc').value = sample(["two crossed sabers", "three angled beams", "four sabers in X", "single vertical saber", "circle of sabers"]);
-  $('style_keywords').value = sample(["cinematic", "formal", "balanced symmetry", "ancient relic", "futuristic tech"]);
-  generate();
-  showToast('Randomized settings applied!');
-});
-
-// Presets
-const presets = {
-  fl_army: {
-    text_top: "SAINT CLOUD JEDI",
-    rim_finish: "metallic silver",
-    plate_color: "black",
-    text_colors: "white with black outline",
-    state_shape: "state of Florida",
-    outline_color: "white",
-    main_symbol: "Death Star",
-    symbol_color: "red + black detail",
-    badge_elements: "rings",
-    secondary_symbol: "Army star emblem",
-    aurebesh_style: "glowing Aurebesh",
-    sabers_desc: "two crossed sabers",
-    style_keywords: "cinematic heraldic"
-  },
-  det_wings: {
-    text_top: "DETROIT JEDI",
-    rim_finish: "polished steel",
-    plate_color: "black",
-    text_colors: "white",
-    state_shape: "Red Wings wheel",
-    outline_color: "red/black",
-    main_symbol: "Death Star",
-    symbol_color: "red etched",
-    badge_elements: "rings",
-    secondary_symbol: "",
-    aurebesh_style: "glowing inscriptions",
-    sabers_desc: "three beams",
-    style_keywords: "sports fusion"
-  },
-  jedi_generic: {
-    text_top: "GALACTIC JEDI ORDER",
-    rim_finish: "brushed silver",
-    plate_color: "navy",
-    text_colors: "silver outline",
-    state_shape: "medallion field",
-    outline_color: "white",
-    main_symbol: "Death Star",
-    symbol_color: "silver rings",
-    badge_elements: "imperial ticks",
-    secondary_symbol: "Jedi crest",
-    aurebesh_style: "cyan glow",
-    sabers_desc: "four sabers",
-    style_keywords: "heraldic glowing"
-  }
-};
 
 document.querySelectorAll('[data-preset]').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -1343,11 +1459,24 @@ document.querySelectorAll('[data-preset]').forEach(btn => {
   });
 });
 
-// Auto-generate default
+// Auto-generate default (safe)
 window.addEventListener('DOMContentLoaded', () => {
-  document.querySelector('[data-preset="fl_army"]').click();
-  // Add animation for the preview
-  document.styleSheets[0].addRule('@keyframes pulse', '{0% {opacity: 1;} 50% {opacity: 0.7;} 100% {opacity: 1;}}');
+  // Inject runtime @keyframes safely (avoid CSSOM CORS issues)
+  const rt = document.createElement('style');
+  rt.id = 'runtime-styles';
+  rt.textContent = `
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.7; }
+      100% { opacity: 1; }
+    }
+  `;
+  document.head.appendChild(rt);
+
+  // Trigger initial preset + generate
+  const btn = document.querySelector('[data-preset="fl_army"]');
+  if (btn) btn.click(); else generate();
+});
 });
 </script>
 </body>
