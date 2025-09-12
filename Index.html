@@ -1,1 +1,960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Medallion Prompt Builder — Ultimate Edition</title>
 
+<!-- Aurebesh Font -->
+<link href="https://fonts.cdnfonts.com/css/aurebesh" rel="stylesheet">
+<!-- Google Fonts for UI -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg: #0b0d13;
+    --panel: #151923;
+    --ink: #e8ecf1;
+    --muted: #9aa3af;
+    --accent: #6ee7ff;
+    --accent-glow: rgba(110, 231, 255, 0.5);
+    --line: #252b39;
+    --success: #4ade80;
+    --warning: #fbbf24;
+    --danger: #f87171;
+    --mono: "JetBrains Mono", "Fira Code", ui-monospace, Menlo, Consolas, monospace;
+    --sans: Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
+    --aurebesh: 'Aurebesh', var(--sans);
+  }
+  
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  
+  body {
+    margin: 0;
+    font: 14px/1.45 var(--sans);
+    color: var(--ink);
+    background: var(--bg);
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+  
+  header {
+    padding: 18px 20px;
+    border-bottom: 1px solid var(--line);
+    background: rgba(16, 20, 32, 0.9);
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    backdrop-filter: blur(6px);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  header h1 {
+    margin: 0;
+    font-size: 18px;
+    letter-spacing: .3px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .logo {
+    width: 28px;
+    height: 28px;
+    background: linear-gradient(135deg, #6ee7ff 0%, #6476ff 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+  }
+  
+  .theme-toggle {
+    background: none;
+    border: 1px solid var(--line);
+    color: var(--muted);
+    border-radius: 8px;
+    padding: 6px 10px;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  
+  .theme-toggle:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  
+  .wrap {
+    max-width: 1200px;
+    margin: 24px auto;
+    padding: 0 16px;
+    display: grid;
+    gap: 24px;
+    grid-template-columns: 1fr 1fr;
+    position: relative;
+    z-index: 1;
+  }
+  
+  .card {
+    background: rgba(21, 25, 35, 0.95);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 20px;
+    backdrop-filter: blur(4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
+  }
+  
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  
+  .row {
+    display: grid;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  
+  label {
+    font-weight: 600;
+    color: #cfd6e4;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  
+  .label-icon {
+    color: var(--accent);
+  }
+  
+  input, textarea, select {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid #2a3142;
+    background: #0f141f;
+    color: var(--ink);
+    outline: none;
+    transition: all 0.3s;
+    font-family: var(--sans);
+  }
+  
+  input:focus, textarea:focus, select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+  }
+  
+  textarea {
+    min-height: 220px;
+    resize: vertical;
+    font: 13px/1.5 var(--mono);
+  }
+  
+  .muted {
+    color: var(--muted);
+    font-size: 12px;
+  }
+  
+  .btns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 16px;
+  }
+  
+  button, .chip {
+    cursor: pointer;
+    border: 1px solid #2a3142;
+    color: var(--ink);
+    background: #0f141f;
+    border-radius: 10px;
+    padding: 10px 14px;
+    transition: all 0.3s;
+    font-family: var(--sans);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  
+  button:hover, .chip:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    box-shadow: 0 0 12px var(--accent-glow);
+  }
+  
+  button.primary {
+    background: linear-gradient(90deg, #22d3ee, #6476ff);
+    border: none;
+    font-weight: 700;
+    color: white;
+    box-shadow: 0 0 12px rgba(100, 118, 255, 0.6);
+  }
+  
+  button.primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(100, 118, 255, 0.7);
+  }
+  
+  .chip {
+    font-size: 12px;
+    padding: 8px 12px;
+  }
+  
+  .monobox {
+    font: 12.5px/1.55 var(--mono);
+    white-space: pre-wrap;
+    background: #0e131d;
+    border: 1px dashed #2d364a;
+    border-radius: 12px;
+    padding: 16px;
+    min-height: 140px;
+    overflow: auto;
+    max-height: 200px;
+  }
+  
+  .split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  
+  .tiny {
+    font-size: 11.5px;
+  }
+  
+  .kbd {
+    font: 11px var(--mono);
+    background: #0e131d;
+    border: 1px solid #2a3142;
+    border-radius: 6px;
+    padding: 2px 6px;
+  }
+  
+  .pill {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #22d3ee, #6476ff);
+    color: white;
+    font-weight: 600;
+    font-size: 10px;
+    letter-spacing: 0.5px;
+  }
+  
+  footer {
+    max-width: 1200px;
+    margin: 24px auto 36px;
+    color: var(--muted);
+    padding: 0 16px;
+    position: relative;
+    z-index: 1;
+    text-align: center;
+  }
+  
+  .glow {
+    color: #6ee7ff;
+    text-shadow: 0 0 6px #6ee7ff, 0 0 12px #22d3ee;
+  }
+  
+  .aurebesh {
+    font-family: var(--aurebesh);
+    letter-spacing: 2px;
+  }
+  
+  canvas#stars {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    background: linear-gradient(135deg, #05070d 0%, #0b0d13 100%);
+  }
+  
+  /* Toast notifications */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transform: translateY(100px);
+    opacity: 0;
+    transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    z-index: 1000;
+  }
+  
+  .toast.show {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  
+  .toast.success {
+    border-left: 4px solid var(--success);
+  }
+  
+  .toast.error {
+    border-left: 4px solid var(--danger);
+  }
+  
+  .toast-icon {
+    font-size: 18px;
+  }
+  
+  .toast.success .toast-icon {
+    color: var(--success);
+  }
+  
+  .toast.error .toast-icon {
+    color: var(--danger);
+  }
+  
+  /* SVG Preview Styles */
+  .preview-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    margin: 16px 0;
+  }
+  
+  #svgPreview {
+    width: 280px;
+    height: 280px;
+    border-radius: 50%;
+    background: #1a1f2e;
+    box-shadow: 0 0 20px rgba(110, 231, 255, 0.2);
+    transition: all 0.5s;
+  }
+  
+  .preview-controls {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .preview-zoom {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .zoom-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  
+  .zoom-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  
+  /* Tooltips */
+  .tooltip {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .tooltip .tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    background-color: var(--panel);
+    color: var(--ink);
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -60px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 12px;
+    border: 1px solid var(--line);
+  }
+  
+  .tooltip .tooltiptext::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: var(--panel) transparent transparent transparent;
+  }
+  
+  .tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 900px) {
+    .wrap {
+      grid-template-columns: 1fr;
+    }
+    
+    .grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+</head>
+<body>
+<canvas id="stars"></canvas>
+
+<header>
+  <h1>
+    <span class="logo">⚔️</span>
+    Medallion Prompt Builder <span class="pill">Ultimate Edition</span>
+  </h1>
+  <button class="theme-toggle" id="themeToggle">🌙 Dark</button>
+</header>
+
+<div class="wrap">
+  <!-- LEFT: FORM -->
+  <section class="card">
+    <div class="btns">
+      <span class="muted">Presets:</span>
+      <button class="chip" data-preset="fl_army">
+        <span class="tooltip">🏛️ Florida + Army
+          <span class="tooltiptext">Florida theme with Army elements</span>
+        </span>
+      </button>
+      <button class="chip" data-preset="det_wings">
+        <span class="tooltip">🏒 Detroit + Wings
+          <span class="tooltiptext">Detroit theme with Red Wings</span>
+        </span>
+      </button>
+      <button class="chip" data-preset="jedi_generic">
+        <span class="tooltip">✨ Generic Jedi
+          <span class="tooltiptext">Generic Jedi theme</span>
+        </span>
+      </button>
+      <button class="chip" id="randBtn">
+        <span class="tooltip">🎲 Randomize
+          <span class="tooltiptext">Generate random settings</span>
+        </span>
+      </button>
+    </div>
+
+    <div class="grid">
+      <div class="row">
+        <label><span class="label-icon">🔤</span>Top Text</label>
+        <input id="text_top" placeholder="e.g., SAINT CLOUD JEDI" />
+      </div>
+      <div class="row">
+        <label><span class="label-icon">⭕</span>Rim Finish</label>
+        <input id="rim_finish" placeholder="e.g., metallic silver" />
+      </div>
+      <div class="row">
+        <label><span class="label-icon">🎨</span>Plate Color</label>
+        <input id="plate_color" placeholder="e.g., black" />
+      </div>
+      <div class="row">
+        <label><span class="label-icon">✏️</span>Text Fill / Outline</label>
+        <input id="text_colors" placeholder="e.g., white with black outline" />
+      </div>
+      <div class="row">
+        <label><span class="label-icon">🔲</span>Main Outline</label>
+        <input id="state_shape" placeholder="e.g., state of Florida" />
+      </div>
+      <div class="row">
+        <label><span class="label-icon">🌈</span>Outline Color</label>
+        <input id="outline_color" placeholder="e.g., white" />
+      </div>
+      <div class="row">
+        <label><span class="label-icon">⭐</span>Main Symbol</label>
+        <input id="main_symbol" placeholder="e.g., Death Star" />
+      </div>
+      <div class="row">
+        <label><span class="label-icon">🎨</span>Symbol Color</label>
+        <input id="symbol_color" placeholder="e.g., red with etched lines" />
+      </div>
+      <div class="row">
+        <label><span class="label-icon">🔰</span>Badge Elements</label>
+        <input id="badge_elements" placeholder="e.g., concentric rings" />
+      </div>
+      <div class="row">
+        <label><span class="label-icon">🔷</span>Secondary Symbol</label>
+        <input id="secondary_symbol" placeholder="e.g., Army star (optional)" />
+      </div>
+      <div class="row">
+        <label><span class="label-icon">🔣</span>Aurebesh Style</label>
+        <input id="aurebesh_style" placeholder="e.g., glowing Aurebesh along rim" />
+      </div>
+      <div class="row">
+        <label><span class="label-icon">⚔️</span>Lightsabers</label>
+        <input id="sabers_desc" placeholder="e.g., two crossed sabers" />
+      </div>
+    </div>
+
+    <div class="row">
+      <label><span class="label-icon">✨</span>Style Keywords</label>
+      <input id="style_keywords" placeholder="e.g., cinematic, heraldic, symmetrical" />
+    </div>
+
+    <div class="btns">
+      <button class="primary" id="gen">
+        <span>⚡</span> Generate
+      </button>
+      <button id="copyBtn">
+        <span>📋</span> Copy
+      </button>
+      <button id="downloadBtn">
+        <span>💾</span> Download
+      </button>
+      <button id="saveBtn">
+        <span>➕</span> Save Preset
+      </button>
+      <button id="loadBtn">
+        <span>📂</span> Load Preset
+      </button>
+    </div>
+  </section>
+
+  <!-- RIGHT: OUTPUT -->
+  <section class="card">
+    <label><span class="label-icon">📝</span>Generated Prompt</label>
+    <textarea id="out" spellcheck="false"></textarea>
+
+    <div class="preview-container">
+      <label><span class="label-icon">👁️</span>Live SVG Preview</label>
+      <svg id="svgPreview" viewBox="0 0 200 200"></svg>
+      <div class="preview-controls">
+        <div class="preview-zoom">
+          <button class="zoom-btn" id="zoomOut">➖</button>
+          <span class="muted">Zoom</span>
+          <button class="zoom-btn" id="zoomIn">➕</button>
+        </div>
+        <button id="rotateBtn" class="chip">🔄 Rotate</button>
+      </div>
+    </div>
+
+    <div class="row">
+      <label><span class="label-icon">🔍</span>Text Preview</label>
+      <div id="preview" class="monobox"></div>
+      <div class="tiny muted">Preview updates as you type. Aurebesh renders glowing inscriptions.</div>
+    </div>
+
+    <div class="split">
+      <div>
+        <label class="muted">💡 Tips</label>
+        <div class="tiny">• Use clear descriptors.<br/>• Combine color + finish.<br/>• Avoid contradictions.<br/>• Favor high contrast.</div>
+      </div>
+      <div>
+        <label class="muted">⌨️ Shortcuts</label>
+        <div class="tiny">Generate: <span class="kbd">Ctrl/⌘+Enter</span><br/>Copy: <span class="kbd">Ctrl/⌘+C</span></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<footer>
+  <div class="tiny">Ultimate Edition adds SVG preview, enhanced UI, toast notifications, and more interactive elements.</div>
+</footer>
+
+<script>
+// === Starfield Background ===
+const canvas = document.getElementById("stars"), ctx = canvas.getContext("2d");
+let stars = [];
+function resize(){canvas.width=innerWidth;canvas.height=innerHeight}
+window.addEventListener("resize",resize);resize();
+function initStars(){stars=[];for(let i=0;i<200;i++){stars.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*2+1,s:Math.random()*0.5+0.2})}}
+function animate(){ctx.clearRect(0,0,canvas.width,canvas.height);ctx.fillStyle="white";stars.forEach(star=>{ctx.beginPath();ctx.arc(star.x,star.y,star.r,0,2*Math.PI);ctx.fill();star.y+=star.s;if(star.y>canvas.height)star.y=0});requestAnimationFrame(animate)}
+initStars();animate();
+
+// === Core Logic ===
+const $ = id => document.getElementById(id);
+
+// Toast notification system
+function showToast(message, type = 'success') {
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.innerHTML = `
+    <span class="toast-icon">${type === 'success' ? '✅' : '❌'}</span>
+    <span>${message}</span>
+  `;
+  
+  document.body.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.classList.add('show');
+  }, 10);
+  
+  setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => {
+      document.body.removeChild(toast);
+    }, 500);
+  }, 3000);
+}
+
+// Theme toggle
+$('themeToggle').addEventListener('click', () => {
+  const isDark = document.body.classList.toggle('light-theme');
+  $('themeToggle').textContent = isDark ? '☀️ Light' : '🌙 Dark';
+  // Note: For a full theme implementation, you would need to define the light-theme styles
+});
+
+function buildPrompt(v) {
+  return [
+    "Cinematic-style medallion pendant design.",
+    "• Shape & Base: Round pendant, " + v.rim_finish + ", plate in " + v.plate_color + ".",
+    "• Text: Raised lettering “" + v.text_top + "” in " + v.text_colors + ".",
+    "• Central Motif: " + v.state_shape + " in " + v.outline_color + " with " + v.main_symbol + " (" + v.symbol_color + "). Elements: " + v.badge_elements + (v.secondary_symbol ? (". Secondary: " + v.secondary_symbol) : "") + ".",
+    "• Aurebesh: " + v.aurebesh_style + ".",
+    "• Lightsabers: " + v.sabers_desc + ".",
+    "• Style: " + v.style_keywords + "."
+  ].join("\\n");
+}
+
+function readForm() {
+  return {
+    text_top: $('text_top').value.trim() || "SAINT CLOUD JEDI",
+    rim_finish: $('rim_finish').value.trim() || "metallic silver",
+    plate_color: $('plate_color').value.trim() || "black",
+    text_colors: $('text_colors').value.trim() || "white with black outline",
+    state_shape: $('state_shape').value.trim() || "state of Florida",
+    outline_color: $('outline_color').value.trim() || "white",
+    main_symbol: $('main_symbol').value.trim() || "Death Star",
+    symbol_color: $('symbol_color').value.trim() || "red with etched lines",
+    badge_elements: $('badge_elements').value.trim() || "concentric rings",
+    secondary_symbol: $('secondary_symbol').value.trim(),
+    aurebesh_style: $('aurebesh_style').value.trim() || "glowing Aurebesh along rim",
+    sabers_desc: $('sabers_desc').value.trim() || "two crossed sabers",
+    style_keywords: $('style_keywords').value.trim() || "cinematic, heraldic, symmetrical"
+  };
+}
+
+// SVG Preview Generation
+function updateSvgPreview(values) {
+  const svg = $('svgPreview');
+  svg.innerHTML = '';
+  
+  // Extract colors from values for dynamic theming
+  const plateColor = values.plate_color || 'black';
+  const rimColor = values.rim_finish.includes('gold') ? '#FFD700' : 
+                   values.rim_finish.includes('silver') ? '#C0C0C0' : 
+                   values.rim_finish.includes('bronze') ? '#CD7F32' : '#6ee7ff';
+  
+  const symbolColor = values.symbol_color.includes('red') ? '#ff4444' :
+                     values.symbol_color.includes('blue') ? '#4444ff' :
+                     values.symbol_color.includes('green') ? '#44ff44' :
+                     '#6ee7ff';
+  
+  // Create SVG elements
+  const namespace = "http://www.w3.org/2000/svg";
+  
+  // Background circle (plate)
+  const plate = document.createElementNS(namespace, "circle");
+  plate.setAttribute("cx", "100");
+  plate.setAttribute("cy", "100");
+  plate.setAttribute("r", "90");
+  plate.setAttribute("fill", plateColor);
+  plate.setAttribute("stroke", rimColor);
+  plate.setAttribute("stroke-width", "5");
+  svg.appendChild(plate);
+  
+  // Rim
+  const rim = document.createElementNS(namespace, "circle");
+  rim.setAttribute("cx", "100");
+  rim.setAttribute("cy", "100");
+  rim.setAttribute("r", "95");
+  rim.setAttribute("fill", "none");
+  rim.setAttribute("stroke", rimColor);
+  rim.setAttribute("stroke-width", "3");
+  svg.appendChild(rim);
+  
+  // Main symbol
+  const symbol = document.createElementNS(namespace, "path");
+  if (values.main_symbol.includes('Death Star')) {
+    symbol.setAttribute("d", "M 70 70 Q 100 50 130 70 Q 145 100 130 130 Q 100 150 70 130 Q 55 100 70 70 Z M 90 90 L 110 90 L 110 110 L 90 110 Z");
+  } else if (values.main_symbol.includes('Jedi')) {
+    symbol.setAttribute("d", "M 80 70 L 100 50 L 120 70 L 120 100 L 100 120 L 80 100 Z M 95 75 L 105 75 L 105 95 L 95 95 Z");
+  } else {
+    // Default star
+    symbol.setAttribute("d", "M100,40 L110,60 L130,65 L115,80 L120,100 L100,90 L80,100 L85,80 L70,65 L90,60 Z");
+  }
+  symbol.setAttribute("fill", symbolColor);
+  svg.appendChild(symbol);
+  
+  // Secondary symbol if exists
+  if (values.secondary_symbol) {
+    const secondary = document.createElementNS(namespace, "circle");
+    secondary.setAttribute("cx", "140");
+    secondary.setAttribute("cy", "60");
+    secondary.setAttribute("r", "10");
+    secondary.setAttribute("fill", symbolColor);
+    svg.appendChild(secondary);
+  }
+  
+  // Text (simulated)
+  if (values.text_top) {
+    const text = document.createElementNS(namespace, "text");
+    text.setAttribute("x", "100");
+    text.setAttribute("y", "40");
+    text.setAttribute("text-anchor", "middle");
+    text.setAttribute("fill", values.text_colors.includes('white') ? 'white' : '#6ee7ff');
+    text.setAttribute("font-size", "10");
+    text.textContent = values.text_top.length > 12 ? values.text_top.substring(0, 12) + "..." : values.text_top;
+    svg.appendChild(text);
+  }
+  
+  // Lightsabers if specified
+  if (values.sabers_desc.includes('crossed')) {
+    const saber1 = document.createElementNS(namespace, "line");
+    saber1.setAttribute("x1", "60");
+    saber1.setAttribute("y1", "60");
+    saber1.setAttribute("x2", "140");
+    saber1.setAttribute("y2", "140");
+    saber1.setAttribute("stroke", "#6ee7ff");
+    saber1.setAttribute("stroke-width", "2");
+    svg.appendChild(saber1);
+    
+    const saber2 = document.createElementNS(namespace, "line");
+    saber2.setAttribute("x1", "140");
+    saber2.setAttribute("y1", "60");
+    saber2.setAttribute("x2", "60");
+    saber2.setAttribute("y2", "140");
+    saber2.setAttribute("stroke", "#6ee7ff");
+    saber2.setAttribute("stroke-width", "2");
+    svg.appendChild(saber2);
+  }
+  
+  // Aurebesh effect if specified
+  if (values.aurebesh_style.includes('glow')) {
+    const glow = document.createElementNS(namespace, "circle");
+    glow.setAttribute("cx", "100");
+    glow.setAttribute("cy", "100");
+    glow.setAttribute("r", "85");
+    glow.setAttribute("fill", "none");
+    glow.setAttribute("stroke", "#6ee7ff");
+    glow.setAttribute("stroke-width", "1");
+    glow.setAttribute("stroke-dasharray", "5,5");
+    glow.setAttribute("opacity", "0.7");
+    svg.appendChild(glow);
+  }
+}
+
+let currentRotation = 0;
+$('rotateBtn').addEventListener('click', () => {
+  currentRotation += 45;
+  $('svgPreview').style.transform = `rotate(${currentRotation}deg)`;
+});
+
+let currentZoom = 1;
+$('zoomIn').addEventListener('click', () => {
+  if (currentZoom < 1.5) {
+    currentZoom += 0.1;
+    $('svgPreview').style.transform = `scale(${currentZoom}) rotate(${currentRotation}deg)`;
+  }
+});
+
+$('zoomOut').addEventListener('click', () => {
+  if (currentZoom > 0.6) {
+    currentZoom -= 0.1;
+    $('svgPreview').style.transform = `scale(${currentZoom}) rotate(${currentRotation}deg)`;
+  }
+});
+
+function generate(){
+  const v = readForm();
+  const txt = buildPrompt(v);
+  $('out').value = txt;
+  $('preview').innerHTML = "<span class='glow aurebesh'>" + txt + "</span>";
+  
+  // Update SVG preview
+  updateSvgPreview(v);
+  
+  // Easter egg: Order 66
+  if(v.text_top.toLowerCase().includes("order 66")){
+    $('preview').style.color = "red";
+    $('preview').style.textShadow = "0 0 12px red";
+    document.body.style.animation = "pulse 0.5s infinite";
+    
+    // Add emergency alert style
+    setTimeout(() => {
+      document.body.style.animation = "";
+    }, 2000);
+  } else {
+    $('preview').style.color = "";
+    $('preview').style.textShadow = "";
+  }
+}
+
+['input','change'].forEach(ev => {
+  document.querySelectorAll('input').forEach(inp => inp.addEventListener(ev, generate));
+});
+
+// Keyboard shortcuts
+document.addEventListener('keydown', (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+    e.preventDefault();
+    generate();
+  }
+  if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
+    if (document.activeElement.id === 'out') {
+      e.preventDefault();
+      $('out').select();
+      document.execCommand('copy');
+      showToast('Copied to clipboard!');
+    }
+  }
+});
+
+$('gen').addEventListener('click', generate);
+
+$('copyBtn').addEventListener('click', () => {
+  $('out').select();
+  document.execCommand('copy');
+  showToast('Copied to clipboard!');
+});
+
+$('downloadBtn').addEventListener('click', () => {
+  const blob = new Blob([$('out').value || ""], {type: 'text/plain'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'medallion_prompt.txt';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showToast('Download started!');
+});
+
+$('saveBtn').addEventListener('click', () => {
+  localStorage.setItem('medallionPreset', JSON.stringify(readForm()));
+  showToast('Preset saved locally!');
+});
+
+$('loadBtn').addEventListener('click', () => {
+  const data = localStorage.getItem('medallionPreset');
+  if (data) {
+    const d = JSON.parse(data);
+    for (const [k, v] of Object.entries(d)) {
+      if ($(k)) $(k).value = v;
+    }
+    generate();
+    showToast('Preset loaded!');
+  } else {
+    showToast('No saved preset found!', 'error');
+  }
+});
+
+// Randomizer
+const sample = arr => arr[Math.floor(Math.random() * arr.length)];
+$('randBtn').addEventListener('click', () => {
+  $('text_top').value = sample(["STELLAR JEDI", "IMPERIAL ORDER", "GALACTIC KNIGHTS", "REBEL ALLIANCE", "SITH EMPIRE"]);
+  $('rim_finish').value = sample(["metallic silver", "brushed steel", "ancient bronze", "obsidian black", "polished gold"]);
+  $('plate_color').value = sample(["black", "navy", "crimson", "deep gray", "forest green"]);
+  $('text_colors').value = sample(["white w/ black outline", "gold fill", "glowing cyan", "silver embossed", "red on black"]);
+  $('state_shape').value = sample(["Death Star silhouette", "state of Florida", "planet outline", "Imperial cog", "Rebel crest"]);
+  $('outline_color').value = sample(["silver", "white", "red glow", "gold trim", "blue neon"]);
+  $('main_symbol').value = sample(["Death Star", "Jedi crest", "Imperial cog", "Millennium Falcon", "Lightsaber"]);
+  $('symbol_color').value = sample(["etched silver", "red + black detail", "glowing white", "gold leaf", "blue crystal"]);
+  $('badge_elements').value = sample(["rings", "spokes", "insignia ticks", "binary stars", "orbital lines"]);
+  $('secondary_symbol').value = sample(["Army star", "none", "Jedi logo", "TIE fighter", "droid outline"]);
+  $('aurebesh_style').value = sample(["glowing rim text", "cyan inscriptions", "luminous white runes", "golden lettering", "etched symbols"]);
+  $('sabers_desc').value = sample(["two crossed sabers", "three angled beams", "four sabers in X", "single vertical saber", "circle of sabers"]);
+  $('style_keywords').value = sample(["cinematic", "formal", "balanced symmetry", "ancient relic", "futuristic tech"]);
+  generate();
+  showToast('Randomized settings applied!');
+});
+
+// Presets
+const presets = {
+  fl_army: {
+    text_top: "SAINT CLOUD JEDI",
+    rim_finish: "metallic silver",
+    plate_color: "black",
+    text_colors: "white with black outline",
+    state_shape: "state of Florida",
+    outline_color: "white",
+    main_symbol: "Death Star",
+    symbol_color: "red + black detail",
+    badge_elements: "rings",
+    secondary_symbol: "Army star emblem",
+    aurebesh_style: "glowing Aurebesh",
+    sabers_desc: "two crossed sabers",
+    style_keywords: "cinematic heraldic"
+  },
+  det_wings: {
+    text_top: "DETROIT JEDI",
+    rim_finish: "polished steel",
+    plate_color: "black",
+    text_colors: "white",
+    state_shape: "Red Wings wheel",
+    outline_color: "red/black",
+    main_symbol: "Death Star",
+    symbol_color: "red etched",
+    badge_elements: "rings",
+    secondary_symbol: "",
+    aurebesh_style: "glowing inscriptions",
+    sabers_desc: "three beams",
+    style_keywords: "sports fusion"
+  },
+  jedi_generic: {
+    text_top: "GALACTIC JEDI ORDER",
+    rim_finish: "brushed silver",
+    plate_color: "navy",
+    text_colors: "silver outline",
+    state_shape: "medallion field",
+    outline_color: "white",
+    main_symbol: "Death Star",
+    symbol_color: "silver rings",
+    badge_elements: "imperial ticks",
+    secondary_symbol: "Jedi crest",
+    aurebesh_style: "cyan glow",
+    sabers_desc: "four sabers",
+    style_keywords: "heraldic glowing"
+  }
+};
+
+document.querySelectorAll('[data-preset]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const p = presets[btn.dataset.preset];
+    for (const [k, v] of Object.entries(p)) {
+      if ($(k)) $(k).value = v;
+    }
+    generate();
+    showToast(`Loaded ${btn.textContent.trim()} preset!`);
+  });
+});
+
+// Auto-generate default
+window.addEventListener('DOMContentLoaded', () => {
+  document.querySelector('[data-preset="fl_army"]').click();
+  // Add animation for the preview
+  document.styleSheets[0].addRule('@keyframes pulse', '{0% {opacity: 1;} 50% {opacity: 0.7;} 100% {opacity: 1;}}');
+});
+</script>
+</body>
+</html>
