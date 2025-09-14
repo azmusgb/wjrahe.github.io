@@ -380,50 +380,55 @@
 (() => {
   'use strict';
 
-  // Helpers (fixed)
+  // ===== Helpers (safe) =====
   const $  = s => document.querySelector(s);
   const $$ = s => Array.from(document.querySelectorAll(s));
   const byId = id => document.getElementById(id);
   const NS = 'http://www.w3.org/2000/svg';
   const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
 
-  // Quiet Eruda if present
-  if (window.eruda && typeof window.eruda.init === 'function') { try { window.eruda.init(); } catch {} }
+  // ---- Eruda: try-init once, otherwise silence warnings ----
+  try {
+    if (window.eruda) {
+      if (typeof window.eruda.init === 'function') { try { window.eruda.init(); } catch {} }
+      else { window.eruda.init = function(){}; }
+    }
+  } catch {}
 
+  // ---- Storage (safe) ----
   const STORAGE_KEYS = { FORM:'medallion:enhanced:form', PRESETS:'medallion:enhanced:presets', THEME:'medallion:enhanced:theme', VIEW:'medallion:enhanced:view' };
-  const storage = { get:k=>{try{return localStorage.getItem(k)}catch{return null}}, set:(k,v)=>{try{localStorage.setItem(k,v)}catch{}}, del:k=>{try{localStorage.removeItem(k)}catch{}} };
-
-  // Toast
-  const toastContainer = byId('toastContainer'); let toastId = 0;
-  const showToast = (msg,type='success',dur=3000) => {
-    const el = document.createElement('div');
-    el.className = `toast ${type} show`; el.id = `toast-${++toastId}`;
-    el.innerHTML = `<div style="display:flex;align-items:center;gap:10px">
-      <span class="material-icons-round">${type==='success'?'check_circle':type==='error'?'error':'info'}</span><span>${msg}</span></div>`;
-    toastContainer.appendChild(el); byId('live').textContent = msg;
-    setTimeout(()=>{ el.style.opacity='0'; el.style.transform='translateX(100%) scale(.95)'; setTimeout(()=>el.remove(),200); }, dur);
+  const storage = {
+    get:k=>{ try { return localStorage.getItem(k) } catch { return null } },
+    set:(k,v)=>{ try { localStorage.setItem(k,v) } catch {} },
+    del:k=>{ try { localStorage.removeItem(k) } catch {} }
   };
 
-  // Theme
-  function initTheme(){
-    const stored = storage.get(STORAGE_KEYS.THEME);
-    if (stored==='light') document.body.classList.add('theme-light');
-    const update = () => {
-      const light = document.body.classList.contains('theme-light');
-      const icon = byId('themeToggle').querySelector('.material-icons-round');
-      byId('themeToggle').setAttribute('aria-pressed', String(light));
-      icon.textContent = light ? 'light_mode' : 'dark_mode';
-      byId('themeLabel').textContent = light ? 'Light' : 'Dark';
-      byId('stage').classList.toggle('light', light);
-    };
-    update();
-    byId('themeToggle').addEventListener('click',()=>{
-      const isLight = document.body.classList.toggle('theme-light');
-      storage.set(STORAGE_KEYS.THEME, isLight ? 'light':'dark'); update(); showToast(`Switched to ${isLight?'Light':'Dark'} theme`);
-    });
+  // ===== Toasts (DOM-safe with queue) =====
+  const toastQueue = [];
+  function getToastContainer(){ return byId('toastContainer'); }
+  function _showToastNow(message, type='success', duration=3000){
+    const tc = getToastContainer(); if (!tc) return;
+    const toast = document.createElement('div');
+    toast.className = `toast ${type} show`;
+    toast.innerHTML = `<div style="display:flex;align-items:center;gap:10px">
+      <span class="material-icons-round">${type==='success'?'check_circle':type==='error'?'error':'info'}</span>
+      <span>${message}</span></div>`;
+    tc.appendChild(toast);
+    const live = byId('live'); if (live) live.textContent = message;
+    setTimeout(()=>{ toast.style.opacity='0'; toast.style.transform='translateX(100%) scale(0.95)'; setTimeout(()=>toast.remove(),200); }, duration);
+  }
+  function showToast(message, type='success', duration=3000){
+    const tc = getToastContainer();
+    if (!tc) { toastQueue.push([message,type,duration]); return; }
+    _showToastNow(message,type,duration);
+  }
+  function flushToasts(){
+    if (!toastQueue.length) return;
+    const tc = getToastContainer(); if (!tc) return;
+    while (toastQueue.length) { const [m,t,d] = toastQueue.shift(); _showToastNow(m,t,d); }
   }
 
-  // Tabs
+  // ---------- Tabs ----------
   function initTabs(){
     const tabs = $$('.tab');
     const panels = { basic:byId('panel-basic'), symbols:byId('panel-symbols'), advanced:byId('panel-advanced'), export:byId('panel-export') };
@@ -445,7 +450,7 @@
     setTab(tabs[0]);
   }
 
-  // Form/presets
+  // ---------- Form / Presets ----------
   const FORM_FIELDS=['text_top','rim_finish','plate_color','text_colors','state_shape','outline_color','main_symbol','symbol_color','badge_elements','secondary_symbol','aurebesh_style','sabers_desc','style_keywords','flip_arc','lighting_mood','material_finish','detail_level','age_patina'];
   const getDefaultForm=()=>({text_top:"GALACTIC JEDI ORDER",rim_finish:"polished steel with subtle etching",plate_color:"deep obsidian with subtle texture",text_colors:"luminous white with shadow outline",state_shape:"ornate circular mandala pattern",outline_color:"electric blue glow",main_symbol:"stylized phoenix rising",symbol_color:"gradient gold to crimson",badge_elements:"intricate geometric patterns with Celtic knots",secondary_symbol:"constellation of stars",aurebesh_style:"glowing runic inscriptions around border",sabers_desc:"twin energy beams with particle effects",style_keywords:"cinematic, photorealistic, dramatic lighting, high detail",flip_arc:"auto",lighting_mood:"soft",material_finish:"polished",detail_level:"7",age_patina:"2"});
   let currentForm=(()=>{const s=storage.get(STORAGE_KEYS.FORM);if(!s)return getDefaultForm();try{return{...getDefaultForm(),...JSON.parse(s)}}catch{return getDefaultForm()}})();
@@ -545,7 +550,7 @@
       if(side==='bottom') t.setAttribute('dominant-baseline','hanging');
       svg.appendChild(t);
     };
-    // Top/bottom
+    // Top/bottom (respects flip auto when rotated)
     const useFlipped = (form.flip_arc==='flipped') || (form.flip_arc==='auto' && (view.rotation%360)>=180);
     addArcText(form.text_top, R*0.72, useFlipped?'bottom':'top');
     addArcText(form.secondary_symbol||'', R*0.72, useFlipped?'top':'bottom');
@@ -597,21 +602,23 @@
     return svg;
   }
 
-  // View state
+  // ---------- View / Preview ----------
   let view={x:0,y:0,scale:1,rotation:0,minScale:0.1,maxScale:5,width:640,height:640};
   function loadViewState(){try{const s=storage.get(STORAGE_KEYS.VIEW);if(s)view={...view,...JSON.parse(s)}}catch{}}
   function saveViewState(){storage.set(STORAGE_KEYS.VIEW,JSON.stringify(view))}
   function updatePreview(){
     const stage=byId('stage'), inner=byId('inner'), r=stage.getBoundingClientRect();
     inner.style.transform=`translate(${r.width/2+view.x}px,${r.height/2+view.y}px) rotate(${view.rotation}deg) scale(${view.scale}) translate(${-view.width/2}px,${-view.height/2}px)`;
-    byId('hudZoom').textContent=`${Math.round(view.scale*100)}%`; byId('hudSize').textContent=`${Math.round(r.width)}×${Math.round(r.height)}px`; saveViewState();
+    byId('hudZoom').textContent=`${Math.round(view.scale*100)}%`;
+    byId('hudSize').textContent=`${Math.round(r.width)}×${Math.round(r.height)}px`;
+    saveViewState();
   }
 
   function generatePreview(){
     const form=readForm(); const svg=generateSvg(form);
     svg.querySelectorAll('path,circle,line,polygon').forEach(el=>{ if(!el.hasAttribute('vector-effect')) el.setAttribute('vector-effect','non-scaling-stroke'); });
     const inner=byId('inner'); inner.innerHTML=''; inner.appendChild(svg);
-    updatePreview(); generatePrompt(); byId('live').textContent='Preview updated';
+    updatePreview(); generatePrompt(); const live=byId('live'); if(live) live.textContent='Preview updated';
   }
 
   function generatePrompt(){
@@ -642,7 +649,7 @@ Technical: 4K resolution, physically accurate materials, professional product ph
     byId('out').value=txt;
   }
 
-  // Interactions
+  // ---------- Interactions ----------
   function initInteractions(){
     const stage=byId('stage'); let pointers=new Map(), lastCenter=null, lastDist=null;
     stage.addEventListener('pointerdown',e=>{stage.setPointerCapture?.(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY})});
@@ -697,7 +704,6 @@ Technical: 4K resolution, physically accurate materials, professional product ph
     byId('copySvgBtn').addEventListener('click',async()=>{const xml=getSvgXml();if(!xml)return showToast('No SVG to copy','error');try{await navigator.clipboard.writeText(xml);showToast('SVG copied to clipboard')}catch{showToast('SVG copy failed','error')}});
     byId('downloadSvgBtn').addEventListener('click',()=>{const xml=getSvgXml();if(!xml)return showToast('No SVG to export','error');const b=new Blob([xml],{type:'image/svg+xml'}),u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=`medallion_${view.width}x${view.height}.svg`;a.click();URL.revokeObjectURL(u);showToast('SVG downloaded')});
     byId('downloadPngBtn').addEventListener('click',()=>{const xml=getSvgXml();if(!xml)return showToast('No image to export','error');const b=new Blob([xml],{type:'image/svg+xml'}),u=URL.createObjectURL(b),img=new Image();img.onload=()=>{const c=document.createElement('canvas'),s=2;c.width=view.width*s;c.height=view.height*s;const ctx=c.getContext('2d');ctx.scale(s,s);ctx.drawImage(img,0,0);URL.revokeObjectURL(u);c.toBlob(blob=>{if(!blob)return showToast('PNG export failed','error');const u2=URL.createObjectURL(blob);const a=document.createElement('a');a.href=u2;a.download=`medallion_${view.width}x${view.height}_${Date.now()}.png`;a.click();URL.revokeObjectURL(u2);showToast('PNG exported successfully')},'image/png',0.95)};img.onerror=()=>{URL.revokeObjectURL(u);showToast('PNG export failed','error')};img.crossOrigin='anonymous';img.src=u});
-
   }
 
   function initPresetActions(){
@@ -768,14 +774,41 @@ Technical: 4K resolution, physically accurate materials, professional product ph
 
   function init(){
     try{
-      loadViewState(); initTheme(); initTabs(); initSwatches(); initInteractions(); initExports(); initPresetActions();
-      initJsonModal(); initFullscreen(); initAnimation(); initFormReactivity(); initKeyboardShortcuts(); initResponsive(); initSearch();
+      loadViewState(); initTabs(); initSearch();
+      // theme needs DOM; safe either way
+      (function initTheme(){
+        const stored = storage.get(STORAGE_KEYS.THEME);
+        if (stored==='light') document.body.classList.add('theme-light');
+        const update = () => {
+          const light = document.body.classList.contains('theme-light');
+          const icon = byId('themeToggle').querySelector('.material-icons-round');
+          byId('themeToggle').setAttribute('aria-pressed', String(light));
+          icon.textContent = light ? 'light_mode' : 'dark_mode';
+          byId('themeLabel').textContent = light ? 'Light' : 'Dark';
+          byId('stage').classList.toggle('light', light);
+        };
+        update();
+        byId('themeToggle').addEventListener('click',()=>{
+          const isLight = document.body.classList.toggle('theme-light');
+          storage.set(STORAGE_KEYS.THEME, isLight ? 'light':'dark'); update(); showToast(`Switched to ${isLight?'Light':'Dark'} theme`);
+        });
+      })();
+
+      initSwatches(); initInteractions(); initExports(); initPresetActions();
+      initJsonModal(); initFullscreen(); initAnimation(); initFormReactivity(); initKeyboardShortcuts(); initResponsive();
+
       writeForm(currentForm); renderPresets();
+
       view.width=view.height=parseInt(byId('sizeSelect').value)||640;
+
+      // Now DOM exists: flush any queued toasts
+      flushToasts();
+
       setTimeout(()=>{generatePreview();fitToView();showToast('Medallion Forge Enhanced ready')},100);
     }catch(err){console.error('Initialization error:',err);showToast('Initialization error - check console','error')}
   }
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init); else init();
+
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init); else init();
 })();
 </script>
 </body>
