@@ -6,191 +6,151 @@
 <meta name="color-scheme" content="dark light" />
 <meta name="theme-color" content="#0b0d13" media="(prefers-color-scheme: dark)">
 <meta name="theme-color" content="#f6f8fc" media="(prefers-color-scheme: light)">
-<title>Medallion Forge — Integrated Ultimate++</title>
+<title>Medallion Forge — v6 Overhaul</title>
 
+<!-- Fonts -->
 <link href="https://fonts.cdnfonts.com/css/aurebesh" rel="stylesheet" />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons&display=swap" rel="stylesheet" />
 
 <style>
   :root{
-    --bg:#0b0d13; --panel:#151923; --ink:#e8ecf1; --muted:#9aa3af;
+    --bg:#0b0d13; --panel:#121521; --ink:#e7ecf3; --muted:#9aa3af;
     --accent:#6ee7ff; --accent2:#6476ff; --glow:rgba(110,231,255,.35);
-    --line:#252b39; --ok:#4ade80; --warn:#fbbf24; --bad:#f87171;
+    --line:#252b39; --ok:#22c55e; --warn:#f59e0b; --bad:#ef4444;
     --mono:"JetBrains Mono","Fira Code",ui-monospace,Menlo,Consolas,monospace;
     --sans:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;
-    --r:16px; --shadow:0 12px 32px rgba(0,0,0,.28);
-    --transition: all .2s ease; --header-height:64px;
+    --r:16px; --shadow:0 16px 40px rgba(0,0,0,.28);
+    --header:64px;
   }
   @media (prefers-color-scheme: light){
-    :root{ --bg:#f6f8fc; --panel:#fff; --ink:#0f172a; --muted:#64748b;
-      --accent:#2563eb; --accent2:#22d3ee; --glow:rgba(37,99,235,.22); --line:#e5e7eb; --ok:#16a34a; --warn:#d97706; --bad:#dc2626; }
+    :root{
+      --bg:#f6f8fc; --panel:#fff; --ink:#0f172a; --muted:#5b6b7f;
+      --accent:#2563eb; --accent2:#22d3ee; --glow:rgba(37,99,235,.22);
+      --line:#e7eaf0; --ok:#16a34a; --warn:#d97706; --bad:#dc2626;
+    }
   }
-  .light-theme{ --bg:#f6f8fc; --panel:#fff; --ink:#0f172a; --muted:#64748b;
-    --accent:#2563eb; --accent2:#22d3ee; --glow:rgba(37,99,235,.22); --line:#e5e7eb; --ok:#16a34a; --warn:#d97706; --bad:#dc2626; }
+  .theme-light{
+    --bg:#f6f8fc; --panel:#fff; --ink:#0f172a; --muted:#5b6b7f;
+    --accent:#2563eb; --accent2:#22d3ee; --glow:rgba(37,99,235,.22);
+    --line:#e7eaf0; --ok:#16a34a; --warn:#d97706; --bad:#dc2626;
+  }
 
+  /* Base */
   *{box-sizing:border-box}
   html,body{height:100%}
   body{
-    margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 var(--sans);
-    -webkit-text-size-adjust:100%;overflow-x:hidden;
-    padding-bottom:max(16px, env(safe-area-inset-bottom));
+    margin:0; color:var(--ink); background:
+      radial-gradient(1200px 800px at 10% -10%, #1a1f2e 0%, #0000 60%),
+      radial-gradient(1200px 800px at 110% 10%, #132032 0%, #0000 55%),
+      var(--bg);
+    font:14px/1.5 var(--sans);
+    -webkit-text-size-adjust:100%;
+    padding-bottom:max(16px,env(safe-area-inset-bottom));
   }
 
   header{
-    position:sticky;top:0;z-index:100;padding:0 18px;height:var(--header-height);
+    position:sticky; top:0; z-index:50; height:var(--header);
     border-bottom:1px solid var(--line);
-    background:color-mix(in oklab, var(--bg) 92%, black 8%);backdrop-filter:blur(6px);
-    display:flex;align-items:center;justify-content:space-between;gap:12px;
-    transition:var(--transition);
+    backdrop-filter: blur(6px);
+    background:
+      linear-gradient(90deg, color-mix(in oklab,var(--panel) 92%, black 8%), color-mix(in oklab,var(--panel) 96%, black 4%));
+    display:flex; align-items:center; justify-content:space-between; gap:12px; padding:0 16px;
   }
-  @supports not (color-mix(in oklab, red, blue)){
-    header{ background:rgba(0,0,0,.22); }
-  }
-  .brand{display:flex;align-items:center;gap:12px}
+  .brand{display:flex;gap:12px;align-items:center}
   .logo{
-    width:36px;height:36px;border-radius:10px;display:grid;place-items:center;
-    background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 100%);box-shadow:0 0 18px var(--glow);
-    transition:var(--transition);
+    width:36px;height:36px;border-radius:12px;display:grid;place-items:center;
+    background:linear-gradient(135deg,var(--accent),var(--accent2)); box-shadow:0 0 18px var(--glow); color:#fff;
+    font-weight:900
   }
-  .logo:hover{transform:rotate(10deg)}
-  .pill{
-    padding:4px 10px;border-radius:999px;background:linear-gradient(90deg,var(--accent),var(--accent2));
-    color:#fff;font-size:11px;font-weight:700;letter-spacing:.5px;
-  }
-  .theme-toggle{
-    border:1px solid var(--line);color:var(--muted);background:var(--panel);border-radius:10px;
-    padding:8px 12px;display:flex;gap:6px;align-items:center;cursor:pointer;
-    transition:var(--transition);
-  }
-  .theme-toggle:hover{border-color:var(--accent);color:var(--accent);box-shadow:0 0 0 3px var(--glow)}
+  .pill{padding:4px 10px;border-radius:999px;background:linear-gradient(90deg,var(--accent),var(--accent2));color:#fff;font-size:11px;font-weight:700;letter-spacing:.4px}
 
-  .app{max-width:1400px;margin:22px auto;padding:0 16px;display:grid;gap:20px;
-       grid-template-columns:340px 1fr 1fr;align-items:start}
+  .chip,.btn{
+    border:1px solid var(--line); background:var(--panel); color:var(--ink);
+    border-radius:10px; padding:10px 14px; display:inline-flex; align-items:center; gap:6px;
+    font-weight:600; cursor:pointer; transition:.2s; min-height:40px
+  }
+  .chip:hover,.btn:hover{border-color:var(--accent); color:var(--accent); box-shadow:0 0 0 3px var(--glow)}
+  .primary{border:none; background:linear-gradient(90deg,var(--accent),var(--accent2)); color:#fff}
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+  /* Layout */
+  .app{max-width:1400px; margin:20px auto; padding:0 16px; display:grid; grid-template-columns:340px 1fr 1fr; gap:20px; align-items:start}
   @media (max-width:1200px){ .app{grid-template-columns:1fr 1fr} .aside{grid-column:1/-1;order:-1} }
   @media (max-width:800px){ .app{grid-template-columns:1fr} .aside{order:-1} }
 
-  .card{
-    background:color-mix(in oklab, var(--panel) 98%, black 2%);border:1px solid var(--line);
-    border-radius:var(--r);box-shadow:var(--shadow);padding:20px;transition:var(--transition);
-  }
-  @supports not (color-mix(in oklab, red, blue)){
-    .card{ background:var(--panel); }
-  }
-  .card:hover{box-shadow:0 16px 40px rgba(0,0,0,.32)}
-  .card h2{
-    font-size:15px;margin:0 0 14px 0;letter-spacing:.2px;display:flex;align-items:center;gap:8px;
-    color:color-mix(in oklab,var(--ink) 85%, var(--muted) 15%);font-weight:600;
-  }
-  @supports not (color-mix(in oklab, red, blue)){
-    .card h2{ color:var(--ink) }
-  }
-  .subtle{color:var(--muted);font-size:12px;line-height:1.4}
+  .card{background:color-mix(in oklab,var(--panel) 98%, black 2%); border:1px solid var(--line); border-radius:16px; box-shadow:var(--shadow); padding:18px}
+  .card h2{margin:0 0 12px; font-size:15px; display:flex; align-items:center; gap:8px; color:color-mix(in oklab,var(--ink) 85%, var(--muted) 15%)}
+  .subtle{font-size:12px; color:var(--muted)}
 
-  .profiles{display:grid;gap:12px}
+  /* Profiles */
+  .profiles{display:grid; gap:10px}
   .profile{
-    display:grid;grid-template-columns:56px 1fr;gap:12px;align-items:center;
-    border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--panel);
-    cursor:pointer;transition:var(--transition);
+    display:grid; grid-template-columns:48px 1fr auto; gap:12px; align-items:center;
+    border:1px solid var(--line); border-radius:12px; padding:10px; background:var(--panel); cursor:pointer;
   }
-  .profile:hover{border-color:var(--accent);box-shadow:0 0 0 3px var(--glow);transform:translateY(-2px)}
-  .profile:active{transform:translateY(0)}
-  .thumb{
-    width:56px;height:56px;border-radius:12px;
-    background:radial-gradient(100% 100% at 25% 20%, var(--accent) 0%, var(--accent2) 100%);
-    display:grid;place-items:center;color:#fff;font-weight:800;font-size:18px;
-  }
-  .tag{display:inline-block;padding:3px 10px;border-radius:999px;background:color-mix(in oklab,var(--accent) 25%, transparent);color:var(--accent);font-size:10px;font-weight:700;margin-top:4px}
+  .profile:hover{border-color:var(--accent); box-shadow:0 0 0 3px var(--glow)}
+  .thumb{width:48px;height:48px;border-radius:12px;display:grid;place-items:center;background:radial-gradient(120% 100% at 25% 20%,var(--accent) 0%,var(--accent2) 100%); color:#fff; font-weight:800}
+  .tag{font-size:10px; padding:3px 8px; border-radius:999px; background:color-mix(in oklab, var(--accent) 20%, transparent); color:var(--accent)}
 
-  .btns{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
-  .chip,.btn{
-    padding:10px 14px;border-radius:10px;border:1px solid var(--line);background:var(--panel);
-    color:var(--ink);cursor:pointer;display:inline-flex;align-items:center;gap:6px;
-    transition:var(--transition);font-weight:600;min-height:42px;font-size:13px;
-  }
-  .chip:hover,.btn:hover{border-color:var(--accent);color:var(--accent);box-shadow:0 0 0 3px var(--glow);transform:translateY(-1px)}
-  .chip:active,.btn:active{transform:translateY(0)}
-  .primary{background:linear-gradient(90deg,var(--accent),var(--accent2));color:#fff;border:none;box-shadow:0 4px 12px rgba(110,231,255,.25)}
-  .primary:hover{box-shadow:0 6px 16px rgba(110,231,255,.35);filter:brightness(1.1)}
+  .profile-tools{display:flex; gap:8px}
+  .searchbar{display:flex; gap:8px; margin-bottom:10px}
+  .searchbar input{flex:1}
 
-  .tabs{display:flex;gap:8px;border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:16px}
-  .tab{padding:10px 16px;border-radius:8px;border:1px solid transparent;background:transparent;color:var(--muted);cursor:pointer;font-weight:500;font-size:13px;transition:var(--transition)}
-  .tab:hover{background:color-mix(in oklab, var(--accent) 10%, transparent);color:var(--accent)}
-  .tab[aria-selected="true"]{background:var(--glow);border-color:var(--accent);color:var(--accent);font-weight:600}
-
-  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-  @media (max-width:600px){ .grid{grid-template-columns:1fr} }
-  .row{display:grid;gap:8px}
-  label{font-size:13px;font-weight:600;color:color-mix(in oklab, var(--ink) 85%, var(--muted) 15%);display:flex;align-items:center;gap:4px}
-  label .material-icons{font-size:16px;color:var(--muted)}
+  /* Controls */
+  .grid{display:grid; gap:12px; grid-template-columns:1fr 1fr}
+  @media (max-width:640px){ .grid{grid-template-columns:1fr} }
+  .row{display:grid; gap:6px}
+  label{font-size:12px; font-weight:700; color:color-mix(in oklab,var(--ink) 85%, var(--muted) 15%); display:flex; gap:4px; align-items:center}
   input,select,textarea{
-    width:100%;padding:12px;border-radius:10px;border:1px solid var(--line);
-    background:color-mix(in oklab,var(--bg) 92%, black 8%);color:var(--ink);outline:none;
-    font-family:var(--sans);font-size:14px;transition:var(--transition)
+    width:100%; padding:11px 12px; border-radius:10px; border:1px solid var(--line);
+    background:color-mix(in oklab, var(--bg) 92%, black 8%); color:var(--ink); outline:none; transition:.2s; font:14px var(--sans);
   }
-  input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--glow);background:var(--panel)}
-  textarea{min-height:200px;font:13px/1.55 var(--mono);resize:vertical;padding:16px}
+  input:focus,select:focus,textarea:focus{border-color:var(--accent); box-shadow:0 0 0 3px var(--glow); background:var(--panel)}
+  .colorrow{display:grid; grid-template-columns:1fr auto; gap:8px; align-items:center}
+  .swatch{width:42px;height:42px;border-radius:10px;border:1px solid var(--line)}
 
-  .preview{display:grid;gap:14px}
-  .stage{
-    position:relative;height:64vh;min-height:420px;border:1px solid var(--line);border-radius:14px;
+  /* Tabs */
+  .tabs{display:flex; gap:8px; border-bottom:1px solid var(--line); padding-bottom:8px; margin-bottom:12px}
+  .tab{padding:10px 14px; background:transparent; border:1px solid transparent; border-radius:10px; color:var(--muted); font-weight:600; cursor:pointer}
+  .tab:hover{background:color-mix(in oklab, var(--accent) 10%, transparent); color:var(--accent)}
+  .tab[aria-selected="true"]{background:var(--glow); border-color:var(--accent); color:var(--accent)}
+  .tabpanel[hidden]{display:none}
+
+  /* Stage */
+  .stage{position:relative; height:64vh; min-height:420px; border:1px solid var(--line); border-radius:14px; overflow:hidden;
     background:
-      conic-gradient(from 0deg at 50% 50%, #0000 0 90deg, #0001 0 180deg, #0000 0) 0 0/28px 28px,
-      color-mix(in oklab,var(--panel) 96%, black 4%);
-    overflow:hidden;touch-action:none;
+      linear-gradient( to bottom right, #ffffff08, #0000 ),
+      conic-gradient(from 0deg at 50% 50%, #0000 0 90deg, #0002 0 180deg, #0000 0) 0 0/28px 28px,
+      color-mix(in oklab,var(--panel) 96%, black 4%); touch-action:none;
   }
-  @supports not (color-mix(in oklab, red, blue)){
-    .stage{ background:repeating-linear-gradient(45deg, #0000 0 14px, #0001 14px 28px), var(--panel); }
-  }
-  #inner{position:absolute;top:50%;left:50%;transform-origin:0 0;will-change:transform}
-  .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin-bottom:12px;padding:4px 0}
-  .chip.min{font-size:12px;padding:8px 12px;background:color-mix(in oklab, var(--panel) 90%, transparent)}
+  #inner{position:absolute; top:50%; left:50%; transform-origin:0 0; will-change:transform}
 
-  .badgePreview{display:grid;gap:10px;justify-items:center;border:1px dashed var(--line);border-radius:12px;padding:16px;margin-top:16px}
-  #svgBadge{width:300px;height:300px;transition:var(--transition)}
-  #svgBadge:hover{transform:scale(1.02)}
+  /* Mini badge */
+  .badgePreview{display:grid; gap:8px; justify-items:center; border:1px dashed var(--line); border-radius:12px; padding:12px}
+  #svgBadge{width:280px; height:280px}
 
-  dialog{border:1px solid var(--line);border-radius:var(--r);padding:0;background:var(--panel);color:var(--ink);box-shadow:var(--shadow);max-width:90vw;width:560px}
-  dialog::backdrop{background:rgba(0,0,0,.5);backdrop-filter:blur(4px)}
-  .modal-head{padding:18px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
-  .modal-body{padding:20px}
-  .modal-actions{padding:16px 20px;border-top:1px solid var(--line);display:flex;gap:12px;justify-content:flex-end}
+  /* Toast & dialog */
+  dialog{border:1px solid var(--line); background:var(--panel); color:var(--ink); border-radius:16px; padding:0; max-width:92vw; width:560px; box-shadow:var(--shadow)}
+  dialog::backdrop{background:rgba(0,0,0,.5); backdrop-filter: blur(4px)}
+  .modal-head{display:flex; justify-content:space-between; align-items:center; padding:16px 18px; border-bottom:1px solid var(--line)}
+  .modal-body{padding:16px 18px}
+  .modal-actions{padding:14px 18px; border-top:1px solid var(--line); display:flex; gap:10px; justify-content:flex-end}
 
-  .toast{
-    position:fixed;bottom:24px;right:24px;z-index:50;transform:translateY(80px);opacity:0;background:var(--panel);
-    border:1px solid var(--line);border-left:4px solid var(--ok);border-radius:10px;padding:14px 16px;box-shadow:var(--shadow);
-    display:flex;gap:10px;align-items:center;transition:.35s cubic-bezier(.2,.8,.2,1);max-width:320px
-  }
-  .toast.show{transform:translateY(0);opacity:1}
+  .toast{position:fixed; right:20px; bottom:20px; border:1px solid var(--line); border-left:4px solid var(--ok); background:var(--panel);
+    border-radius:12px; padding:12px 14px; display:flex; gap:8px; align-items:center; transform:translateY(100px); opacity:0; transition:.35s; box-shadow:var(--shadow)}
+  .toast.show{transform:translateY(0); opacity:1}
   .toast.error{border-left-color:var(--bad)}
-  .toast .material-icons{font-size:20px}
 
-  .help-text{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.4}
-
-  button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-
-  .loading{position:relative;overflow:hidden}
-  .loading::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent);animation:loading 1.5s infinite}
-  @keyframes loading{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
-
-  @media (prefers-reduced-motion: reduce){
-    *{animation:none!important;transition:none!important}
-  }
-
+  /* Mobile tweaks */
   @media (max-width:480px){
-    header{padding:0 12px;height:56px}
-    .card{padding:16px;border-radius:14px}
-    .app{padding:0 12px;gap:16px}
-    .toolbar{flex-direction:column;align-items:flex-start}
-    .btns{justify-content:center}
-    .theme-toggle span:last-child{display:none}
+    header{height:56px}
     .logo{width:32px;height:32px}
+    .card{padding:16px}
   }
-
-  ::-webkit-scrollbar{width:8px;height:8px}
-  ::-webkit-scrollbar-track{background:color-mix(in oklab, var(--bg) 90%, black 10%);border-radius:4px}
-  ::-webkit-scrollbar-thumb{background:var(--muted);border-radius:4px}
-  ::-webkit-scrollbar-thumb:hover{background:var(--accent)}
+  @media (prefers-reduced-motion: reduce){
+    *{transition:none!important; animation:none!important}
+  }
 </style>
 </head>
 <body>
@@ -198,369 +158,450 @@
   <div class="brand">
     <div class="logo" aria-hidden="true">⚔️</div>
     <div>
-      <div style="display:flex;align-items:center;gap:8px">
-        <strong style="font-size:18px">Medallion Forge</strong> <span class="pill">Integrated Ultimate++</span>
+      <div style="display:flex;gap:8px;align-items:center">
+        <strong style="font-size:18px">Medallion Forge</strong>
+        <span class="pill">v6 Overhaul</span>
       </div>
-      <div class="subtle">Profiles • Prompt Builder • Dynamic SVG • Export</div>
+      <div class="subtle">Profiles • Builder • Live SVG • Export</div>
     </div>
   </div>
-  <div class="btns" role="group" aria-label="Global controls">
+  <div class="toolbar" role="group" aria-label="Global">
     <label class="chip" style="gap:6px">
       <span class="material-icons" aria-hidden="true">photo_size_select_large</span>
       <select id="sizeSelect" aria-label="Canvas size">
-        <option value="320">320</option><option value="512">512</option>
-        <option value="640" selected>640</option><option value="768">768</option><option value="1024">1024</option>
+        <option>320</option><option>512</option><option selected>640</option><option>768</option><option>1024</option>
       </select>
     </label>
-    <button id="themeToggle" class="theme-toggle" type="button" aria-pressed="false" title="Toggle theme">
+    <button id="themeToggle" class="chip" type="button" aria-pressed="false" title="Toggle theme">
       <span class="material-icons" aria-hidden="true">dark_mode</span><span id="themeLabel">Dark</span>
     </button>
   </div>
 </header>
 
 <main class="app">
+  <!-- Aside: Profiles -->
   <aside class="aside card">
-    <h2><span class="material-icons" style="font-size:18px" aria-hidden="true">view_carousel</span> Profiles</h2>
-    <div class="profiles" role="list" id="profiles"></div>
-    <div class="btns" role="group" aria-label="Profile actions">
-      <button id="saveBtn" class="chip" type="button"><span class="material-icons" aria-hidden="true">bookmark_add</span>Save Current</button>
-      <button id="loadBtn" class="chip" type="button"><span class="material-icons" aria-hidden="true">folder_open</span>Load Saved</button>
-      <button id="randBtn" class="chip" type="button"><span class="material-icons" aria-hidden="true">casino</span>Randomize</button>
-      <button id="exportJsonBtn" class="chip" type="button"><span class="material-icons" aria-hidden="true">ios_share</span>Export JSON</button>
-      <button id="importJsonBtn" class="chip" type="button"><span class="material-icons" aria-hidden="true">download</span>Import JSON</button>
+    <h2><span class="material-icons" aria-hidden="true" style="font-size:18px">view_carousel</span> Profiles</h2>
+
+    <div class="searchbar">
+      <input id="profileSearch" placeholder="Search presets…" aria-label="Search presets">
+      <button id="addPresetBtn" class="chip" type="button" title="Save as preset"><span class="material-icons" aria-hidden="true">bookmark_add</span>Save</button>
     </div>
 
-    <div style="margin-top:20px" class="badgePreview" aria-live="polite">
+    <div class="profiles" id="profiles" role="list"></div>
+
+    <div class="profile-tools">
+      <button id="exportJsonBtn" class="chip" type="button"><span class="material-icons" aria-hidden="true">ios_share</span>Export</button>
+      <button id="importJsonBtn" class="chip" type="button"><span class="material-icons" aria-hidden="true">download</span>Import</button>
+      <button id="randBtn" class="chip" type="button"><span class="material-icons" aria-hidden="true">casino</span>Random</button>
+      <button id="clearBtn" class="chip" type="button"><span class="material-icons" aria-hidden="true">backspace</span>Clear</button>
+    </div>
+
+    <div class="badgePreview" style="margin-top:12px" aria-live="polite">
       <svg id="svgBadge" viewBox="0 0 300 300" role="img" aria-label="Mini medallion preview"></svg>
       <div class="subtle">Mini preview mirrors the main canvas</div>
     </div>
   </aside>
 
+  <!-- Builder -->
   <section class="card" aria-label="Builder">
-    <h2><span class="material-icons" style="font-size:18px" aria-hidden="true">tune</span> Builder</h2>
-    <div class="tabs" role="tablist" aria-label="Sections">
-      <button class="tab" id="tab-basic" role="tab" aria-controls="panel-basic" aria-selected="true" data-tab="basic">Basic</button>
-      <button class="tab" id="tab-symbols" role="tab" aria-controls="panel-symbols" aria-selected="false" data-tab="symbols" tabindex="-1">Symbols</button>
-      <button class="tab" id="tab-advanced" role="tab" aria-controls="panel-advanced" aria-selected="false" data-tab="advanced" tabindex="-1">Advanced</button>
+    <h2><span class="material-icons" aria-hidden="true" style="font-size:18px">tune</span> Builder</h2>
+
+    <div class="tabs" role="tablist">
+      <button class="tab" data-tab="basic" aria-controls="panel-basic" aria-selected="true">Basic</button>
+      <button class="tab" data-tab="symbols" aria-controls="panel-symbols" aria-selected="false" tabindex="-1">Symbols</button>
+      <button class="tab" data-tab="style" aria-controls="panel-style" aria-selected="false" tabindex="-1">Style & Export</button>
     </div>
 
-    <div id="panel-basic" class="tab-panel" role="tabpanel" aria-labelledby="tab-basic">
+    <!-- Basic -->
+    <div id="panel-basic" class="tabpanel" role="tabpanel">
       <div class="grid">
         <div class="row">
           <label for="text_top"><span class="material-icons">text_fields</span>Top Text</label>
           <input id="text_top" placeholder="SAINT CLOUD JEDI" autocomplete="off">
-          <div class="help-text">Curved text at the top of the medallion</div>
+          <div class="subtle">Curved text along the top arc.</div>
         </div>
-        <div class="row">
-          <label for="rim_finish"><span class="material-icons">settings</span>Rim Finish</label>
-          <input id="rim_finish" placeholder="metallic silver" autocomplete="off">
+
+        <div class="row colorrow">
+          <div>
+            <label for="rim_finish"><span class="material-icons">settings</span>Rim Finish</label>
+            <input id="rim_finish" placeholder="metallic silver">
+          </div>
+          <div class="swatch" id="sw_rim" title="Rim color preview"></div>
         </div>
-        <div class="row">
-          <label for="plate_color"><span class="material-icons">palette</span>Plate Color</label>
-          <input id="plate_color" placeholder="black" autocomplete="off">
+
+        <div class="row colorrow">
+          <div>
+            <label for="plate_color"><span class="material-icons">palette</span>Plate Color</label>
+            <input id="plate_color" placeholder="black">
+          </div>
+          <input id="plate_hex" type="color" value="#121316" title="Plate hex">
         </div>
-        <div class="row">
-          <label for="text_colors"><span class="material-icons">format_color_text</span>Text Fill / Outline</label>
-          <input id="text_colors" placeholder="white with black outline" autocomplete="off">
+
+        <div class="row colorrow">
+          <div>
+            <label for="text_colors"><span class="material-icons">format_color_text</span>Text Fill / Outline</label>
+            <input id="text_colors" placeholder="white with black outline">
+          </div>
+          <input id="text_hex" type="color" value="#ffffff" title="Text hex">
         </div>
+
         <div class="row">
           <label for="state_shape"><span class="material-icons">polyline</span>Main Outline</label>
-          <input id="state_shape" placeholder="state of Florida" autocomplete="off">
+          <input id="state_shape" placeholder="state of Florida">
         </div>
+
+        <div class="row colorrow">
+          <div>
+            <label for="outline_color"><span class="material-icons">border_color</span>Outline Color</label>
+            <input id="outline_color" placeholder="white">
+          </div>
+          <input id="outline_hex" type="color" value="#ffffff" title="Outline hex">
+        </div>
+
         <div class="row">
-          <label for="outline_color"><span class="material-icons">border_color</span>Outline Color</label>
-          <input id="outline_color" placeholder="white" autocomplete="off">
-        </div>
-        <div class="row" style="align-items:center">
           <label for="flip_arc"><span class="material-icons">flip</span>Flip top text</label>
           <select id="flip_arc">
             <option value="auto" selected>Auto</option>
             <option value="normal">Normal</option>
             <option value="flipped">Flipped</option>
           </select>
-          <div class="help-text">Helpful for designs after rotation</div>
         </div>
       </div>
     </div>
 
-    <div id="panel-symbols" class="tab-panel" role="tabpanel" aria-labelledby="tab-symbols" hidden>
+    <!-- Symbols -->
+    <div id="panel-symbols" class="tabpanel" role="tabpanel" hidden>
       <div class="grid">
         <div class="row">
           <label for="main_symbol"><span class="material-icons">star</span>Main Symbol</label>
-          <input id="main_symbol" placeholder="Death Star" autocomplete="off">
+          <input id="main_symbol" placeholder="Death Star">
         </div>
-        <div class="row">
-          <label for="symbol_color"><span class="material-icons">color_lens</span>Symbol Color</label>
-          <input id="symbol_color" placeholder="red with etched lines" autocomplete="off">
+
+        <div class="row colorrow">
+          <div>
+            <label for="symbol_color"><span class="material-icons">color_lens</span>Symbol Color</label>
+            <input id="symbol_color" placeholder="red with etched lines">
+          </div>
+          <input id="symbol_hex" type="color" value="#e43b44" title="Symbol hex">
         </div>
+
         <div class="row">
           <label for="badge_elements"><span class="material-icons">category</span>Badge Elements</label>
-          <input id="badge_elements" placeholder="concentric rings" autocomplete="off">
+          <input id="badge_elements" placeholder="concentric rings">
         </div>
+
         <div class="row">
           <label for="secondary_symbol"><span class="material-icons">workspace_premium</span>Secondary Symbol</label>
-          <input id="secondary_symbol" placeholder="Army star (optional)" autocomplete="off">
+          <input id="secondary_symbol" placeholder="Army star emblem (optional)">
         </div>
+
         <div class="row">
           <label for="aurebesh_style"><span class="material-icons">translate</span>Aurebesh Style</label>
-          <input id="aurebesh_style" placeholder="glowing Aurebesh along rim" autocomplete="off">
+          <input id="aurebesh_style" placeholder="glowing Aurebesh along rim">
         </div>
+
         <div class="row">
           <label for="sabers_desc"><span class="material-icons">flash_on</span>Lightsabers</label>
-          <input id="sabers_desc" placeholder="two crossed sabers glow" autocomplete="off">
+          <input id="sabers_desc" placeholder="two crossed sabers glow">
         </div>
       </div>
     </div>
 
-    <div id="panel-advanced" class="tab-panel" role="tabpanel" aria-labelledby="tab-advanced" hidden>
-      <div class="row">
-        <label for="style_keywords"><span class="material-icons">style</span>Style Keywords</label>
-        <input id="style_keywords" placeholder="cinematic, heraldic, symmetrical" autocomplete="off">
+    <!-- Style & Export -->
+    <div id="panel-style" class="tabpanel" role="tabpanel" hidden>
+      <div class="grid">
+        <div class="row">
+          <label for="style_keywords"><span class="material-icons">style</span>Style Keywords</label>
+          <input id="style_keywords" placeholder="cinematic, heraldic, symmetrical">
+        </div>
+
+        <div class="row">
+          <label for="arc_radius"><span class="material-icons">trip_origin</span>Top Arc Radius</label>
+          <input id="arc_radius" type="range" min="55" max="88" step="1" value="78">
+          <div class="subtle">Fine-tune the text arc (percent of radius)</div>
+        </div>
+
+        <div class="row">
+          <label for="out"><span class="material-icons">notes</span>Generated Prompt</label>
+          <textarea id="out" spellcheck="false" placeholder="Generated prompt appears here…" style="min-height:160px; font:13px/1.55 var(--mono)"></textarea>
+        </div>
       </div>
-      <div class="btns" role="group" aria-label="Actions">
+
+      <div class="toolbar" style="margin-top:8px" role="group" aria-label="Export">
         <button id="gen" class="btn primary" type="button"><span class="material-icons" aria-hidden="true">bolt</span>Generate</button>
-        <button id="copyBtn" class="btn" type="button"><span class="material-icons" aria-hidden="true">content_copy</span>Copy Text</button>
-        <button id="downloadBtn" class="btn" type="button"><span class="material-icons" aria-hidden="true">save</span>Download TXT</button>
-        <button id="copySvgBtn" class="btn" type="button"><span class="material-icons" aria-hidden="true">content_paste</span>Copy SVG</button>
-        <button id="downloadSvgBtn" class="btn" type="button"><span class="material-icons" aria-hidden="true">image</span>Download SVG</button>
-        <button id="downloadPngBtn" class="btn" type="button"><span class="material-icons" aria-hidden="true">photo</span>Download PNG</button>
+        <button id="copyBtn" class="btn" type="button"><span class="material-icons">content_copy</span>Copy Text</button>
+        <button id="downloadBtn" class="btn" type="button"><span class="material-icons">save</span>Download TXT</button>
+        <button id="copySvgBtn" class="btn" type="button"><span class="material-icons">content_paste</span>Copy SVG</button>
+        <button id="downloadSvgBtn" class="btn" type="button"><span class="material-icons">image</span>Download SVG</button>
+        <button id="downloadPngBtn" class="btn" type="button"><span class="material-icons">photo</span>Download PNG</button>
       </div>
-      <div class="subtle" style="margin-top:12px">Shortcuts: ⌘/Ctrl+Enter generate • ⌘/Ctrl+C copy (when text area focused)</div>
-      <div class="row" style="margin-top:16px">
-        <label for="out"><span class="material-icons">notes</span>Generated Prompt</label>
-        <textarea id="out" spellcheck="false" placeholder="Your generated prompt will appear here..."></textarea>
-      </div>
+      <div class="subtle">Shortcuts: ⌘/Ctrl+Enter = Generate • ⌘/Ctrl+C inside prompt = Copy</div>
     </div>
   </section>
 
+  <!-- Preview -->
   <section class="card" aria-label="Preview">
-    <h2><span class="material-icons" style="font-size:18px" aria-hidden="true">visibility</span> Live SVG Preview</h2>
-    <div class="toolbar">
-      <div class="btns" role="group" aria-label="View controls">
-        <button class="chip" id="fit" type="button"><span class="material-icons" aria-hidden="true">fit_screen</span>Fit</button>
-        <button class="chip" id="fillView" type="button"><span class="material-icons" aria-hidden="true">crop_free</span>Fill</button>
-        <button class="chip" id="resetView" type="button"><span class="material-icons" aria-hidden="true">restart_alt</span>Reset</button>
-        <button class="chip" id="rotateView" type="button"><span class="material-icons" aria-hidden="true">rotate_90_degrees_ccw</span>Rotate</button>
-      </div>
-      <div class="btns" aria-live="polite">
-        <span class="chip min" id="hudZoom">Zoom 100%</span>
-        <span class="chip min" id="hudSize">—</span>
-        <span class="chip min" id="meta">—</span>
-      </div>
+    <h2><span class="material-icons" aria-hidden="true" style="font-size:18px">visibility</span> Live SVG Preview</h2>
+    <div class="toolbar" style="margin-bottom:10px">
+      <button class="chip" id="fit" type="button"><span class="material-icons">fit_screen</span>Fit</button>
+      <button class="chip" id="fillView" type="button"><span class="material-icons">crop_free</span>Fill</button>
+      <button class="chip" id="resetView" type="button"><span class="material-icons">restart_alt</span>Reset</button>
+      <button class="chip" id="rotateView" type="button"><span class="material-icons">rotate_90_degrees_ccw</span>Rotate</button>
+      <span class="chip" id="hudZoom">Zoom 100%</span>
+      <span class="chip" id="hudSize">—</span>
+      <span class="chip" id="meta">—</span>
     </div>
     <div class="stage" id="stage" aria-label="Pan/zoom stage"><div id="inner"></div></div>
   </section>
 </main>
 
+<!-- Modal -->
 <dialog id="jsonModal" aria-labelledby="jsonTitle" aria-modal="true">
   <div class="modal-head">
-    <strong id="jsonTitle" style="font-size:16px">Import / Export JSON</strong>
-    <button id="closeJson" class="chip" type="button"><span class="material-icons" aria-hidden="true">close</span>Close</button>
+    <strong id="jsonTitle">Import / Export JSON</strong>
+    <button id="closeJson" class="chip" type="button"><span class="material-icons">close</span>Close</button>
   </div>
   <div class="modal-body">
-    <textarea id="jsonArea" class="card" style="min-height:180px;font:13px/1.55 var(--mono)" placeholder='Paste JSON here or edit and click "Apply"'></textarea>
+    <textarea id="jsonArea" class="card" style="min-height:180px; font:13px/1.55 var(--mono)" placeholder='Paste JSON here or edit and click "Apply"'></textarea>
   </div>
   <div class="modal-actions">
-    <button id="applyJson" class="btn primary" type="button"><span class="material-icons" aria-hidden="true">check</span>Apply</button>
-    <button id="copyJson" class="btn" type="button"><span class="material-icons" aria-hidden="true">content_copy</span>Copy</button>
+    <button id="applyJson" class="btn primary" type="button"><span class="material-icons">check</span>Apply</button>
+    <button id="copyJson" class="btn" type="button"><span class="material-icons">content_copy</span>Copy</button>
   </div>
 </dialog>
 
+<!-- Toast -->
 <div id="toast" class="toast" role="status" aria-live="polite"><span class="material-icons" aria-hidden="true">check_circle</span><span id="toastMsg">Done</span></div>
 
 <script>
-/* ===== Utilities & Theme ===== */
-const $ = s => document.querySelector(s);
-const $$ = s => Array.from(document.querySelectorAll(s));
-const byId = id => document.getElementById(id);
-const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
-const LS_FORM = 'medallion:form:v5';
-const LS_THEME = 'medallion:theme:light';
-const safeLS = {
-  get(k){ try{ return localStorage.getItem(k) }catch{ return null } },
-  set(k,v){ try{ localStorage.setItem(k,v) }catch{} }
-};
-function toast(msg, err=false){
-  const el = byId('toast'); if(!el) return;
-  el.classList.toggle('error', !!err);
-  byId('toastMsg').textContent = msg;
-  el.classList.add('show');
-  setTimeout(()=>el.classList.remove('show'), 2200);
-}
+/* ===== Utilities ===== */
+const $=s=>document.querySelector(s);
+const $$=s=>Array.from(document.querySelectorAll(s));
+const byId=id=>document.getElementById(id);
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const NS='http://www.w3.org/2000/svg';
+const LS_FORM='medallion:form:v6';
+const LS_THEME='medallion:theme:light';
+const LS_PRESETS='medallion:presets:v2';
 
+const safeLS={ get:k=>{try{return localStorage.getItem(k)}catch{return null}}, set:(k,v)=>{try{localStorage.setItem(k,v)}catch{}} };
+
+function toast(msg,err=false){ const el=byId('toast'); if(!el) return; el.classList.toggle('error',!!err); byId('toastMsg').textContent=msg; el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),2200); }
+
+/* ===== Theme ===== */
 (function initTheme(){
-  const stored = safeLS.get(LS_THEME);
-  if(stored === '1') document.body.classList.add('light-theme');
+  const stored=safeLS.get(LS_THEME);
+  if(stored==='1') document.body.classList.add('theme-light');
   paintTheme();
 })();
 function paintTheme(){
-  const light = document.body.classList.contains('light-theme');
-  const btn = byId('themeToggle');
-  btn.setAttribute('aria-pressed', String(light));
-  btn.querySelector('.material-icons').textContent = light ? 'light_mode' : 'dark_mode';
-  byId('themeLabel').textContent = light ? 'Light' : 'Dark';
+  const light=document.body.classList.contains('theme-light');
+  byId('themeToggle').setAttribute('aria-pressed',String(light));
+  byId('themeToggle').querySelector('.material-icons').textContent=light?'light_mode':'dark_mode';
+  byId('themeLabel').textContent=light?'Light':'Dark';
 }
-byId('themeToggle').addEventListener('click',()=>{
-  const light = document.body.classList.toggle('light-theme');
-  safeLS.set(LS_THEME, light ? '1' : '0'); paintTheme();
-});
+byId('themeToggle').addEventListener('click',()=>{ const l=document.body.classList.toggle('theme-light'); safeLS.set(LS_THEME,l?'1':'0'); paintTheme(); });
 
 /* ===== Tabs ===== */
-const tabs = $$('.tab');
-const panels = { basic:byId('panel-basic'), symbols:byId('panel-symbols'), advanced:byId('panel-advanced') };
-function setTab(btn){
-  const id = btn.dataset.tab;
-  tabs.forEach(t => { const a = t === btn; t.setAttribute('aria-selected', String(a)); t.tabIndex = a ? 0 : -1; });
-  Object.entries(panels).forEach(([k,p]) => p.hidden = (k !== id));
-  btn.focus();
-}
-tabs.forEach((t,i) => {
-  t.addEventListener('click', () => setTab(t));
-  t.addEventListener('keydown', (e) => {
-    if(e.key === 'ArrowRight') setTab(tabs[(i+1)%tabs.length]);
-    if(e.key === 'ArrowLeft') setTab(tabs[(i-1+tabs.length)%tabs.length]);
-    if(e.key === 'Home') setTab(tabs[0]);
-    if(e.key === 'End') setTab(tabs[tabs.length-1]);
-  }, {passive:true});
-});
+const tabs=$$('.tab');
+const panels={basic:byId('panel-basic'),symbols:byId('panel-symbols'),style:byId('panel-style')};
+function setTab(t){ const id=t.dataset.tab; tabs.forEach(btn=>{const a=btn===t; btn.setAttribute('aria-selected',String(a)); btn.tabIndex=a?0:-1;}); Object.entries(panels).forEach(([k,p])=>p.hidden=(k!==id)); t.focus(); }
+tabs.forEach((t,i)=>{ t.addEventListener('click',()=>setTab(t)); t.addEventListener('keydown',e=>{ if(e.key==='ArrowRight') setTab(tabs[(i+1)%tabs.length]); if(e.key==='ArrowLeft') setTab(tabs[(i-1+tabs.length)%tabs.length]); if(e.key==='Home') setTab(tabs[0]); if(e.key==='End') setTab(tabs.at(-1)); }, {passive:true}); });
 setTab(tabs[0]);
 
-/* ===== Presets / Profiles ===== */
-const PRESETS = [
-  { id:'fl_army', name:'Florida + Army', note:'Aurebesh rim • Crossed sabers', thumb:'FL',
-    form:{ text_top:"SAINT CLOUD JEDI", rim_finish:"metallic silver", plate_color:"black", text_colors:"white with black outline", state_shape:"state of Florida", outline_color:"white", main_symbol:"Death Star", symbol_color:"red with etched lines", badge_elements:"concentric rings", secondary_symbol:"Army star emblem", aurebesh_style:"glowing Aurebesh along rim", sabers_desc:"two crossed sabers glow", style_keywords:"cinematic, heraldic, symmetrical", flip_arc:"auto" } },
-  { id:'det_wings', name:'Detroit + Wings', note:'Sports fusion • 3 beams', thumb:'DET',
-    form:{ text_top:"DETROIT JEDI", rim_finish:"polished steel", plate_color:"black", text_colors:"white", state_shape:"medallion field", outline_color:"red/black", main_symbol:"Death Star", symbol_color:"red etched", badge_elements:"concentric rings", secondary_symbol:"", aurebesh_style:"glowing inscriptions", sabers_desc:"three angled beams glow", style_keywords:"sports fusion, symmetrical", flip_arc:"auto" } },
-  { id:'jedi_generic', name:'Galactic Jedi', note:'Navy plate • Vertical glow', thumb:'JEDI',
-    form:{ text_top:"GALACTIC JEDI ORDER", rim_finish:"brushed silver", plate_color:"navy", text_colors:"silver outline", state_shape:"medallion field", outline_color:"white", main_symbol:"Jedi crest", symbol_color:"silver", badge_elements:"imperial ticks", secondary_symbol:"", aurebesh_style:"cyan glow runes", sabers_desc:"single vertical saber glow", style_keywords:"heraldic, luminous", flip_arc:"auto" } },
+/* ===== Presets & Profiles ===== */
+const DEFAULT_PRESETS=[
+  {id:'fl_army',name:'Florida + Army',note:'Aurebesh rim • Crossed sabers',thumb:'FL',form:{
+    text_top:"SAINT CLOUD JEDI",rim_finish:"metallic silver",plate_color:"black",text_colors:"white with black outline",
+    state_shape:"state of Florida",outline_color:"white",main_symbol:"Death Star",symbol_color:"red with etched lines",
+    badge_elements:"concentric rings",secondary_symbol:"Army star emblem",aurebesh_style:"glowing Aurebesh along rim",
+    sabers_desc:"two crossed sabers glow",style_keywords:"cinematic, heraldic, symmetrical",flip_arc:"auto"
+  }},
+  {id:'det_wings',name:'Detroit + Wings',note:'Sports fusion • 3 beams',thumb:'DET',form:{
+    text_top:"DETROIT JEDI",rim_finish:"polished steel",plate_color:"black",text_colors:"white",
+    state_shape:"medallion field",outline_color:"red/black",main_symbol:"Death Star",symbol_color:"red etched",
+    badge_elements:"concentric rings",secondary_symbol:"",aurebesh_style:"glowing inscriptions",
+    sabers_desc:"three angled beams glow",style_keywords:"sports fusion, symmetrical",flip_arc:"auto"
+  }},
+  {id:'jedi_generic',name:'Galactic Jedi',note:'Navy plate • Vertical glow',thumb:'JEDI',form:{
+    text_top:"GALACTIC JEDI ORDER",rim_finish:"brushed silver",plate_color:"navy",text_colors:"silver outline",
+    state_shape:"medallion field",outline_color:"white",main_symbol:"Jedi crest",symbol_color:"silver",
+    badge_elements:"imperial ticks",secondary_symbol:"",aurebesh_style:"cyan glow runes",
+    sabers_desc:"single vertical saber glow",style_keywords:"heraldic, luminous",flip_arc:"auto"
+  }},
 ];
-const profilesHost = byId('profiles');
-PRESETS.forEach(p=>{
-  const btn=document.createElement('button');
-  btn.className='profile'; btn.type='button'; btn.setAttribute('role','listitem'); btn.dataset.profile=p.id;
-  btn.innerHTML = `<div class="thumb">${p.thumb}</div><div><strong>${p.name}</strong><div class="subtle">${p.note}</div><span class="tag">Preset</span></div>`;
-  btn.addEventListener('click',()=>{ fillForm(p.form,true); toast('Profile loaded'); });
-  profilesHost.appendChild(btn);
+
+function getPresets(){ const raw=safeLS.get(LS_PRESETS); if(!raw) return DEFAULT_PRESETS; try{const arr=JSON.parse(raw); return Array.isArray(arr)&&arr.length?arr:DEFAULT_PRESETS}catch{return DEFAULT_PRESETS} }
+function setPresets(arr){ safeLS.set(LS_PRESETS, JSON.stringify(arr)); renderProfiles(); }
+
+const profilesHost=byId('profiles');
+function renderProfiles(){
+  profilesHost.innerHTML='';
+  const q=(byId('profileSearch').value||'').toLowerCase();
+  getPresets().filter(p=>!q || p.name.toLowerCase().includes(q) || p.thumb.toLowerCase().includes(q)).forEach(p=>{
+    const li=document.createElement('button');
+    li.className='profile'; li.type='button'; li.setAttribute('role','listitem');
+    li.innerHTML=`<div class="thumb">${p.thumb}</div>
+      <div><div style="font-weight:700">${p.name}</div><div class="subtle">${p.note}</div><span class="tag">Preset</span></div>
+      <div style="display:flex; gap:6px">
+        <button class="chip" data-act="apply" type="button" title="Apply"><span class="material-icons">play_arrow</span></button>
+        <button class="chip" data-act="delete" type="button" title="Delete"><span class="material-icons">delete</span></button>
+      </div>`;
+    li.querySelector('[data-act="apply"]').addEventListener('click',e=>{ e.stopPropagation(); fillForm(p.form,true); toast('Preset applied'); });
+    li.querySelector('[data-act="delete"]').addEventListener('click',e=>{
+      e.stopPropagation();
+      const all=getPresets().filter(x=>x.id!==p.id || DEFAULT_PRESETS.find(d=>d.id===p.id)); // keep defaults undeletable
+      if(!DEFAULT_PRESETS.find(d=>d.id===p.id)){ setPresets(all); toast('Preset deleted'); } else { toast('Default presets cannot be deleted', true); }
+    });
+    li.addEventListener('click',()=>{ fillForm(p.form,true); toast('Preset loaded'); });
+    profilesHost.appendChild(li);
+  });
+}
+byId('profileSearch').addEventListener('input', renderProfiles);
+byId('addPresetBtn').addEventListener('click', ()=>{
+  const v=readForm();
+  const name=(v.text_top||'Custom Preset').trim().slice(0,40);
+  const id='user_'+Date.now().toString(36);
+  const arr=getPresets().concat({id,name,thumb:(name.split(' ')[0]||'CUST').toUpperCase().slice(0,4),note:'Saved from form',form:v});
+  setPresets(arr);
+  toast('Preset saved');
 });
 
-/* ===== Form IO + autosave ===== */
+/* ===== Form IO ===== */
 const FIELDS=["text_top","rim_finish","plate_color","text_colors","state_shape","outline_color","main_symbol","symbol_color","badge_elements","secondary_symbol","aurebesh_style","sabers_desc","style_keywords","flip_arc"];
 function readForm(){
-  const v={}; FIELDS.forEach(id => v[id] = (byId(id)?.value || '').trim());
-  v.text_top ||= "SAINT CLOUD JEDI";
-  v.rim_finish ||= "metallic silver";
-  v.plate_color ||= "black";
-  v.text_colors ||= "white with black outline";
-  v.state_shape ||= "state of Florida";
-  v.outline_color ||= "white";
-  v.main_symbol ||= "Death Star";
-  v.symbol_color ||= "red with etched lines";
-  v.badge_elements ||= "concentric rings";
-  v.aurebesh_style ||= "glowing Aurebesh along rim";
-  v.sabers_desc ||= "two crossed sabers glow";
-  v.style_keywords ||= "cinematic, heraldic, symmetrical";
-  v.flip_arc ||= "auto";
+  const v={}; FIELDS.forEach(id=>v[id]=(byId(id)?.value||'').trim());
+  v.text_top||="SAINT CLOUD JEDI";
+  v.rim_finish||="metallic silver";
+  v.plate_color||="black";
+  v.text_colors||="white with black outline";
+  v.state_shape||="state of Florida";
+  v.outline_color||="white";
+  v.main_symbol||="Death Star";
+  v.symbol_color||="red with etched lines";
+  v.badge_elements||="concentric rings";
+  v.aurebesh_style||="glowing Aurebesh along rim";
+  v.sabers_desc||="two crossed sabers glow";
+  v.style_keywords||="cinematic, heraldic, symmetrical";
+  v.flip_arc||="auto";
+  v.arc_radius = Number(byId('arc_radius').value||78);
+  // hex overrides
+  v._hex_plate = byId('plate_hex').value;
+  v._hex_text = byId('text_hex').value;
+  v._hex_outline = byId('outline_hex').value;
+  v._hex_symbol = byId('symbol_hex').value;
   return v;
 }
-function fillForm(data, andGenerate=false){
-  FIELDS.forEach(k => { const el = byId(k); if(el && data[k] !== undefined) el.value = data[k]; });
-  if(andGenerate) generate();
+function fillForm(data,andGen=false){
+  FIELDS.concat(['arc_radius']).forEach(k=>{ const el=byId(k); if(el && data[k]!=null){ el.value=data[k]; }});
+  if(data._hex_plate) byId('plate_hex').value=data._hex_plate;
+  if(data._hex_text) byId('text_hex').value=data._hex_text;
+  if(data._hex_outline) byId('outline_hex').value=data._hex_outline;
+  if(data._hex_symbol) byId('symbol_hex').value=data._hex_symbol;
+  if(andGen) generate();
 }
 let saveT;
-function autosave(){
-  clearTimeout(saveT);
-  saveT = setTimeout(()=> safeLS.set(LS_FORM, JSON.stringify(readForm())), 200);
-}
-FIELDS.forEach(id=>{
+function autosave(){ clearTimeout(saveT); saveT=setTimeout(()=>safeLS.set(LS_FORM, JSON.stringify(readForm())), 200); }
+[...FIELDS, 'arc_radius'].forEach(id=>{
   const el=byId(id); if(!el) return;
-  ['input','change'].forEach(ev => el.addEventListener(ev, ()=>{ generate(); autosave(); }, {passive:true}));
+  ['input','change'].forEach(ev=>el.addEventListener(ev,()=>{ generate(); autosave(); }, {passive:true}));
 });
-(function restore(){
-  const raw = safeLS.get(LS_FORM);
-  if(raw){ try{ fillForm(JSON.parse(raw), true); }catch{} }
-})();
+['plate_hex','text_hex','outline_hex','symbol_hex'].forEach(id=>{
+  byId(id).addEventListener('input', ()=>{ generate(); autosave(); }, {passive:true});
+});
+byId('clearBtn').addEventListener('click', ()=>{
+  localStorage.removeItem(LS_FORM);
+  fillForm({}, true);
+  toast('Cleared');
+});
 
-/* ===== Prompt text builder ===== */
+/* ===== Prompt ===== */
 function buildPrompt(v){
   return [
     "Cinematic medallion pendant design.",
-    "• Shape & Base: Round pendant, "+v.rim_finish+", plate in "+v.plate_color+".",
-    "• Text: Raised lettering “"+v.text_top+"” in "+v.text_colors+".",
-    "• Central Motif: "+v.state_shape+" in "+v.outline_color+" with "+v.main_symbol+" ("+v.symbol_color+"). Elements: "+v.badge_elements+(v.secondary_symbol?(". Secondary: "+v.secondary_symbol):"")+".",
-    "• Aurebesh: "+v.aurebesh_style+".",
-    "• Lightsabers: "+v.sabers_desc+".",
-    "• Style: "+v.style_keywords+"."
+    `• Shape & Base: Round pendant, ${v.rim_finish}, plate in ${v.plate_color}.`,
+    `• Text: Raised lettering “${v.text_top}” in ${v.text_colors}.`,
+    `• Central Motif: ${v.state_shape} (${v.outline_color}) with ${v.main_symbol} (${v.symbol_color}). Elements: ${v.badge_elements}${v.secondary_symbol?`. Secondary: ${v.secondary_symbol}`:''}.`,
+    `• Aurebesh: ${v.aurebesh_style}.`,
+    `• Lightsabers: ${v.sabers_desc}.`,
+    `• Style: ${v.style_keywords}.`
   ].join("\n");
 }
 
-/* ===== SVG builder ===== */
-const NS='http://www.w3.org/2000/svg';
-const stage = byId('stage'), inner = byId('inner'), hudZoom = byId('hudZoom'), hudSize = byId('hudSize'), meta = byId('meta'), sizeSelect=byId('sizeSelect');
+/* ===== Color helpers ===== */
+function colorPick(key, table, fallback){ key=(key||'').toLowerCase(); for(const [k,v] of table){ if(k && key.includes(k)) return v; } return fallback; }
 
+/* ===== SVG Builder ===== */
+const stage=byId('stage'), inner=byId('inner'), hudZoom=byId('hudZoom'), hudSize=byId('hudSize'), meta=byId('meta');
+const sizeSelect=byId('sizeSelect');
 let view={x:0,y:0,k:1,min:.06,max:10,w:640,h:640,rot:0};
-new ResizeObserver(()=>{ const r=stage.getBoundingClientRect(); hudSize.textContent=`${Math.round(r.width)}×${Math.round(r.height)}px`; renderPreview(); }).observe(stage);
-sizeSelect.addEventListener('change',()=>{ view.w=view.h=Number(sizeSelect.value||640); generate(); setTimeout(fit, 0); });
 
-function make(name, attrs = {}, parent) {
+new ResizeObserver(()=>{ const r=stage.getBoundingClientRect(); hudSize.textContent=`${Math.round(r.width)}×${Math.round(r.height)}px`; renderPreview(); }).observe(stage);
+sizeSelect.addEventListener('change',()=>{ view.w=view.h=Number(sizeSelect.value||640); generate(); setTimeout(fit,0); });
+
+function make(name, attrs={}, parent){
   const el=document.createElementNS(NS,name);
-  for(const [k,v] of Object.entries(attrs)) if(v!=null){
+  for(const [k,v] of Object.entries(attrs)){
+    if(v==null) continue;
     if(k==='href'){ el.setAttributeNS('http://www.w3.org/1999/xlink','xlink:href',String(v)); el.setAttribute('href',String(v)); }
     else el.setAttribute(k,String(v));
   }
-  (parent||currentSvgRoot()).appendChild(el);
+  (parent||inner).appendChild(el);
   return el;
 }
-function currentSvgRoot(){ return inner; }
-
-function colorPick(key, table, fallback){ key=(key||'').toLowerCase(); for(const [k,v] of table){ if(k && key.includes(k)) return v; } return fallback; }
 
 function buildMedallionSvg(v){
   const D=view.w, R=D/2;
-  const svg=document.createElementNS(NS,'svg');
-  svg.setAttribute('xmlns',NS); svg.setAttribute('viewBox',`0 0 ${D} ${D}`); svg.setAttribute('width',D); svg.setAttribute('height',D);
+  const svg=document.createElementNS(NS,'svg'); svg.setAttribute('xmlns',NS); svg.setAttribute('viewBox',`0 0 ${D} ${D}`); svg.setAttribute('width',D); svg.setAttribute('height',D);
   svg.setAttribute('shape-rendering','geometricPrecision');
+
+  // Palette
+  const plateFill = v._hex_plate || colorPick(v.plate_color,[['black','#121316'],['navy','#0b2346'],['crimson','#5c0b12'],['gray','#2a2f3a'],['white','#f3f6f9']], '#121316');
+  const rimColor   = colorPick(v.rim_finish,[['gold','#ffd54a'],['silver','#c0c7ce'],['steel','#b0b7c3'],['bronze','#c18b52'],['obsidian','#000']], '#a9bdd1');
+  const textFill   = v._hex_text || colorPick(v.text_colors,[['white','#fff'],['gold','#ffd54a'],['silver','#c0c7ce'],['cyan','#6ee7ff'],['red','#e43b44'],['black','#000']], '#fff');
+  const symColor   = v._hex_symbol || colorPick(v.symbol_color,[['red','#e43b44'],['silver','#c0c7ce'],['gold','#ffd54a'],['white','#fff'],['blue','#3b6ee4'],['cyan','#6ee7ff']], '#6ee7ff');
+  const outlineCol = v._hex_outline || colorPick(v.outline_color,[['white','#ffffff'],['gold','#ffd54a'],['silver','#c0c7ce'],['red','#e43b44'],['blue','#3b6ee4']], '#ffffff');
 
   const defs=make('defs',{},svg);
   make('style',{},defs).textContent=`.ns{vector-effect:non-scaling-stroke;shape-rendering:crispEdges}.round{stroke-linecap:round;stroke-linejoin:round}`;
-  const sweepA=R*0.78, y=R-sweepA;
+  const sweepA=R*(Number(v.arc_radius||78)/100), y=R-sweepA;
   make('path',{id:'topArc',d:`M ${R- sweepA} ${y} A ${sweepA} ${sweepA} 0 0 1 ${R+ sweepA} ${y}`},defs);
   make('path',{id:'topArcRev',d:`M ${R+ sweepA} ${y} A ${sweepA} ${sweepA} 0 0 0 ${R- sweepA} ${y}`},defs);
 
-  const plateFill=colorPick(v.plate_color,[['black','#121316'],['navy','#0b2346'],['crimson','#5c0b12'],['gray','#2a2f3a'],['white','#f3f6f9']], '#121316');
-  const rimColor=colorPick(v.rim_finish,[['gold','#ffd54a'],['silver','#c0c7ce'],['steel','#b0b7c3'],['bronze','#c18b52'],['obsidian','#000']], '#9ad6ff');
-  const textFill=colorPick(v.text_colors,[['white','#fff'],['gold','#ffd54a'],['silver','#c0c7ce'],['cyan','#6ee7ff'],['red','#e43b44'],['black','#000']], '#fff');
-  const symColor=colorPick(v.symbol_color,[['red','#e43b44'],['silver','#c0c7ce'],['gold','#ffd54a'],['white','#fff'],['blue','#3b6ee4'],['cyan','#6ee7ff']], '#6ee7ff');
-  const outlineColor=colorPick(v.outline_color,[['white','#ffffff'],['gold','#ffd54a'],['silver','#c0c7ce'],['red','#e43b44'],['blue','#3b6ee4']], '#ffffff');
-
+  // Base rings
   const gBase=make('g',{},svg);
-  make('circle',{cx:R,cy:R,r:R*0.93,fill:plateFill,stroke:rimColor,'stroke-width':Math.max(8,D*0.015),class:'ns'},gBase);
-  make('circle',{cx:R,cy:R,r:R*0.98,fill:'none',stroke:rimColor,'stroke-width':Math.max(2,D*0.004),class:'ns'},gBase);
-  make('circle',{cx:R,cy:R,r:R*0.86,fill:'none',stroke:'#ffffff14','stroke-width':Math.max(1.5,D*0.003),class:'ns'},gBase);
+  make('circle',{cx:R,cy:R,r:R*0.94,fill:plateFill,stroke:rimColor,'stroke-width':Math.max(8,D*0.015),class:'ns'},gBase);
+  make('circle',{cx:R,cy:R,r:R*0.985,fill:'none',stroke:rimColor,'stroke-width':Math.max(2,D*0.004),class:'ns'},gBase);
+  make('circle',{cx:R,cy:R,r:R*0.86,fill:'none',stroke:'#ffffff20','stroke-width':Math.max(1.5,D*0.003),class:'ns'},gBase);
 
   if((v.badge_elements||'').toLowerCase().includes('ring')){
     [0.76,0.64,0.54].forEach((p,i)=>make('circle',{cx:R,cy:R,r:R*p,fill:'none',stroke: i===1 ? '#7fbbe0' : rimColor,'stroke-width':Math.max(1,D*0.0026),'stroke-dasharray': i===1?'6 6':null,class:'ns'},gBase));
   }
 
+  // Top arc text
   if((v.text_top||'').trim()){
     const wantsOutline=(v.text_colors||'').toLowerCase().includes('outline') || plateFill==='#121316';
-    const t=make('text',{'font-size':Math.max(26,D*0.047),'font-weight':800,fill:textFill,'letter-spacing':'.8','text-anchor':'middle'},svg);
+    const t=make('text',{'font-size':Math.max(26,D*0.047),'font-weight':900,fill:textFill,'text-anchor':'middle','letter-spacing':'.8'},svg);
     if(wantsOutline){ t.setAttribute('stroke','#000'); t.setAttribute('stroke-width',Math.max(1.6,D*0.003)); t.setAttribute('paint-order','stroke'); }
     const useRev = (v.flip_arc==='flipped') || (v.flip_arc==='auto' && view.rot%360>=180);
     const tp=make('textPath',{href:useRev?'#topArcRev':'#topArc',startOffset:'50%',method:'align',spacing:'auto'},t);
-    tp.textContent=(v.text_top.length>42? v.text_top.slice(0,41)+'…' : v.text_top).toUpperCase();
+    tp.textContent=(v.text_top.length>42 ? v.text_top.slice(0,41)+'…' : v.text_top).toUpperCase();
   }
 
+  // Central outline
   if((v.state_shape||'').toLowerCase().includes('florida')){
     const path=`M ${R-90} ${R+30} C ${R-40} ${R-10}, ${R+10} ${R-6}, ${R+64} ${R+18}
                 C ${R+90} ${R+32}, ${R+96} ${R+56}, ${R+122} ${R+80}
                 C ${R+82} ${R+78}, ${R+70} ${R+64}, ${R+50} ${R+62}
                 C ${R+28} ${R+60}, ${R+22} ${R+76}, ${R-4} ${R+78}
                 C ${R-40} ${R+82}, ${R-72} ${R+68}, ${R-90} ${R+58} Z`;
-    make('path',{d:path,fill:'none',stroke:outlineColor,'stroke-width':Math.max(4.5,D*0.007),'stroke-linejoin':'round',class:'ns'},svg);
-  }else{
-    make('circle',{cx:R,cy:R,r:R*0.34,fill:'none',stroke:outlineColor,'stroke-width':Math.max(3,D*0.005),class:'ns'},svg);
+    make('path',{d:path,fill:'none',stroke:outlineCol,'stroke-width':Math.max(4.5,D*0.007),'stroke-linejoin':'round','class':'ns'},svg);
+  } else {
+    make('circle',{cx:R,cy:R,r:R*0.34,fill:'none',stroke:outlineCol,'stroke-width':Math.max(3,D*0.005),'class':'ns'},svg);
   }
 
+  // Main symbol
   const g=make('g',{},svg);
   const ms=(v.main_symbol||'').toLowerCase();
   if(ms.includes('death')){
@@ -568,28 +609,27 @@ function buildMedallionSvg(v){
     make('line',{x1:R-R*0.31,y1:R,x2:R+R*0.31,y2:R,stroke: plateFill==='#121316' ? '#0a0a0a' : '#111','stroke-width':Math.max(8,D*0.0125),class:'ns'},g);
     make('circle',{cx:R+R*0.11,cy:R-R*0.09,r:R*0.065,fill: plateFill==='#121316' ? '#0a0a0a' : '#111',stroke:'#3b3f48','stroke-width':Math.max(1.5,D*0.0023),class:'ns'},g);
     for(let i=0;i<12;i++){ const a=i*15*Math.PI/180, r1=R*0.16, r2=R*0.31;
-      const x1=R+r1*Math.cos(a), y1=R+r1*Math.sin(a);
-      const x2=R+r2*Math.cos(a), y2=R+r2*Math.sin(a);
-      make('line',{x1,y1,x2,y2,stroke:'#27303d','stroke-width':Math.max(1.3,D*0.002),'stroke-linecap':'round',class:'ns'},g);
+      make('line',{x1:R+r1*Math.cos(a),y1:R+r1*Math.sin(a),x2:R+r2*Math.cos(a),y2:R+r2*Math.sin(a),stroke:'#27303d','stroke-width':Math.max(1.3,D*0.002),'stroke-linecap':'round',class:'ns'},g);
     }
-    make('path',{d:`M ${R-R*0.2} ${R+R*0.22} A ${R*0.2} ${R*0.2} 0 0 0 ${R+R*0.2} ${R+R*0.22}`,
-      stroke:'#27303d','stroke-width':Math.max(1.3,D*0.002),fill:'none',class:'ns'},g);
-  } else if (ms.includes('jedi')) {
+    make('path',{d:`M ${R-R*0.2} ${R+R*0.22} A ${R*0.2} ${R*0.2} 0 0 0 ${R+R*0.2} ${R+R*0.22}`,stroke:'#27303d','stroke-width':Math.max(1.3,D*0.002),fill:'none','class':'ns'},g);
+  } else if(ms.includes('jedi')){
     make('path',{d:`M${R} ${R-0.22*D} L${R+0.035*D} ${R-0.26*D} L${R+0.035*D} ${R}
       L${R+0.07*D} ${R+0.028*D} L${R+0.035*D} ${R+0.056*D} L${R+0.035*D} ${R+0.29*D}
       L${R} ${R+0.23*D} L${R-0.035*D} ${R+0.29*D} L${R-0.035*D} ${R+0.056*D}
       L${R-0.07*D} ${R+0.028*D} L${R-0.035*D} ${R} L${R-0.035*D} ${R-0.26*D} Z`,fill:symColor},g);
   } else {
-    make('path',{d:`M${R},${R-0.26*D} L${R+0.04*D},${R-0.15*D} L${R+0.11*D},${R-0.14*D}
-      L${R+0.05*D},${R-0.01*D} L${R+0.07*D},${R+0.07*D} L${R},${R+0.03*D}
-      L${R-0.07*D},${R+0.07*D} L${R-0.05*D},${R-0.01*D} L${R-0.11*D},${R-0.14*D}
-      L${R-0.04*D},${R-0.15*D} Z`,fill:symColor},g);
+    make('polygon',{points:
+      `${R},${R-0.26*D} ${R+0.06*D},${R-0.15*D} ${R+0.11*D},${R-0.14*D} ${R+0.05*D},${R-0.01*D}
+       ${R+0.07*D},${R+0.07*D} ${R},${R+0.03*D} ${R-0.07*D},${R+0.07*D} ${R-0.05*D},${R-0.01*D}
+       ${R-0.11*D},${R-0.14*D} ${R-0.06*D},${R-0.15*D}`, fill:symColor},g);
   }
 
   if((v.secondary_symbol||'').trim()){
-    make('polygon',{points:starPoints(R+0.4*D,R-0.25*D,0.075*D,0.04*D,5),fill:'none',stroke:'#d4af37','stroke-width':Math.max(3,D*0.0046),class:'ns'},svg);
+    const starPts=(cx,cy,or,ir,n=5)=>{let s=''; const step=Math.PI/n; for(let i=0;i<n*2;i++){ const r=(i%2===0)?or:ir, a=i*step-Math.PI/2; s+=`${cx+r*Math.cos(a)},${cy+r*Math.sin(a)} `;} return s.trim();};
+    make('polygon',{points:starPts(R+0.4*D,R-0.25*D,0.075*D,0.04*D,5),fill:'none',stroke:'#d4af37','stroke-width':Math.max(3,D*0.0046),class:'ns'},svg);
   }
 
+  // Sabers
   const saber=(x1,y1,x2,y2)=>{
     make('line',{x1,y1,x2,y2,stroke:'#9feaff','stroke-opacity':.22,'stroke-width':Math.max(12,D*0.02),class:'ns round'},svg);
     make('line',{x1,y1,x2,y2,stroke:'#79e4ff','stroke-opacity':.38,'stroke-width':Math.max(7,D*0.011),class:'ns round'},svg);
@@ -598,23 +638,18 @@ function buildMedallionSvg(v){
   const s=(v.sabers_desc||'').toLowerCase();
   if(s.includes('cross')||/\bx\b/.test(s)){ saber(R-0.28*D,R-0.28*D,R+0.28*D,R+0.28*D); saber(R+0.28*D,R-0.28*D,R-0.28*D,R+0.28*D); }
   else if(s.includes('three')||/\b3\b/.test(s)){ saber(R-0.31*D,R+0.37*D,R+0.31*D,R+0.37*D); saber(R-0.22*D,R+0.40*D,R+0.12*D,R+0.12*D); saber(R+0.22*D,R+0.40*D,R-0.12*D,R+0.12*D); }
-  else { saber(R,R-0.12*D,R,R+0.40*D); }
+  else{ saber(R,R-0.12*D,R,R+0.40*D); }
 
+  // Aurebesh ring
   const aure=(v.aurebesh_style||'').toLowerCase();
   if(aure.includes('glow')||aure.includes('aurebesh')||aure.includes('rune')||aure.includes('inscription')){
     make('circle',{cx:R,cy:R,r:R*0.68,fill:'none',stroke:'#6ee7ff','stroke-width':Math.max(2,D*0.003),'stroke-dasharray':'6 6','stroke-opacity':.75,class:'ns'},svg);
   }
 
   return svg;
-
-  function starPoints(cx,cy,outerR,innerR,points){
-    let str=''; const step=Math.PI/points;
-    for(let i=0;i<points*2;i++){ const r=(i%2===0)?outerR:innerR; const a=i*step-Math.PI/2; const x=cx+r*Math.cos(a), y=cy+r*Math.sin(a); str+=`${x},${y} `; }
-    return str.trim();
-  }
 }
 
-/* ===== Preview: pan / pinch-zoom / rotate ===== */
+/* ===== Stage: mount & gestures ===== */
 function mount(svg){
   svg.querySelectorAll('path,rect,circle,ellipse,line,polyline,polygon').forEach(el=>{ if(!el.hasAttribute('vector-effect')) el.setAttribute('vector-effect','non-scaling-stroke'); });
   inner.innerHTML=''; inner.appendChild(svg);
@@ -629,29 +664,29 @@ function fit(){ const r=stage.getBoundingClientRect(); const k=Math.min(r.width/
 function fillView(){ const r=stage.getBoundingClientRect(); const k=Math.max(r.width/view.w, r.height/view.h); view={...view,x:0,y:0,k}; renderPreview(); }
 function resetView(){ view={...view,x:0,y:0,k:1,rot:0}; renderPreview(); }
 function rotateView(){ view.rot=(view.rot+45)%360; renderPreview(); }
+
 byId('fit').addEventListener('click',fit);
 byId('fillView').addEventListener('click',fillView);
 byId('resetView').addEventListener('click',resetView);
 byId('rotateView').addEventListener('click',rotateView);
 
-// Pointer capture lifecycle + gestures
+// Gestures
 let pointers=new Map(), lastCenter=null, lastDist=null;
 stage.addEventListener('pointerdown',e=>{ stage.setPointerCapture(e.pointerId); pointers.set(e.pointerId,{x:e.clientX,y:e.clientY}); }, {passive:true});
-stage.addEventListener('pointerup',e=>{ try{ stage.releasePointerCapture(e.pointerId) }catch{} pointers.delete(e.pointerId); if(pointers.size<2){ lastCenter=lastDist=null; } }, {passive:true});
-stage.addEventListener('pointercancel',e=>{ pointers.delete(e.pointerId); if(pointers.size<2){ lastCenter=lastDist=null; } }, {passive:true});
-
+stage.addEventListener('pointerup',e=>{ try{stage.releasePointerCapture(e.pointerId)}catch{} pointers.delete(e.pointerId); if(pointers.size<2){ lastCenter=lastDist=null } }, {passive:true});
+stage.addEventListener('pointercancel',e=>{ pointers.delete(e.pointerId); if(pointers.size<2){ lastCenter=lastDist=null } }, {passive:true});
 stage.addEventListener('pointermove',e=>{
   if(!pointers.has(e.pointerId)) return;
   pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
   const pts=[...pointers.values()];
   if(pts.length===1){
-    const p=pts[0]; const prev=lastCenter||p; view.x += p.x - prev.x; view.y += p.y - prev.y; lastCenter={...p}; renderPreview();
+    const p=pts[0]; const prev=lastCenter||p; view.x += p.x-prev.x; view.y += p.y-prev.y; lastCenter={...p}; renderPreview();
   }else if(pts.length===2){
-    const c={x:(pts[0].x+pts[1].x)/2, y:(pts[0].y+pts[1].y)/2};
+    const c={x:(pts[0].x+pts[1].x)/2,y:(pts[0].y+pts[1].y)/2};
     const d=Math.hypot(pts[0].x-pts[1].x, pts[0].y-pts[1].y);
     if(lastCenter && lastDist){
-      view.x += c.x - lastCenter.x; view.y += c.y - lastCenter.y;
-      const k = clamp(view.k * (d/lastDist), view.min, view.max);
+      view.x += c.x-lastCenter.x; view.y += c.y-lastCenter.y;
+      const k=clamp(view.k*(d/lastDist), view.min, view.max);
       const rect=stage.getBoundingClientRect(), cx=c.x-rect.left - stage.clientWidth/2 - view.x, cy=c.y-rect.top - stage.clientHeight/2 - view.y;
       const adj=k/view.k; view.x -= cx*(adj-1); view.y -= cy*(adj-1); view.k=k;
       renderPreview();
@@ -659,20 +694,17 @@ stage.addEventListener('pointermove',e=>{
     lastCenter=c; lastDist=d;
   }
 },{passive:true});
-stage.addEventListener('pointerleave',()=>{ lastCenter=lastDist=null; }, {passive:true});
-stage.addEventListener('dblclick',()=>fit(),{passive:true});
-
-// Wheel zoom (desktop)
 stage.addEventListener('wheel',e=>{
   e.preventDefault();
-  const factor = (e.ctrlKey||e.metaKey)?0.0025:0.0015;
-  const delta = -e.deltaY*factor;
-  const k = clamp(view.k*(1+delta), view.min, view.max);
+  const factor=(e.ctrlKey||e.metaKey)?0.0025:0.0016;
+  const delta=-e.deltaY*factor;
+  const k=clamp(view.k*(1+delta), view.min, view.max);
   const rect=stage.getBoundingClientRect(), cx=e.clientX-rect.left - stage.clientWidth/2 - view.x, cy=e.clientY-rect.top - stage.clientHeight/2 - view.y;
-  const ratio = k/view.k; view.x -= cx*(ratio-1); view.y -= cy*(ratio-1); view.k = k; renderPreview();
+  const ratio=k/view.k; view.x -= cx*(ratio-1); view.y -= cy*(ratio-1); view.k=k; renderPreview();
 },{passive:false});
+stage.addEventListener('dblclick',()=>fit(),{passive:true});
 
-/* ===== Mini badge mirrors main SVG ===== */
+/* ===== Mini badge mirror ===== */
 function renderBadge(svg){
   const badge=byId('svgBadge'); if(!badge) return;
   badge.innerHTML='';
@@ -681,58 +713,46 @@ function renderBadge(svg){
   badge.appendChild(clone);
 }
 
-/* ===== Export (SVG/PNG/TXT/JSON) ===== */
+/* ===== Export ===== */
 function toXml(svg){ const clone=svg.cloneNode(true); clone.setAttribute('xmlns',NS); return `<?xml version="1.0" encoding="UTF-8"?>\n`+clone.outerHTML; }
-function revokeLater(url){ setTimeout(()=>URL.revokeObjectURL(url), 1000); }
+function revokeLater(url){ setTimeout(()=>URL.revokeObjectURL(url), 1200); }
 
 byId('copySvgBtn').addEventListener('click',()=>{
   const svg=inner.querySelector('svg'); if(!svg) return toast('Nothing to copy',true);
   navigator.clipboard?.writeText(toXml(svg)).then(()=>toast('SVG copied')).catch(()=>toast('Clipboard blocked',true));
 });
-
 byId('downloadSvgBtn').addEventListener('click',()=>{
   const svg=inner.querySelector('svg'); if(!svg) return toast('Nothing to export',true);
   const clone=svg.cloneNode(true);
-  const g=document.createElementNS(NS,'g');
-  while(clone.firstChild){ g.appendChild(clone.firstChild) }
-  g.setAttribute('transform',`rotate(${view.rot} ${view.w/2} ${view.h/2})`);
-  clone.appendChild(g);
-  const xml=toXml(clone);
-  const blob=new Blob([xml],{type:'image/svg+xml'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a'); a.href=url; a.download='medallion.svg'; a.click();
-  revokeLater(url);
-  toast('SVG downloaded');
+  const g=document.createElementNS(NS,'g'); while(clone.firstChild) g.appendChild(clone.firstChild);
+  g.setAttribute('transform',`rotate(${view.rot} ${view.w/2} ${view.h/2})`); clone.appendChild(g);
+  const blob=new Blob([toXml(clone)],{type:'image/svg+xml'}); const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download='medallion.svg'; a.click(); revokeLater(url); toast('SVG downloaded');
 });
-
 byId('downloadPngBtn').addEventListener('click',()=>{
   const svg=inner.querySelector('svg'); if(!svg) return toast('Nothing to export',true);
   const clone=svg.cloneNode(true);
-  const g=document.createElementNS(NS,'g');
-  while(clone.firstChild){ g.appendChild(clone.firstChild) }
-  g.setAttribute('transform',`rotate(${view.rot} ${view.w/2} ${view.h/2})`);
-  clone.appendChild(g);
-  const xml=toXml(clone);
-  const url=URL.createObjectURL(new Blob([xml],{type:'image/svg+xml'}));
-  const img=new Image(); const scale = Math.max(2, Math.ceil((window.devicePixelRatio||1)));
+  const g=document.createElementNS(NS,'g'); while(clone.firstChild) g.appendChild(clone.firstChild);
+  g.setAttribute('transform',`rotate(${view.rot} ${view.w/2} ${view.h/2})`); clone.appendChild(g);
+  const xml=toXml(clone); const url=URL.createObjectURL(new Blob([xml],{type:'image/svg+xml'}));
+  const img=new Image(); const scale=Math.max(2, Math.ceil((window.devicePixelRatio||1)));
   img.onload=()=>{
     const box=clone.viewBox.baseVal||{width:view.w,height:view.h};
     const c=document.createElement('canvas'); c.width=box.width*scale; c.height=box.height*scale;
     const ctx=c.getContext('2d'); ctx.setTransform(scale,0,0,scale,0,0); ctx.drawImage(img,0,0);
     revokeLater(url);
     c.toBlob(b=>{ if(!b) return toast('PNG failed',true);
-      const u=URL.createObjectURL(b); const a=document.createElement('a'); a.href=u; a.download=`medallion_${box.width}x${box.height}.png`; a.click(); revokeLater(u);
-      toast('PNG downloaded');
+      const u=URL.createObjectURL(b); const a=document.createElement('a'); a.href=u; a.download=`medallion_${box.width}x${box.height}.png`; a.click(); revokeLater(u); toast('PNG downloaded');
     },'image/png');
   };
   img.crossOrigin='anonymous'; img.src=url;
 });
-
 byId('copyBtn').addEventListener('click',()=>{ navigator.clipboard?.writeText(byId('out').value||'').then(()=>toast('Copied')); });
 byId('downloadBtn').addEventListener('click',()=>{
   const blob=new Blob([byId('out').value||''],{type:'text/plain'}); const u=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=u; a.download='medallion_prompt.txt'; a.click(); revokeLater(u); toast('TXT downloaded');
 });
 
+/* ===== JSON modal ===== */
 const jsonModal=byId('jsonModal');
 byId('exportJsonBtn').addEventListener('click',()=>{ byId('jsonArea').value=JSON.stringify(readForm(),null,2); jsonModal.showModal(); });
 byId('importJsonBtn').addEventListener('click',()=>{ byId('jsonArea').value=''; jsonModal.showModal(); });
@@ -740,52 +760,31 @@ byId('closeJson').addEventListener('click',()=>jsonModal.close());
 byId('copyJson').addEventListener('click',()=>navigator.clipboard?.writeText(byId('jsonArea').value||'').then(()=>toast('JSON copied')));
 byId('applyJson').addEventListener('click',()=>{ try{ const obj=JSON.parse(byId('jsonArea').value||'{}'); fillForm(obj,true); jsonModal.close(); toast('JSON applied'); }catch{ toast('Invalid JSON',true); }});
 
-/* ===== Save / Load / Randomize ===== */
-byId('saveBtn').addEventListener('click',()=>{ safeLS.set('medallionPreset', JSON.stringify(readForm())); toast('Preset saved'); });
-byId('loadBtn').addEventListener('click',()=>{ const data=safeLS.get('medallionPreset'); if(!data) return toast('No saved preset',true); try{ fillForm(JSON.parse(data),true); toast('Preset loaded'); }catch{ toast('Load failed',true) }});
-byId('randBtn').addEventListener('click',()=>{
-  const pick=a=>a[Math.floor(Math.random()*a.length)];
-  fillForm({
-    text_top:pick(["STELLAR JEDI","IMPERIAL ORDER","REBEL ALLIANCE","SITH EMPIRE","CORELLIAN KNIGHTS"]),
-    rim_finish:pick(["metallic silver","polished gold","brushed steel","obsidian black","antique bronze"]),
-    plate_color:pick(["black","navy","crimson","deep gray","white"]),
-    text_colors:pick(["white with black outline","gold fill","glowing cyan","silver embossed","red on black"]),
-    state_shape:pick(["medallion field","state of Florida","planet outline","Imperial cog","Rebel crest"]),
-    outline_color:pick(["white","silver","gold trim","red glow","blue neon"]),
-    main_symbol:pick(["Death Star","Jedi crest","Imperial cog","Lightsaber"]),
-    symbol_color:pick(["red with etched lines","etched silver","glowing white","gold leaf","blue crystal"]),
-    badge_elements:pick(["concentric rings","spokes","binary stars","orbital lines","insignia ticks"]),
-    secondary_symbol:pick(["Army star emblem",""]),
-    aurebesh_style:pick(["glowing Aurebesh along rim","cyan inscriptions","luminous white runes","golden lettering","etched symbols"]),
-    sabers_desc:pick(["two crossed sabers glow","three angled beams glow","single vertical saber glow","circle of sabers glow"]),
-    style_keywords:pick(["cinematic","formal","balanced symmetry","ancient relic","futuristic tech"]),
-    flip_arc:"auto"
-  }, true);
-  toast('Randomized');
-});
-
-/* ===== Generate (sync text + SVG) ===== */
+/* ===== Generate ===== */
 function updateOutputs(v){
   const svg=buildMedallionSvg(v);
-  mount(svg); renderPreview();
-  renderBadge(svg);
+  mount(svg); renderPreview(); renderBadge(svg);
+  // swatches
+  byId('sw_rim').style.background = colorPick(v.rim_finish,[['gold','#ffd54a'],['silver','#c0c7ce'],['steel','#b0b7c3'],['bronze','#c18b52'],['obsidian','#000']], '#a9bdd1');
 }
 function generate(){
   const v=readForm();
-  byId('out').value = buildPrompt(v);
+  byId('out').value=buildPrompt(v);
   updateOutputs(v);
 }
 byId('gen').addEventListener('click',generate);
 addEventListener('keydown',e=>{
   if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){ e.preventDefault(); generate(); }
   if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='c' && document.activeElement.id==='out'){ e.preventDefault(); navigator.clipboard?.writeText(byId('out').value||'').then(()=>toast('Copied')); }
-}, {passive:false});
+},{passive:false});
 
 /* ===== Boot ===== */
 (function boot(){
-  if(!byId('out').value.trim()){ fillForm(PRESETS[0].form,true); }
-  const stored=safeLS.get(LS_FORM); if(stored) try{ fillForm(JSON.parse(stored),true); }catch{}
-  setTimeout(()=>fit(), 60);
+  renderProfiles();
+  const saved=safeLS.get(LS_FORM);
+  if(saved){ try{ fillForm(JSON.parse(saved), true); }catch{ fillForm(DEFAULT_PRESETS[0].form, true); } }
+  else { fillForm(DEFAULT_PRESETS[0].form, true); }
+  setTimeout(()=>fit(), 80);
 })();
 </script>
 </body>
