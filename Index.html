@@ -4,119 +4,270 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="color-scheme" content="dark light" />
-<title>Medallion Forge — Integrated Ultimate+</title>
+<title>Medallion Forge — Integrated Ultimate++</title>
 
-<!-- Fonts -->
 <link href="https://fonts.cdnfonts.com/css/aurebesh" rel="stylesheet" />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons&display=swap" rel="stylesheet" />
 
 <style>
-  /* ===== Theme & tokens ===== */
   :root{
     --bg:#0b0d13; --panel:#151923; --ink:#e8ecf1; --muted:#9aa3af;
     --accent:#6ee7ff; --accent2:#6476ff; --glow:rgba(110,231,255,.35);
     --line:#252b39; --ok:#4ade80; --warn:#fbbf24; --bad:#f87171;
     --mono:"JetBrains Mono","Fira Code",ui-monospace,Menlo,Consolas,monospace;
     --sans:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;
-    --aure:'Aurebesh', var(--sans); --r:16px; --shadow:0 12px 32px rgba(0,0,0,.28);
+    --r:16px; --shadow:0 12px 32px rgba(0,0,0,.28);
+    --transition: all 0.2s ease;
+    --header-height: 64px;
   }
   @media (prefers-color-scheme: light){
-    :root{
-      --bg:#f5f7fb; --panel:#fff; --ink:#0f172a; --muted:#64748b;
-      --accent:#2563eb; --accent2:#22d3ee; --glow:rgba(37,99,235,.25); --line:#e5e7eb; --ok:#16a34a; --warn:#d97706; --bad:#dc2626;
-    }
+    :root{ --bg:#f6f8fc; --panel:#fff; --ink:#0f172a; --muted:#64748b;
+      --accent:#2563eb; --accent2:#22d3ee; --glow:rgba(37,99,235,.22); --line:#e5e7eb; --ok:#16a34a; --warn:#d97706; --bad:#dc2626; }
   }
-  .light-theme{
-    --bg:#f5f7fb; --panel:#fff; --ink:#0f172a; --muted:#64748b;
-    --accent:#2563eb; --accent2:#22d3ee; --glow:rgba(37,99,235,.25); --line:#e5e7eb; --ok:#16a34a; --warn:#d97706; --bad:#dc2626;
-  }
+  .light-theme{ --bg:#f6f8fc; --panel:#fff; --ink:#0f172a; --muted:#64748b;
+    --accent:#2563eb; --accent2:#22d3ee; --glow:rgba(37,99,235,.22); --line:#e5e7eb; --ok:#16a34a; --warn:#d97706; --bad:#dc2626; }
 
   *{box-sizing:border-box}
   html,body{height:100%}
-  body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 var(--sans);-webkit-text-size-adjust:100%;overflow-x:hidden}
-
-  /* ===== Header ===== */
-  header{
-    position:sticky;top:0;z-index:10;padding:14px 18px;border-bottom:1px solid var(--line);
-    background:color-mix(in oklab, var(--bg) 92%, black 8%);backdrop-filter:blur(6px);
-    display:flex;align-items:center;justify-content:space-between
+  body{
+    margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 var(--sans);
+    -webkit-text-size-adjust:100%;overflow-x:hidden;
+    padding-bottom: max(16px, env(safe-area-inset-bottom)); /* keep UI clear of iOS toolbars */
   }
-  .brand{display:flex;align-items:center;gap:10px}
-  .logo{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;
-    background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 100%);box-shadow:0 0 18px var(--glow)}
-  .pill{padding:3px 8px;border-radius:999px;background:linear-gradient(90deg,var(--accent),var(--accent2));color:#fff;font-size:11px;font-weight:700}
-  .theme-toggle{border:1px solid var(--line);color:var(--muted);background:var(--panel);border-radius:10px;padding:6px 10px;display:flex;gap:6px;align-items:center;cursor:pointer}
-  .theme-toggle:hover{border-color:var(--accent);color:var(--accent)}
 
-  /* ===== Layout: Profiles | Builder | Live Preview ===== */
+  /* Improved Header */
+  header{
+    position:sticky;top:0;z-index:100;padding:0 18px;height:var(--header-height);
+    border-bottom:1px solid var(--line);
+    background:color-mix(in oklab, var(--bg) 92%, black 8%);backdrop-filter:blur(6px);
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    transition: var(--transition);
+  }
+  .brand{display:flex;align-items:center;gap:12px}
+  .logo{
+    width:36px;height:36px;border-radius:10px;display:grid;place-items:center;
+    background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 100%);box-shadow:0 0 18px var(--glow);
+    transition: var(--transition);
+  }
+  .logo:hover { transform: rotate(10deg); }
+  .pill{
+    padding:4px 10px;border-radius:999px;background:linear-gradient(90deg,var(--accent),var(--accent2));
+    color:#fff;font-size:11px;font-weight:700;letter-spacing:0.5px;
+  }
+  .theme-toggle{
+    border:1px solid var(--line);color:var(--muted);background:var(--panel);border-radius:10px;
+    padding:8px 12px;display:flex;gap:6px;align-items:center;cursor:pointer;
+    transition: var(--transition);
+  }
+  .theme-toggle:hover{border-color:var(--accent);color:var(--accent);box-shadow:0 0 0 3px var(--glow)}
+
+  /* Main App Layout */
   .app{
-    max-width:1400px;margin:22px auto;padding:0 16px;display:grid;gap:18px;
-    grid-template-columns:320px 1fr 1fr;align-items:start
+    max-width:1400px;margin:22px auto;padding:0 16px;display:grid;gap:20px;
+    grid-template-columns:340px 1fr 1fr;align-items:start
   }
   @media (max-width:1200px){ .app{grid-template-columns:1fr 1fr} .aside{grid-column:1/-1;order:-1} }
   @media (max-width:800px){ .app{grid-template-columns:1fr} .aside{order:-1} }
 
-  .card{background:color-mix(in oklab, var(--panel) 98%, black 2%);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:16px}
-  .card h2{font-size:14px;margin:0 0 10px 0;letter-spacing:.2px;display:flex;align-items:center;gap:6px;color:color-mix(in oklab,var(--ink) 85%, var(--muted) 15%)}
-  .subtle{color:var(--muted);font-size:12px}
+  /* Enhanced Cards */
+  .card{
+    background:color-mix(in oklab, var(--panel) 98%, black 2%);border:1px solid var(--line);
+    border-radius:var(--r);box-shadow:var(--shadow);padding:20px;
+    transition: var(--transition);
+  }
+  .card:hover { box-shadow: 0 16px 40px rgba(0,0,0,0.32); }
+  .card h2{
+    font-size:15px;margin:0 0 14px 0;letter-spacing:.2px;display:flex;align-items:center;gap:8px;
+    color:color-mix(in oklab,var(--ink) 85%, var(--muted) 15%);font-weight:600;
+  }
+  .subtle{color:var(--muted);font-size:12px;line-height:1.4}
 
-  /* Profiles */
-  .profiles{display:grid;gap:10px}
+  /* Profile Cards */
+  .profiles{display:grid;gap:12px}
   .profile{
-    display:grid;grid-template-columns:56px 1fr;gap:10px;align-items:center;
-    border:1px solid var(--line);border-radius:12px;padding:10px;background:var(--panel);cursor:pointer;transition:.2s;
+    display:grid;grid-template-columns:56px 1fr;gap:12px;align-items:center;
+    border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--panel);
+    cursor:pointer;transition:var(--transition);
   }
-  .profile:hover{border-color:var(--accent);box-shadow:0 0 0 3px var(--glow)}
-  .thumb{width:56px;height:56px;border-radius:10px;background:radial-gradient(100% 100% at 25% 20%, var(--accent) 0%, var(--accent2) 100%);display:grid;place-items:center;color:#fff;font-weight:800}
-  .tag{display:inline-block;padding:2px 8px;border-radius:999px;background:color-mix(in oklab,var(--accent) 25%, transparent);color:var(--accent);font-size:10px;font-weight:700}
-  .btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
-  .chip,.btn{padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:.15s;font-weight:600;min-height:40px}
-  .chip:hover,.btn:hover{border-color:var(--accent);color:var(--accent);box-shadow:0 0 0 3px var(--glow)}
-  .primary{background:linear-gradient(90deg,var(--accent),var(--accent2));color:#fff;border:none}
+  .profile:hover{
+    border-color:var(--accent);box-shadow:0 0 0 3px var(--glow);transform: translateY(-2px);
+  }
+  .profile:active { transform: translateY(0); }
+  .thumb{
+    width:56px;height:56px;border-radius:12px;
+    background:radial-gradient(100% 100% at 25% 20%, var(--accent) 0%, var(--accent2) 100%);
+    display:grid;place-items:center;color:#fff;font-weight:800;font-size:18px;
+  }
+  .tag{
+    display:inline-block;padding:3px 10px;border-radius:999px;
+    background:color-mix(in oklab,var(--accent) 25%, transparent);color:var(--accent);
+    font-size:10px;font-weight:700;margin-top:4px;
+  }
+  .btns{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+  .chip,.btn{
+    padding:10px 14px;border-radius:10px;border:1px solid var(--line);background:var(--panel);
+    color:var(--ink);cursor:pointer;display:inline-flex;align-items:center;gap:6px;
+    transition:var(--transition);font-weight:600;min-height:42px;font-size:13px;
+  }
+  .chip:hover,.btn:hover{
+    border-color:var(--accent);color:var(--accent);box-shadow:0 0 0 3px var(--glow);
+    transform: translateY(-1px);
+  }
+  .chip:active, .btn:active { transform: translateY(0); }
+  .primary{
+    background:linear-gradient(90deg,var(--accent),var(--accent2));color:#fff;border:none;
+    box-shadow: 0 4px 12px rgba(110, 231, 255, 0.25);
+  }
+  .primary:hover {
+    box-shadow: 0 6px 16px rgba(110, 231, 255, 0.35);
+    filter: brightness(1.1);
+  }
 
-  /* Tabs + form */
-  .tabs{display:flex;gap:8px;border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:12px}
-  .tab{padding:8px 12px;border-radius:8px;border:1px solid transparent;background:transparent;color:var(--muted);cursor:pointer}
-  .tab[aria-selected="true"]{background:var(--glow);border-color:var(--accent);color:var(--accent)}
-  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  /* Improved Tabs */
+  .tabs{
+    display:flex;gap:8px;border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:16px
+  }
+  .tab{
+    padding:10px 16px;border-radius:8px;border:1px solid transparent;background:transparent;
+    color:var(--muted);cursor:pointer;font-weight:500;font-size:13px;transition:var(--transition);
+  }
+  .tab:hover {
+    background: color-mix(in oklab, var(--accent) 10%, transparent);
+    color: var(--accent);
+  }
+  .tab[aria-selected="true"]{
+    background:var(--glow);border-color:var(--accent);color:var(--accent);font-weight:600;
+  }
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
   @media (max-width:600px){ .grid{grid-template-columns:1fr} }
-  .row{display:grid;gap:6px}
-  label{font-size:12px;font-weight:700;color:color-mix(in oklab, var(--ink) 85%, var(--muted) 15%)}
-  input,select,textarea{
-    width:100%;padding:11px 12px;border-radius:10px;border:1px solid var(--line);
-    background:color-mix(in oklab,var(--bg) 92%, black 8%);color:var(--ink);outline:none
+  .row{display:grid;gap:8px}
+  label{
+    font-size:13px;font-weight:600;color:color-mix(in oklab, var(--ink) 85%, var(--muted) 15%);
+    display: flex; align-items: center; gap: 4px;
   }
-  input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--glow)}
-  textarea{min-height:200px;font:12.5px/1.55 var(--mono);resize:vertical}
+  label .material-icons {
+    font-size: 16px;
+    color: var(--muted);
+  }
+  input,select,textarea{
+    width:100%;padding:12px;border-radius:10px;border:1px solid var(--line);
+    background:color-mix(in oklab,var(--bg) 92%, black 8%);color:var(--ink);outline:none;
+    font-family: var(--sans); font-size: 14px; transition: var(--transition);
+  }
+  input:focus,select:focus,textarea:focus{
+    border-color:var(--accent);box-shadow:0 0 0 3px var(--glow);background:var(--panel);
+  }
+  textarea{min-height:200px;font:13px/1.55 var(--mono);resize:vertical;padding:16px;}
 
-  /* Live Preview (pan/zoom/rotate) */
-  .preview{display:grid;gap:12px}
-  .stage{position:relative;height:64vh;min-height:420px;border:1px solid var(--line);border-radius:14px;background:color-mix(in oklab,var(--panel) 96%, black 4%);overflow:hidden}
+  /* Preview Section */
+  .preview{display:grid;gap:14px}
+  .stage{
+    position:relative;height:64vh;min-height:420px;border:1px solid var(--line);border-radius:14px;
+    background:
+      conic-gradient(from 0deg at 50% 50%, #0000 0 90deg, #0001 0 180deg, #0000 0) 0 0/28px 28px,
+      color-mix(in oklab,var(--panel) 96%, black 4%);
+    overflow:hidden;touch-action:none; /* for pinch/pan */
+  }
   #inner{position:absolute;top:50%;left:50%;transform-origin:0 0;will-change:transform}
-  .toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin-bottom:8px}
-  .hud{position:absolute;right:10px;bottom:10px;display:flex;gap:8px;flex-wrap:wrap;pointer-events:none}
-  .chip.min{font-size:12px;padding:6px 8px}
+  .toolbar{
+    display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;
+    margin-bottom:12px; padding: 4px 0;
+  }
+  .chip.min{font-size:12px;padding:8px 12px; background: color-mix(in oklab, var(--panel) 90%, transparent);}
 
-  /* Small preview badge (optional) */
-  .badgePreview{display:grid;gap:8px;justify-items:center;border:1px dashed var(--line);border-radius:12px;padding:12px}
-  #svgBadge{width:300px;height:300px}
+  /* Badge Preview */
+  .badgePreview{
+    display:grid;gap:10px;justify-items:center;border:1px dashed var(--line);
+    border-radius:12px;padding:16px; margin-top: 16px;
+  }
+  #svgBadge{width:300px;height:300px; transition: var(--transition); }
+  #svgBadge:hover { transform: scale(1.02); }
 
-  /* Toast + modal */
-  .toast{position:fixed;bottom:20px;right:20px;z-index:50;transform:translateY(80px);opacity:0;background:var(--panel);
-    border:1px solid var(--line);border-left:4px solid var(--ok);border-radius:10px;padding:12px 14px;box-shadow:var(--shadow);
-    display:flex;gap:8px;align-items:center;transition:.35s cubic-bezier(.2,.8,.2,1)}
+  /* Modal Improvements */
+  dialog {
+    border: 1px solid var(--line); border-radius: var(--r); padding: 0; 
+    background: var(--panel); color: var(--ink); box-shadow: var(--shadow);
+    max-width: 90vw; width: 560px;
+  }
+  dialog::backdrop{ background:rgba(0,0,0,.5); backdrop-filter: blur(4px); }
+  .modal-head {
+    padding: 18px 20px; border-bottom: 1px solid var(--line);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .modal-body { padding: 20px; }
+  .modal-actions {
+    padding: 16px 20px; border-top: 1px solid var(--line);
+    display: flex; gap: 12px; justify-content: flex-end;
+  }
+
+  /* Toast Improvements */
+  .toast{
+    position:fixed;bottom:24px;right:24px;z-index:50;transform:translateY(80px);opacity:0;background:var(--panel);
+    border:1px solid var(--line);border-left:4px solid var(--ok);border-radius:10px;padding:14px 16px;box-shadow:var(--shadow);
+    display:flex;gap:10px;align-items:center;transition:.35s cubic-bezier(.2,.8,.2,1); max-width: 320px;
+  }
   .toast.show{transform:translateY(0);opacity:1}
   .toast.error{border-left-color:var(--bad)}
-  dialog::backdrop{ background:rgba(0,0,0,.35) }
-  .modal-head{display:flex;gap:8px;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);padding:10px}
-  .modal-body{padding:10px}
-  .modal-actions{display:flex;gap:8px;justify-content:flex-end;padding:10px;border-top:1px solid var(--line)}
+  .toast .material-icons { font-size: 20px; }
 
-  /* Phone niceties */
+  /* Help Text */
+  .help-text {
+    font-size: 12px; color: var(--muted); margin-top: 4px; line-height: 1.4;
+  }
+
+  /* Focus indicators for accessibility */
+  button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  /* Loading state */
+  .loading {
+    position: relative;
+    overflow: hidden;
+  }
+  .loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    animation: loading 1.5s infinite;
+  }
+  @keyframes loading {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+
+  /* Responsive improvements */
   @media (max-width: 480px) {
-    header { padding: 12px 12px; }
-    .card { padding: 12px; border-radius: 14px; }
+    header { padding: 0 12px; height: 56px; }
+    .card { padding: 16px; border-radius: 14px; }
+    .app { padding: 0 12px; gap: 16px; }
+    .toolbar { flex-direction: column; align-items: flex-start; }
+    .btns { justify-content: center; }
+    .theme-toggle span:last-child { display: none; }
+    .logo { width: 32px; height: 32px; }
+  }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: color-mix(in oklab, var(--bg) 90%, black 10%);
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--muted);
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--accent);
   }
 </style>
 </head>
@@ -126,18 +277,26 @@
     <div class="logo" aria-hidden="true">⚔️</div>
     <div>
       <div style="display:flex;align-items:center;gap:8px">
-        <strong>Medallion Forge</strong> <span class="pill">Integrated Ultimate+</span>
+        <strong style="font-size: 18px;">Medallion Forge</strong> <span class="pill">Integrated Ultimate++</span>
       </div>
       <div class="subtle">Profiles • Prompt Builder • Dynamic SVG • Export</div>
     </div>
   </div>
-  <button id="themeToggle" class="theme-toggle" type="button" aria-pressed="false">
-    <span class="material-icons" aria-hidden="true">dark_mode</span><span id="themeLabel">Dark</span>
-  </button>
+  <div class="btns">
+    <label class="chip" style="gap:6px">
+      <span class="material-icons" aria-hidden="true">photo_size_select_large</span>
+      <select id="sizeSelect" aria-label="Canvas size">
+        <option value="320">320</option><option value="512">512</option>
+        <option value="640" selected>640</option><option value="768">768</option><option value="1024">1024</option>
+      </select>
+    </label>
+    <button id="themeToggle" class="theme-toggle" type="button" aria-pressed="false">
+      <span class="material-icons" aria-hidden="true">dark_mode</span><span id="themeLabel">Dark</span>
+    </button>
+  </div>
 </header>
 
 <main class="app">
-  <!-- LEFT: Profiles + IO -->
   <aside class="aside card">
     <h2><span class="material-icons" style="font-size:18px" aria-hidden="true">view_carousel</span> Profiles</h2>
     <div class="profiles" role="list" id="profiles"></div>
@@ -149,13 +308,12 @@
       <button id="importJsonBtn" class="chip" type="button"><span class="material-icons" aria-hidden="true">download</span>Import JSON</button>
     </div>
 
-    <div style="margin-top:14px" class="badgePreview">
+    <div style="margin-top:20px" class="badgePreview">
       <svg id="svgBadge" viewBox="0 0 300 300" role="img" aria-label="Mini medallion preview"></svg>
       <div class="subtle">Mini preview mirrors the main canvas</div>
     </div>
   </aside>
 
-  <!-- MIDDLE: Prompt Builder (your Ultimate+ fields) -->
   <section class="card" aria-label="Builder">
     <h2><span class="material-icons" style="font-size:18px" aria-hidden="true">tune</span> Builder</h2>
     <div class="tabs" role="tablist" aria-label="Sections">
@@ -166,41 +324,105 @@
 
     <div id="panel-basic" class="tab-panel" role="tabpanel" aria-labelledby="tab-basic">
       <div class="grid">
-        <div class="row"><label for="text_top">Top Text</label><input id="text_top" placeholder="SAINT CLOUD JEDI" autocomplete="off"></div>
-        <div class="row"><label for="rim_finish">Rim Finish</label><input id="rim_finish" placeholder="metallic silver" autocomplete="off"></div>
-        <div class="row"><label for="plate_color">Plate Color</label><input id="plate_color" placeholder="black" autocomplete="off"></div>
-        <div class="row"><label for="text_colors">Text Fill / Outline</label><input id="text_colors" placeholder="white with black outline" autocomplete="off"></div>
-        <div class="row"><label for="state_shape">Main Outline</label><input id="state_shape" placeholder="state of Florida" autocomplete="off"></div>
-        <div class="row"><label for="outline_color">Outline Color</label><input id="outline_color" placeholder="white" autocomplete="off"></div>
+        <div class="row">
+          <label for="text_top"><span class="material-icons">text_fields</span>Top Text</label>
+          <input id="text_top" placeholder="SAINT CLOUD JEDI" autocomplete="off">
+          <div class="help-text">Appears as curved text at the top of the medallion</div>
+        </div>
+        <div class="row">
+          <label for="rim_finish"><span class="material-icons">settings</span>Rim Finish</label>
+          <input id="rim_finish" placeholder="metallic silver" autocomplete="off">
+          <div class="help-text">Material and finish for the outer rim</div>
+        </div>
+        <div class="row">
+          <label for="plate_color"><span class="material-icons">palette</span>Plate Color</label>
+          <input id="plate_color" placeholder="black" autocomplete="off">
+          <div class="help-text">Background color of the main plate</div>
+        </div>
+        <div class="row">
+          <label for="text_colors"><span class="material-icons">format_color_text</span>Text Fill / Outline</label>
+          <input id="text_colors" placeholder="white with black outline" autocomplete="off">
+          <div class="help-text">Color and outline style for text elements</div>
+        </div>
+        <div class="row">
+          <label for="state_shape"><span class="material-icons">polyline</span>Main Outline</label>
+          <input id="state_shape" placeholder="state of Florida" autocomplete="off">
+          <div class="help-text">Shape or outline in the center (e.g., state, symbol)</div>
+        </div>
+        <div class="row">
+          <label for="outline_color"><span class="material-icons">border_color</span>Outline Color</label>
+          <input id="outline_color" placeholder="white" autocomplete="off">
+          <div class="help-text">Color of the main outline shape</div>
+        </div>
+        <div class="row" style="align-items:center">
+          <label for="flip_arc"><span class="material-icons">flip</span>Flip top text</label>
+          <select id="flip_arc">
+            <option value="auto" selected>Auto</option>
+            <option value="normal">Normal</option>
+            <option value="flipped">Flipped</option>
+          </select>
+          <div class="help-text">Control text orientation (helpful for certain designs)</div>
+        </div>
       </div>
     </div>
 
     <div id="panel-symbols" class="tab-panel" role="tabpanel" aria-labelledby="tab-symbols" hidden>
       <div class="grid">
-        <div class="row"><label for="main_symbol">Main Symbol</label><input id="main_symbol" placeholder="Death Star" autocomplete="off"></div>
-        <div class="row"><label for="symbol_color">Symbol Color</label><input id="symbol_color" placeholder="red with etched lines" autocomplete="off"></div>
-        <div class="row"><label for="badge_elements">Badge Elements</label><input id="badge_elements" placeholder="concentric rings" autocomplete="off"></div>
-        <div class="row"><label for="secondary_symbol">Secondary Symbol</label><input id="secondary_symbol" placeholder="Army star (optional)" autocomplete="off"></div>
-        <div class="row"><label for="aurebesh_style">Aurebesh Style</label><input id="aurebesh_style" placeholder="glowing Aurebesh along rim" autocomplete="off"></div>
-        <div class="row"><label for="sabers_desc">Lightsabers</label><input id="sabers_desc" placeholder="two crossed sabers glow" autocomplete="off"></div>
+        <div class="row">
+          <label for="main_symbol"><span class="material-icons">star</span>Main Symbol</label>
+          <input id="main_symbol" placeholder="Death Star" autocomplete="off">
+          <div class="help-text">Primary symbol in the center of the medallion</div>
+        </div>
+        <div class="row">
+          <label for="symbol_color"><span class="material-icons">color_lens</span>Symbol Color</label>
+          <input id="symbol_color" placeholder="red with etched lines" autocomplete="off">
+          <div class="help-text">Color and finish for the main symbol</div>
+        </div>
+        <div class="row">
+          <label for="badge_elements"><span class="material-icons">category</span>Badge Elements</label>
+          <input id="badge_elements" placeholder="concentric rings" autocomplete="off">
+          <div class="help-text">Additional design elements like rings or patterns</div>
+        </div>
+        <div class="row">
+          <label for="secondary_symbol"><span class="material-icons">workspace_premium</span>Secondary Symbol</label>
+          <input id="secondary_symbol" placeholder="Army star (optional)" autocomplete="off">
+          <div class="help-text">Optional secondary symbol element</div>
+        </div>
+        <div class="row">
+          <label for="aurebesh_style"><span class="material-icons">translate</span>Aurebesh Style</label>
+          <input id="aurebesh_style" placeholder="glowing Aurebesh along rim" autocomplete="off">
+          <div class="help-text">Style for Aurebesh text around the rim</div>
+        </div>
+        <div class="row">
+          <label for="sabers_desc"><span class="material-icons">flash_on</span>Lightsabers</label>
+          <input id="sabers_desc" placeholder="two crossed sabers glow" autocomplete="off">
+          <div class="help-text">Lightsaber design and arrangement</div>
+        </div>
       </div>
     </div>
 
     <div id="panel-advanced" class="tab-panel" role="tabpanel" aria-labelledby="tab-advanced" hidden>
-      <div class="row"><label for="style_keywords">Style Keywords</label><input id="style_keywords" placeholder="cinematic, heraldic, symmetrical" autocomplete="off"></div>
+      <div class="row">
+        <label for="style_keywords"><span class="material-icons">style</span>Style Keywords</label>
+        <input id="style_keywords" placeholder="cinematic, heraldic, symmetrical" autocomplete="off">
+        <div class="help-text">Keywords to influence the overall visual style</div>
+      </div>
       <div class="btns" role="group" aria-label="Actions">
         <button id="gen" class="btn primary" type="button"><span class="material-icons" aria-hidden="true">bolt</span>Generate</button>
         <button id="copyBtn" class="btn" type="button"><span class="material-icons" aria-hidden="true">content_copy</span>Copy Text</button>
         <button id="downloadBtn" class="btn" type="button"><span class="material-icons" aria-hidden="true">save</span>Download TXT</button>
-        <button id="downloadSvgBtn" class="btn" type="button"><span class="material-icons" aria-hidden="true">image</span>Export SVG</button>
-        <button id="downloadPngBtn" class="btn" type="button"><span class="material-icons" aria-hidden="true">photo</span>Export PNG</button>
+        <button id="copySvgBtn" class="btn" type="button"><span class="material-icons" aria-hidden="true">content_paste</span>Copy SVG</button>
+        <button id="downloadSvgBtn" class="btn" type="button"><span class="material-icons" aria-hidden="true">image</span>Download SVG</button>
+        <button id="downloadPngBtn" class="btn" type="button"><span class="material-icons" aria-hidden="true">photo</span>Download PNG</button>
       </div>
-      <div class="subtle" style="margin-top:8px">Shortcuts: ⌘/Ctrl+Enter generate • ⌘/Ctrl+C copy</div>
-      <div class="row" style="margin-top:10px"><label for="out">Generated Prompt</label><textarea id="out" spellcheck="false"></textarea></div>
+      <div class="subtle" style="margin-top:12px">Shortcuts: ⌘/Ctrl+Enter generate • ⌘/Ctrl+C copy</div>
+      <div class="row" style="margin-top:16px">
+        <label for="out"><span class="material-icons">notes</span>Generated Prompt</label>
+        <textarea id="out" spellcheck="false" placeholder="Your generated prompt will appear here..."></textarea>
+      </div>
     </div>
   </section>
 
-  <!-- RIGHT: Live SVG Preview + View tools -->
   <section class="card" aria-label="Preview">
     <h2><span class="material-icons" style="font-size:18px" aria-hidden="true">visibility</span> Live SVG Preview</h2>
     <div class="toolbar">
@@ -216,18 +438,17 @@
         <span class="chip min" id="meta">—</span>
       </div>
     </div>
-    <div class="stage" id="stage"><div id="inner"></div><div class="hud"></div></div>
+    <div class="stage" id="stage"><div id="inner"></div></div>
   </section>
 </main>
 
-<!-- Import/Export JSON Modal -->
 <dialog id="jsonModal" aria-labelledby="jsonTitle" aria-modal="true">
   <div class="modal-head">
-    <strong id="jsonTitle">Import / Export JSON</strong>
+    <strong id="jsonTitle" style="font-size: 16px;">Import / Export JSON</strong>
     <button id="closeJson" class="chip" type="button"><span class="material-icons" aria-hidden="true">close</span>Close</button>
   </div>
   <div class="modal-body">
-    <textarea id="jsonArea" class="card" style="min-height:180px;font:12.5px/1.55 var(--mono)" placeholder='Paste JSON here or edit and click "Apply"'></textarea>
+    <textarea id="jsonArea" class="card" style="min-height:180px;font:13px/1.55 var(--mono)" placeholder='Paste JSON here or edit and click "Apply"'></textarea>
   </div>
   <div class="modal-actions">
     <button id="applyJson" class="btn primary" type="button"><span class="material-icons" aria-hidden="true">check</span>Apply</button>
@@ -238,38 +459,38 @@
 <div id="toast" class="toast" role="status" aria-live="polite"><span class="material-icons" aria-hidden="true">check_circle</span><span id="toastMsg">Done</span></div>
 
 <script>
-/* ============== Utilities & Theme ============== */
-const $ = (sel)=>document.querySelector(sel);
-const $$ = (sel)=>Array.from(document.querySelectorAll(sel));
-const byId=(id)=>document.getElementById(id);
+/* ===== Utilities & Theme ===== */
+const $ = s=>document.querySelector(s);
+const $$ = s=>Array.from(document.querySelectorAll(s));
+const byId = id=>document.getElementById(id);
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
-const LS_FORM='medallion:form:v3', LS_THEME='medallion:theme:light';
+const LS_FORM='medallion:form:v4', LS_THEME='medallion:theme:light';
 function toast(msg, err=false){const el=byId('toast'); el.classList.toggle('error',!!err); byId('toastMsg').textContent=msg; el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),2200);}
 
 (function initTheme(){
   const stored=localStorage.getItem(LS_THEME);
   if(stored==='1') document.body.classList.add('light-theme');
+  paintTheme();
+})();
+function paintTheme(){
   const light=document.body.classList.contains('light-theme');
   byId('themeToggle').setAttribute('aria-pressed', String(light));
   byId('themeToggle').querySelector('.material-icons').textContent=light?'light_mode':'dark_mode';
   byId('themeLabel').textContent=light?'Light':'Dark';
-})();
+}
 byId('themeToggle').addEventListener('click',()=>{
   const light=document.body.classList.toggle('light-theme');
-  localStorage.setItem(LS_THEME, light?'1':'0');
-  byId('themeToggle').setAttribute('aria-pressed', String(light));
-  byId('themeToggle').querySelector('.material-icons').textContent=light?'light_mode':'dark_mode';
-  byId('themeLabel').textContent=light?'Light':'Dark';
+  localStorage.setItem(LS_THEME, light?'1':'0'); paintTheme();
 });
 
-/* ============== Tabs (Ultimate+ builder) ============== */
+/* ===== Tabs ===== */
 const tabs=$$('.tab');
 const panels={basic:byId('panel-basic'), symbols:byId('panel-symbols'), advanced:byId('panel-advanced')};
 function setTab(btn){ const id=btn.dataset.tab; tabs.forEach(t=>{const a=t===btn; t.setAttribute('aria-selected',String(a)); t.tabIndex=a?0:-1;}); Object.entries(panels).forEach(([k,p])=>p.hidden=(k!==id)); btn.focus(); }
 tabs.forEach(t=>{ t.addEventListener('click',()=>setTab(t)); t.addEventListener('keydown',(e)=>{ const i=tabs.indexOf(t); if(e.key==='ArrowRight') setTab(tabs[(i+1)%tabs.length]); if(e.key==='ArrowLeft') setTab(tabs[(i-1+tabs.length)%tabs.length]); if(e.key==='Home') setTab(tabs[0]); if(e.key==='End') setTab(tabs[tabs.length-1]); }); });
 setTab(tabs[0]);
 
-/* ============== Presets / Profiles ============== */
+/* ===== Presets / Profiles ===== */
 const PRESETS = [
   { id:'fl_army', name:'Florida + Army', note:'Aurebesh rim • Crossed sabers', thumb:'FL',
     form:{ text_top:"SAINT CLOUD JEDI", rim_finish:"metallic silver", plate_color:"black", text_colors:"white with black outline", state_shape:"state of Florida", outline_color:"white", main_symbol:"Death Star", symbol_color:"red with etched lines", badge_elements:"concentric rings", secondary_symbol:"Army star emblem", aurebesh_style:"glowing Aurebesh along rim", sabers_desc:"two crossed sabers glow", style_keywords:"cinematic, heraldic, symmetrical" } },
@@ -287,12 +508,11 @@ PRESETS.forEach(p=>{
   profilesHost.appendChild(btn);
 });
 
-/* ============== Form IO + autosave ============== */
-const FIELDS=["text_top","rim_finish","plate_color","text_colors","state_shape","outline_color","main_symbol","symbol_color","badge_elements","secondary_symbol","aurebesh_style","sabers_desc","style_keywords"];
+/* ===== Form IO + autosave ===== */
+const FIELDS=["text_top","rim_finish","plate_color","text_colors","state_shape","outline_color","main_symbol","symbol_color","badge_elements","secondary_symbol","aurebesh_style","sabers_desc","style_keywords","flip_arc"];
 function readForm(){
   const v = {};
   FIELDS.forEach(id=>v[id]=(byId(id)?.value||'').trim());
-  // sensible defaults
   v.text_top ||= "SAINT CLOUD JEDI";
   v.rim_finish ||= "metallic silver";
   v.plate_color ||= "black";
@@ -305,14 +525,15 @@ function readForm(){
   v.aurebesh_style ||= "glowing Aurebesh along rim";
   v.sabers_desc ||= "two crossed sabers glow";
   v.style_keywords ||= "cinematic, heraldic, symmetrical";
+  v.flip_arc ||= "auto";
   return v;
 }
 function fillForm(data, andGenerate=false){ FIELDS.forEach(k=>{ const el=byId(k); if(el && data[k]!==undefined) el.value=data[k]; }); if(andGenerate) generate(); }
-let saveT; function autosave(){ clearTimeout(saveT); saveT=setTimeout(()=>{ try{ localStorage.setItem(LS_FORM, JSON.stringify(readForm())); }catch{} }, 250); }
+let saveT; function autosave(){ clearTimeout(saveT); saveT=setTimeout(()=>{ try{ localStorage.setItem(LS_FORM, JSON.stringify(readForm())); }catch{} }, 200); }
 FIELDS.forEach(id=>{ const el=byId(id); if(el){ ['input','change'].forEach(ev=>el.addEventListener(ev,()=>{ generate(); autosave(); }, {passive:true})); }});
 (function restore(){ try{ const raw=localStorage.getItem(LS_FORM); if(raw){ fillForm(JSON.parse(raw),true); } }catch{} })();
 
-/* ============== Prompt text builder (stays in sync with SVG) ============== */
+/* ===== Prompt text builder ===== */
 function buildPrompt(v){
   return [
     "Cinematic medallion pendant design.",
@@ -325,30 +546,30 @@ function buildPrompt(v){
   ].join("\n");
 }
 
-/* ============== SVG Generator (dynamic) ============== */
+/* ===== SVG builder ===== */
 const NS='http://www.w3.org/2000/svg';
-const toRad = d=>d*Math.PI/180;
-const stage = byId('stage'), inner = byId('inner'), hudZoom = byId('hudZoom'), hudSize = byId('hudSize'), meta = byId('meta');
+const stage = byId('stage'), inner = byId('inner'), hudZoom = byId('hudZoom'), hudSize = byId('hudSize'), meta = byId('meta'), sizeSelect=byId('sizeSelect');
 
-let view={x:0,y:0,k:1,min:.06,max:8,w:640,h:640,rot:0};
+let view={x:0,y:0,k:1,min:.06,max:10,w:640,h:640,rot:0};
 new ResizeObserver(()=>{ const r=stage.getBoundingClientRect(); hudSize.textContent=`${Math.round(r.width)}×${Math.round(r.height)}px`; renderPreview(); }).observe(stage);
+sizeSelect.addEventListener('change',()=>{ view.w=view.h=Number(sizeSelect.value||640); generate(); setTimeout(fit, 0); });
 
 function make(name, attrs = {}, parent) { const el=document.createElementNS(NS,name); for(const[k,v] of Object.entries(attrs)) if(v!=null) el.setAttribute(k,String(v)); (parent||currentSvgRoot()).appendChild(el); return el; }
 function currentSvgRoot(){ return inner; }
 
 function buildMedallionSvg(v){
-  const D=640, R=D/2;
+  const D=view.w, R=D/2;
   const svg=document.createElementNS(NS,'svg');
   svg.setAttribute('xmlns',NS); svg.setAttribute('viewBox',`0 0 ${D} ${D}`); svg.setAttribute('width',D); svg.setAttribute('height',D);
   svg.setAttribute('shape-rendering','geometricPrecision');
 
-  // defs
   const defs=make('defs',{},svg);
-  const style=make('style',{},defs);
-  style.textContent=`.ns{vector-effect:non-scaling-stroke;shape-rendering:crispEdges}.round{stroke-linecap:round;stroke-linejoin:round}`;
-  make('path',{id:'topArc', d:`M ${R-180} ${R-200} A 180 180 0 0 1 ${R+180} ${R-200}`}, defs);
+  make('style',{},defs).textContent=`.ns{vector-effect:non-scaling-stroke;shape-rendering:crispEdges}.round{stroke-linecap:round;stroke-linejoin:round}`;
+  // two arc directions so we can flip text safely on Safari/iOS
+  const sweepA=R*0.78, y=R-sweepA;
+  make('path',{id:'topArc',d:`M ${R- sweepA} ${y} A ${sweepA} ${sweepA} 0 0 1 ${R+ sweepA} ${y}`},defs);
+  make('path',{id:'topArcRev',d:`M ${R+ sweepA} ${y} A ${sweepA} ${sweepA} 0 0 0 ${R- sweepA} ${y}`},defs);
 
-  // palette from builder words
   const colorPick=(key, table, fallback)=>{ key=(key||'').toLowerCase(); for(const [k,v] of table){ if(k && key.includes(k)) return v; } return fallback; };
   const plateFill=colorPick(v.plate_color,[['black','#121316'],['navy','#0b2346'],['crimson','#5c0b12'],['gray','#2a2f3a'],['white','#f3f6f9']], '#121316');
   const rimColor=colorPick(v.rim_finish,[['gold','#ffd54a'],['silver','#c0c7ce'],['steel','#b0b7c3'],['bronze','#c18b52'],['obsidian','#000']], '#9ad6ff');
@@ -356,74 +577,80 @@ function buildMedallionSvg(v){
   const symColor=colorPick(v.symbol_color,[['red','#e43b44'],['silver','#c0c7ce'],['gold','#ffd54a'],['white','#fff'],['blue','#3b6ee4'],['cyan','#6ee7ff']], '#6ee7ff');
   const outlineColor=colorPick(v.outline_color,[['white','#ffffff'],['gold','#ffd54a'],['silver','#c0c7ce'],['red','#e43b44'],['blue','#3b6ee4']], '#ffffff');
 
-  // base rings
   const gBase=make('g',{},svg);
-  make('circle',{cx:R,cy:R,r:R*0.93,fill:plateFill,stroke:rimColor,'stroke-width':10,class:'ns'},gBase);
-  make('circle',{cx:R,cy:R,r:R*0.98,fill:'none',stroke:rimColor,'stroke-width':3,class:'ns'},gBase);
-  make('circle',{cx:R,cy:R,r:R*0.86,fill:'none',stroke:'#ffffff14','stroke-width':2,class:'ns'},gBase);
+  make('circle',{cx:R,cy:R,r:R*0.93,fill:plateFill,stroke:rimColor,'stroke-width':Math.max(8,D*0.015),class:'ns'},gBase);
+  make('circle',{cx:R,cy:R,r:R*0.98,fill:'none',stroke:rimColor,'stroke-width':Math.max(2,D*0.004),class:'ns'},gBase);
+  make('circle',{cx:R,cy:R,r:R*0.86,fill:'none',stroke:'#ffffff14','stroke-width':Math.max(1.5,D*0.003),class:'ns'},gBase);
 
-  // ticks/rings if requested
   if((v.badge_elements||'').toLowerCase().includes('ring')){
-    [0.76,0.64,0.54].forEach((p,i)=>make('circle',{cx:R,cy:R,r:R*p,fill:'none',stroke: i===1 ? '#7fbbe0' : rimColor,'stroke-width': i===1?1:1.2,'stroke-dasharray': i===1?'6 6':null,class:'ns'},gBase));
+    [0.76,0.64,0.54].forEach((p,i)=>make('circle',{cx:R,cy:R,r:R*p,fill:'none',stroke: i===1 ? '#7fbbe0' : rimColor,'stroke-width':Math.max(1,D*0.0026),'stroke-dasharray': i===1?'6 6':null,class:'ns'},gBase));
   }
 
-  // arc text
+  // Arc text with robust flip control
   if((v.text_top||'').trim()){
     const wantsOutline=(v.text_colors||'').toLowerCase().includes('outline') || plateFill==='#121316';
-    const t=make('text',{'font-size':30,'font-weight':800,fill:textFill,'letter-spacing':'.8','text-anchor':'middle'},svg);
-    if(wantsOutline){ t.setAttribute('stroke','#000'); t.setAttribute('stroke-width','2'); t.setAttribute('paint-order','stroke'); }
-    const tp=make('textPath',{href:'#topArc',startOffset:'50%',method:'align',spacing:'auto'},t);
-    const raw=v.text_top.length>34? v.text_top.slice(0,33)+'…' : v.text_top;
-    tp.textContent=raw.toUpperCase();
+    const t=make('text',{'font-size':Math.max(26,D*0.047),'font-weight':800,fill:textFill,'letter-spacing':'.8','text-anchor':'middle'},svg);
+    if(wantsOutline){ t.setAttribute('stroke','#000'); t.setAttribute('stroke-width',Math.max(1.6,D*0.003)); t.setAttribute('paint-order','stroke'); }
+    const useRev = (v.flip_arc==='flipped') || (v.flip_arc==='auto' && view.rot%360>=180);
+    const tp=make('textPath',{href:useRev?'#topArcRev':'#topArc',startOffset:'50%',method:'align',spacing:'auto'},t);
+    tp.textContent=(v.text_top.length>42? v.text_top.slice(0,41)+'…' : v.text_top).toUpperCase();
   }
 
-  // state/outline (Florida or generic field)
+  // Florida outline (stylized) or generic circle
   if((v.state_shape||'').toLowerCase().includes('florida')){
-    const path="M 230 210 C 260 180, 300 190, 330 210 C 352 226, 360 250, 380 270 C 350 268, 340 258, 325 256 C 310 254, 305 266, 292 268 C 270 272, 248 262, 220 252 Z";
-    make('path',{d:path,fill:'none',stroke:outlineColor,'stroke-width':6,class:'ns'},svg);
+    const path=`M ${R-90} ${R+30} C ${R-40} ${R-10}, ${R+10} ${R-6}, ${R+64} ${R+18}
+                C ${R+90} ${R+32}, ${R+96} ${R+56}, ${R+122} ${R+80}
+                C ${R+82} ${R+78}, ${R+70} ${R+64}, ${R+50} ${R+62}
+                C ${R+28} ${R+60}, ${R+22} ${R+76}, ${R-4} ${R+78}
+                C ${R-40} ${R+82}, ${R-72} ${R+68}, ${R-90} ${R+58} Z`;
+    make('path',{d:path,fill:'none',stroke:outlineColor,'stroke-width':Math.max(4.5,D*0.007),'stroke-linejoin':'round',class:'ns'},svg);
   }else{
-    make('circle',{cx:R,cy:R,r:110,fill:'none',stroke:outlineColor,'stroke-width':4,class:'ns'},svg);
+    make('circle',{cx:R,cy:R,r:R*0.34,fill:'none',stroke:outlineColor,'stroke-width':Math.max(3,D*0.005),class:'ns'},svg);
   }
 
   // main symbol
   const g=make('g',{},svg);
   const ms=(v.main_symbol||'').toLowerCase();
   if(ms.includes('death')){
-    make('circle',{cx:R,cy:R,r:95,fill:symColor,stroke:'#222','stroke-width':2,class:'ns'},g);
-    make('line',{x1:R-95,y1:R,x2:R+95,y2:R,stroke: plateFill==='#121316' ? '#0a0a0a' : '#111','stroke-width':10,class:'ns'},g);
-    make('circle',{cx:R+36,cy:R-30,r:20,fill: plateFill==='#121316' ? '#0a0a0a' : '#111',stroke:'#3b3f48','stroke-width':2,class:'ns'},g);
-    for(let i=0;i<12;i++){ const a=i*15*Math.PI/180, r1=50, r2=95;
+    make('circle',{cx:R,cy:R,r:R*0.31,fill:symColor,stroke:'#222','stroke-width':Math.max(2,D*0.0032),class:'ns'},g);
+    make('line',{x1:R-R*0.31,y1:R,x2:R+R*0.31,y2:R,stroke: plateFill==='#121316' ? '#0a0a0a' : '#111','stroke-width':Math.max(8,D*0.0125),class:'ns'},g);
+    make('circle',{cx:R+R*0.11,cy:R-R*0.09,r:R*0.065,fill: plateFill==='#121316' ? '#0a0a0a' : '#111',stroke:'#3b3f48','stroke-width':Math.max(1.5,D*0.0023),class:'ns'},g);
+    for(let i=0;i<12;i++){ const a=i*15*Math.PI/180, r1=R*0.16, r2=R*0.31;
       const x1=R+r1*Math.cos(a), y1=R+r1*Math.sin(a);
       const x2=R+r2*Math.cos(a), y2=R+r2*Math.sin(a);
-      make('line',{x1,y1,x2,y2,stroke:'#27303d','stroke-width':1.6,class:'ns'},g);
+      make('line',{x1,y1,x2,y2,stroke:'#27303d','stroke-width':Math.max(1.3,D*0.002),'stroke-linecap':'round',class:'ns'},g);
     }
-    make('path',{d:`M ${R-60} ${R+70} A 60 60 0 0 0 ${R+60} ${R+70}`,stroke:'#27303d','stroke-width':1.6,fill:'none',class:'ns'},g);
+    make('path',{d:`M ${R-R*0.2} ${R+R*0.22} A ${R*0.2} ${R*0.2} 0 0 0 ${R+R*0.2} ${R+R*0.22}`,
+      stroke:'#27303d','stroke-width':Math.max(1.3,D*0.002),fill:'none',class:'ns'},g);
   } else if (ms.includes('jedi')) {
-    make('path',{d:`M${R} ${R-70} L${R+24} ${R-84} L${R+24} ${R} L${R+42} ${R+18} L${R+24} ${R+36} L${R+24} ${R+94} L${R} ${R+74} L${R-24} ${R+94} L${R-24} ${R+36} L${R-42} ${R+18} L${R-24} ${R} L${R-24} ${R-84} Z`,fill:symColor},g);
+    make('path',{d:`M${R} ${R-0.22*D} L${R+0.035*D} ${R-0.26*D} L${R+0.035*D} ${R}
+      L${R+0.07*D} ${R+0.028*D} L${R+0.035*D} ${R+0.056*D} L${R+0.035*D} ${R+0.29*D}
+      L${R} ${R+0.23*D} L${R-0.035*D} ${R+0.29*D} L${R-0.035*D} ${R+0.056*D}
+      L${R-0.07*D} ${R+0.028*D} L${R-0.035*D} ${R} L${R-0.035*D} ${R-0.26*D} Z`,fill:symColor},g);
   } else {
-    make('path',{d:`M${R},${R-85} L${R+20},${R-45} L${R+72},${R-40} L${R+30},${R-8} L${R+42},${R+44} L${R},${R+18} L${R-42},${R+44} L${R-30},${R-8} L${R-72},${R-40} L${R-20},${R-45} Z`,fill:symColor},g);
+    make('path',{d:`M${R},${R-0.26*D} L${R+0.04*D},${R-0.15*D} L${R+0.11*D},${R-0.14*D}
+      L${R+0.05*D},${R-0.01*D} L${R+0.07*D},${R+0.07*D} L${R},${R+0.03*D}
+      L${R-0.07*D},${R+0.07*D} L${R-0.05*D},${R-0.01*D} L${R-0.11*D},${R-0.14*D}
+      L${R-0.04*D},${R-0.15*D} Z`,fill:symColor},g);
   }
 
-  // secondary symbol marker (Army star placeholder)
   if((v.secondary_symbol||'').trim()){
-    make('polygon',{points:starPoints(R+130,R-80,24,12,5),fill:'none',stroke:'#d4af37','stroke-width':4,class:'ns'},svg);
+    make('polygon',{points:starPoints(R+0.4*D,R-0.25*D,0.075*D,0.04*D,5),fill:'none',stroke:'#d4af37','stroke-width':Math.max(3,D*0.0046),class:'ns'},svg);
   }
 
-  // sabers (layered strokes for glow without filters)
   const saber=(x1,y1,x2,y2)=>{
-    make('line',{x1,y1,x2,y2,stroke:'#9feaff','stroke-opacity':.22,'stroke-width':18,class:'ns round'},svg);
-    make('line',{x1,y1,x2,y2,stroke:'#79e4ff','stroke-opacity':.38,'stroke-width':10,class:'ns round'},svg);
-    make('line',{x1,y1,x2,y2,stroke:'#fff','stroke-width':4,class:'ns round'},svg);
+    make('line',{x1,y1,x2,y2,stroke:'#9feaff','stroke-opacity':.22,'stroke-width':Math.max(12,D*0.02),class:'ns round'},svg);
+    make('line',{x1,y1,x2,y2,stroke:'#79e4ff','stroke-opacity':.38,'stroke-width':Math.max(7,D*0.011),class:'ns round'},svg);
+    make('line',{x1,y1,x2,y2,stroke:'#fff','stroke-width':Math.max(3.2,D*0.005),class:'ns round'},svg);
   };
   const s=(v.sabers_desc||'').toLowerCase();
-  if(s.includes('cross')||/\bx\b/.test(s)){ saber(R-90,R-90,R+90,R+90); saber(R+90,R-90,R-90,R+90); }
-  else if(s.includes('three')||/\b3\b/.test(s)){ saber(R-100,R+120,R+100,R+120); saber(R-70,R+130,R+40,R+40); saber(R+70,R+130,R-40,R+40); }
-  else { saber(R,R-40,R,R+130); }
+  if(s.includes('cross')||/\bx\b/.test(s)){ saber(R-0.28*D,R-0.28*D,R+0.28*D,R+0.28*D); saber(R+0.28*D,R-0.28*D,R-0.28*D,R+0.28*D); }
+  else if(s.includes('three')||/\b3\b/.test(s)){ saber(R-0.31*D,R+0.37*D,R+0.31*D,R+0.37*D); saber(R-0.22*D,R+0.40*D,R+0.12*D,R+0.12*D); saber(R+0.22*D,R+0.40*D,R-0.12*D,R+0.12*D); }
+  else { saber(R,R-0.12*D,R,R+0.40*D); }
 
-  // aurebesh cue
   const aure=(v.aurebesh_style||'').toLowerCase();
   if(aure.includes('glow')||aure.includes('aurebesh')||aure.includes('rune')||aure.includes('inscription')){
-    make('circle',{cx:R,cy:R,r:R*0.68,fill:'none',stroke:'#6ee7ff','stroke-width':2,'stroke-dasharray':'6 6','stroke-opacity':.75,class:'ns'},svg);
+    make('circle',{cx:R,cy:R,r:R*0.68,fill:'none',stroke:'#6ee7ff','stroke-width':Math.max(2,D*0.003), 'stroke-dasharray':'6 6','stroke-opacity':.75,class:'ns'},svg);
   }
 
   return svg;
@@ -435,17 +662,16 @@ function buildMedallionSvg(v){
   }
 }
 
-/* ============== Preview engine: pan / zoom / rotate ============== */
+/* ===== Preview: pan / pinch-zoom / rotate ===== */
 function mount(svg){
-  // vector-effect for crisp zoom
   svg.querySelectorAll('path,rect,circle,ellipse,line,polyline,polygon').forEach(el=>{ if(!el.hasAttribute('vector-effect')) el.setAttribute('vector-effect','non-scaling-stroke'); });
   inner.innerHTML=''; inner.appendChild(svg);
 }
 function renderPreview(){
   const W=stage.clientWidth, H=stage.clientHeight;
-  inner.style.transform =
-    `translate(${(W/2)+view.x}px, ${(H/2)+view.y}px) rotate(${view.rot}deg) scale(${view.k}) translate(${-view.w/2}px, ${-view.h/2}px)`;
+  inner.style.transform = `translate(${(W/2)+view.x}px, ${(H/2)+view.y}px) rotate(${view.rot}deg) scale(${view.k}) translate(${-view.w/2}px, ${-view.h/2}px)`;
   hudZoom.textContent=`Zoom ${Math.round(view.k*100)}%`;
+  meta.textContent=`${view.w}×${view.h} • live`;
 }
 function fit(){ const r=stage.getBoundingClientRect(); const k=Math.min(r.width/view.w, r.height/view.h); view={...view,x:0,y:0,k}; renderPreview(); }
 function fillView(){ const r=stage.getBoundingClientRect(); const k=Math.max(r.width/view.w, r.height/view.h); view={...view,x:0,y:0,k}; renderPreview(); }
@@ -456,10 +682,39 @@ byId('fillView').addEventListener('click',fillView);
 byId('resetView').addEventListener('click',resetView);
 byId('rotateView').addEventListener('click',rotateView);
 
-let dragging=false, lx=0, ly=0;
-stage.addEventListener('pointerdown',e=>{dragging=true;stage.setPointerCapture(e.pointerId);lx=e.clientX;ly=e.clientY;});
-stage.addEventListener('pointermove',e=>{ if(!dragging) return; view.x+=e.clientX-lx; view.y+=e.clientY-ly; lx=e.clientX; ly=e.clientY; renderPreview(); });
-addEventListener('pointerup',()=>dragging=false);
+// Pan + pinch (2 pointers)
+let pointers=new Map();
+stage.addEventListener('pointerdown',e=>{ stage.setPointerCapture(e.pointerId); pointers.set(e.pointerId,{x:e.clientX,y:e.clientY}); });
+stage.addEventListener('pointerup',e=>{ pointers.delete(e.pointerId); });
+stage.addEventListener('pointercancel',e=>{ pointers.delete(e.pointerId); });
+
+let lastCenter=null,lastDist=null;
+stage.addEventListener('pointermove',e=>{
+  if(!pointers.has(e.pointerId)) return;
+  pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  const pts=[...pointers.values()];
+  if(pts.length===1){
+    const p=pts[0]; const prev=lastCenter||p; view.x += p.x - prev.x; view.y += p.y - prev.y; lastCenter={...p}; renderPreview();
+  }else if(pts.length===2){
+    const c={x:(pts[0].x+pts[1].x)/2, y:(pts[0].y+pts[1].y)/2};
+    const d=Math.hypot(pts[0].x-pts[1].x, pts[0].y-pts[1].y);
+    if(lastCenter && lastDist){
+      // pan by center delta
+      view.x += c.x - lastCenter.x; view.y += c.y - lastCenter.y;
+      // scale by pinch ratio
+      const ratio=d/lastDist; const k=clamp(view.k*ratio, view.min, view.max);
+      // zoom toward gesture center
+      const rect=stage.getBoundingClientRect(), cx=c.x-rect.left - stage.clientWidth/2 - view.x, cy=c.y-rect.top - stage.clientHeight/2 - view.y;
+      const adj=k/view.k; view.x -= cx*(adj-1); view.y -= cy*(adj-1); view.k=k;
+      renderPreview();
+    }
+    lastCenter=c; lastDist=d;
+  }
+},{passive:true});
+stage.addEventListener('pointerleave',()=>{ lastCenter=lastDist=null; });
+stage.addEventListener('dblclick',()=>fit(),{passive:true}); // quick reset on phone
+
+// Wheel zoom (desktop)
 stage.addEventListener('wheel',e=>{
   e.preventDefault();
   const factor = (e.ctrlKey||e.metaKey)?0.0025:0.0015;
@@ -469,7 +724,7 @@ stage.addEventListener('wheel',e=>{
   const ratio = k/view.k; view.x -= cx*(ratio-1); view.y -= cy*(ratio-1); view.k = k; renderPreview();
 },{passive:false});
 
-/* ============== Mini badge mirrors main SVG ============== */
+/* ===== Mini badge mirrors main SVG ===== */
 function renderBadge(svg){
   const badge=byId('svgBadge'); if(!badge) return;
   badge.innerHTML='';
@@ -479,23 +734,35 @@ function renderBadge(svg){
   badge.appendChild(clone);
 }
 
-/* ============== Export (SVG/PNG/TXT/JSON) ============== */
+/* ===== Export (SVG/PNG/TXT/JSON) ===== */
 function toXml(svg){ const clone=svg.cloneNode(true); clone.setAttribute('xmlns',NS); return `<?xml version="1.0" encoding="UTF-8"?>\n`+clone.outerHTML; }
+byId('copySvgBtn').addEventListener('click',()=>{
+  const svg=inner.querySelector('svg'); if(!svg) return toast('Nothing to copy',true);
+  navigator.clipboard?.writeText(toXml(svg)).then(()=>toast('SVG copied')).catch(()=>toast('Clipboard blocked',true));
+});
 byId('downloadSvgBtn').addEventListener('click',()=>{
   const svg=inner.querySelector('svg'); if(!svg) return toast('Nothing to export',true);
-  const g=document.createElementNS(NS,'g'); while(svg.firstChild){ g.appendChild(svg.firstChild) } g.setAttribute('transform',`rotate(${view.rot} ${view.w/2} ${view.h/2})`); svg.appendChild(g);
-  const xml=toXml(svg); const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([xml],{type:'image/svg+xml'})); a.download='medallion.svg'; a.click(); toast('SVG downloaded');
+  // apply rotation at export time
+  const clone=svg.cloneNode(true); const g=document.createElementNS(NS,'g'); while(clone.firstChild){ g.appendChild(clone.firstChild) }
+  g.setAttribute('transform',`rotate(${view.rot} ${view.w/2} ${view.h/2})`); clone.appendChild(g);
+  const xml=toXml(clone); const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([xml],{type:'image/svg+xml'})); a.download='medallion.svg'; a.click(); toast('SVG downloaded');
 });
 byId('downloadPngBtn').addEventListener('click',()=>{
   const svg=inner.querySelector('svg'); if(!svg) return toast('Nothing to export',true);
   const clone=svg.cloneNode(true); const g=document.createElementNS(NS,'g'); while(clone.firstChild){ g.appendChild(clone.firstChild) }
   g.setAttribute('transform',`rotate(${view.rot} ${view.w/2} ${view.h/2})`); clone.appendChild(g);
   const xml=toXml(clone); const url=URL.createObjectURL(new Blob([xml],{type:'image/svg+xml'}));
-  const img=new Image(); const scale=2; img.onload=()=>{
-    const box=clone.viewBox.baseVal||{width:view.w,height:view.h}; const c=document.createElement('canvas'); c.width=box.width*scale; c.height=box.height*scale;
-    const ctx=c.getContext('2d'); ctx.setTransform(scale,0,0,scale,0,0); ctx.drawImage(img,0,0); URL.revokeObjectURL(url);
-    c.toBlob(b=>{ if(!b) return toast('PNG failed',true); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='medallion.png'; a.click(); toast('PNG downloaded'); },'image/png');
-  }; img.crossOrigin='anonymous'; img.src=url;
+  const img=new Image(); const scale = Math.max(2, Math.ceil((window.devicePixelRatio||1)));
+  img.onload=()=>{
+    const box=clone.viewBox.baseVal||{width:view.w,height:view.h};
+    const c=document.createElement('canvas'); c.width=box.width*scale; c.height=box.height*scale;
+    const ctx=c.getContext('2d'); ctx.setTransform(scale,0,0,scale,0,0); ctx.drawImage(img,0,0);
+    URL.revokeObjectURL(url);
+    c.toBlob(b=>{ if(!b) return toast('PNG failed',true);
+      const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=`medallion_${box.width}x${box.height}.png`; a.click(); toast('PNG downloaded');
+    },'image/png');
+  };
+  img.crossOrigin='anonymous'; img.src=url;
 });
 byId('copyBtn').addEventListener('click',()=>{ navigator.clipboard?.writeText(byId('out').value||'').then(()=>toast('Copied')); });
 byId('downloadBtn').addEventListener('click',()=>{
@@ -508,7 +775,7 @@ byId('closeJson').addEventListener('click',()=>jsonModal.close());
 byId('copyJson').addEventListener('click',()=>navigator.clipboard?.writeText(byId('jsonArea').value||'').then(()=>toast('JSON copied')));
 byId('applyJson').addEventListener('click',()=>{ try{ const obj=JSON.parse(byId('jsonArea').value||'{}'); fillForm(obj,true); jsonModal.close(); toast('JSON applied'); }catch{ toast('Invalid JSON',true); }});
 
-/* ============== Save / Load / Randomize presets (localStorage) ============== */
+/* ===== Save / Load / Randomize ===== */
 byId('saveBtn').addEventListener('click',()=>{ localStorage.setItem('medallionPreset', JSON.stringify(readForm())); toast('Preset saved'); });
 byId('loadBtn').addEventListener('click',()=>{ const data=localStorage.getItem('medallionPreset'); if(!data) return toast('No saved preset',true); try{ fillForm(JSON.parse(data),true); toast('Preset loaded'); }catch{ toast('Load failed',true) }});
 byId('randBtn').addEventListener('click',()=>{
@@ -526,19 +793,16 @@ byId('randBtn').addEventListener('click',()=>{
     secondary_symbol:pick(["Army star emblem",""]),
     aurebesh_style:pick(["glowing Aurebesh along rim","cyan inscriptions","luminous white runes","golden lettering","etched symbols"]),
     sabers_desc:pick(["two crossed sabers glow","three angled beams glow","single vertical saber glow","circle of sabers glow"]),
-    style_keywords:pick(["cinematic","formal","balanced symmetry","ancient relic","futuristic tech"])
+    style_keywords:pick(["cinematic","formal","balanced symmetry","ancient relic","futuristic tech"]),
+    flip_arc:"auto"
   }, true);
   toast('Randomized');
 });
 
-/* ============== Generate (sync text + SVG) ============== */
+/* ===== Generate (sync text + SVG) ===== */
 function updateOutputs(v){
-  // big SVG
   const svg=buildMedallionSvg(v);
-  view.w=640; view.h=640; mount(svg); renderPreview();
-  meta.textContent=`${view.w}×${view.h} • live`;
-
-  // mini badge
+  mount(svg); renderPreview();
   renderBadge(svg);
 }
 function generate(){
@@ -547,11 +811,15 @@ function generate(){
   updateOutputs(v);
 }
 byId('gen').addEventListener('click',generate);
-addEventListener('keydown',e=>{ if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){ e.preventDefault(); generate(); } if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='c' && document.activeElement.id==='out'){ e.preventDefault(); navigator.clipboard?.writeText(byId('out').value||'').then(()=>toast('Copied')); } }, {passive:true});
+addEventListener('keydown',e=>{
+  if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){ e.preventDefault(); generate(); }
+  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='c' && document.activeElement.id==='out'){ e.preventDefault(); navigator.clipboard?.writeText(byId('out').value||'').then(()=>toast('Copied')); }
+}, {passive:true});
 
-/* ============== Boot ============== */
+/* ===== Boot ===== */
 (function boot(){
   if(!byId('out').value.trim()){ fillForm(PRESETS[0].form,true); }
+  const stored=localStorage.getItem(LS_FORM); if(stored) fillForm(JSON.parse(stored),true);
   setTimeout(()=>fit(), 60);
 })();
 </script>
