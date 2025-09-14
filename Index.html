@@ -6,119 +6,90 @@
 <meta name="color-scheme" content="dark light" />
 <meta name="theme-color" content="#0d1117" media="(prefers-color-scheme: dark)">
 <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
-<title>Medallion Forge — Enhanced Edition</title>
+<title>Medallion Forge — Enhanced, Crisp Export</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round&display=swap" rel="stylesheet" />
 
 <style>
   :root{
-    --bg:#0a0e14; --surface:#111827; --elevated:#1f2937; --ink:#f1f5f9; --muted:#94a3b8; --subtle:#64748b;
+    --bg:#0a0e14; --surface:#111827; --elevated:#1f2937; --ink:#f1f5f9; --muted:#94a3b8;
     --border:#334155; --accent:#6366f1; --accent-2:#8b5cf6; --accent-glow:#6366f133;
     --success:#10b981; --warning:#f59e0b; --danger:#ef4444;
     --glass:rgba(255,255,255,.05); --glass-border:rgba(255,255,255,.1);
     --r:16px; --r-lg:24px; --shadow:0 20px 25px -5px rgba(0,0,0,.4),0 10px 10px -5px rgba(0,0,0,.2);
     --shadow-lg:0 25px 50px -12px rgba(0,0,0,.6);
-    --sans:'Inter',system-ui,sans-serif;
-    --transition:all .2s cubic-bezier(.4,0,.2,1); --bounce:cubic-bezier(.68,-.55,.265,1.55);
+    --sans:'Inter',system-ui,sans-serif; --transition:all .2s cubic-bezier(.4,0,.2,1);
   }
   @media (prefers-color-scheme: light){
-    :root{ --bg:#fafafa; --surface:#ffffff; --elevated:#f8fafc; --ink:#0f172a; --muted:#64748b; --subtle:#94a3b8; --border:#e2e8f0; --glass:rgba(0,0,0,.03); --glass-border:rgba(0,0,0,.08); }
+    :root{ --bg:#fafafa; --surface:#ffffff; --elevated:#f8fafc; --ink:#0f172a; --muted:#64748b; --border:#e2e8f0; --glass:rgba(0,0,0,.03); --glass-border:rgba(0,0,0,.08) }
   }
-  .theme-light{ --bg:#fafafa; --surface:#ffffff; --elevated:#f8fafc; --ink:#0f172a; --muted:#64748b; --subtle:#94a3b8; --border:#e2e8f0; --glass:rgba(0,0,0,.03); --glass-border:rgba(0,0,0,.08); }
+  .theme-light{ --bg:#fafafa; --surface:#ffffff; --elevated:#f8fafc; --ink:#0f172a; --muted:#64748b; --border:#e2e8f0; --glass:rgba(0,0,0,.03); --glass-border:rgba(0,0,0,.08) }
 
   *{box-sizing:border-box;margin:0;padding:0}
   html{font-size:16px;scroll-behavior:smooth}
   body{min-height:100vh;font:400 14px/1.6 var(--sans);color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;overflow-x:hidden}
   .app{max-width:1400px;margin:0 auto;padding:20px;min-height:calc(100vh - 80px)}
   .grid{display:grid;gap:20px;grid-template-columns:320px 1fr 400px}
-  @media (max-width:1200px){.grid{grid-template-columns:280px 1fr 350px;gap:16px}}
   @media (max-width:1000px){.grid{grid-template-columns:1fr;gap:16px}.app{padding:16px}}
 
   .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--shadow);padding:24px;position:relative;overflow:hidden;backdrop-filter:blur(20px);transition:var(--transition)}
-  .card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--glass-border),transparent)}
   .card:hover{box-shadow:var(--shadow-lg);transform:translateY(-2px)}
 
   h1{font-size:24px;font-weight:800;margin-bottom:16px;background:linear-gradient(135deg,var(--accent),var(--accent-2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
   h2{font-size:16px;font-weight:700;color:var(--muted);margin:20px 0 12px;text-transform:uppercase;letter-spacing:.5px}
-  h2:first-of-type{margin-top:0}
 
   header{position:sticky;top:0;z-index:100;backdrop-filter:blur(20px);background:var(--glass);border-bottom:1px solid var(--glass-border)}
   .header-inner{max-width:1400px;margin:0 auto;padding:16px 20px;display:flex;align-items:center;justify-content:space-between}
   .brand{display:flex;gap:12px;align-items:center}
-  .logo{width:32px;height:32px;border-radius:12px;overflow:hidden;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:grid;place-items:center}
-  .logo::before{content:'⚡';color:#fff;font-size:16px;font-weight:900;text-shadow:0 2px 4px rgba(0,0,0,.3)}
+  .logo{width:32px;height:32px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:grid;place-items:center;color:#fff;font-weight:900}
   .brand-text strong{font-size:18px;font-weight:800}
   .brand-text .subtitle{font-size:12px;color:var(--muted);margin-top:2px}
 
   .toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-  .chip,.btn{min-height:40px;padding:10px 14px;border-radius:12px;display:inline-flex;align-items:center;gap:8px;border:1px solid var(--border);background:var(--elevated);color:var(--ink);cursor:pointer;font-weight:500;transition:var(--transition);position:relative;overflow:hidden}
-  .chip::before,.btn::before{content:'';position:absolute;inset:0;background:var(--accent-glow);opacity:0;transition:var(--transition)}
-  .chip:hover::before,.btn:hover::before{opacity:1}
-  .chip:hover,.btn:hover{border-color:var(--accent);transform:translateY(-1px)}
-  .chip:active,.btn:active{transform:scale(.98)}
+  .chip,.btn{min-height:40px;padding:10px 14px;border-radius:12px;display:inline-flex;align-items:center;gap:8px;border:1px solid var(--border);background:var(--elevated);color:var(--ink);cursor:pointer;font-weight:500;transition:var(--transition)}
   .btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent-2));border:none;color:#fff;font-weight:600;box-shadow:0 8px 25px -8px var(--accent)}
-  .material-icons-round{font-size:20px;user-select:none}
 
   .form-grid{display:grid;gap:16px;grid-template-columns:1fr 1fr}
   @media (max-width:1000px){.form-grid{grid-template-columns:1fr}}
-  .form-group{position:relative}.form-group.full{grid-column:1/-1}
-  label{font-size:13px;font-weight:600;color:var(--muted);margin-bottom:6px;display:block;text-transform:uppercase;letter-spacing:.5px}
-  input,select,textarea{width:100%;min-height:44px;padding:12px 16px;border-radius:12px;font-family:inherit;border:1px solid var(--border);background:var(--elevated);color:var(--ink);transition:var(--transition);font-size:14px}
+  .form-group.full{grid-column:1/-1}
+  label{font-size:13px;font-weight:600;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+  input,select,textarea{width:100%;min-height:44px;padding:12px 16px;border-radius:12px;border:1px solid var(--border);background:var(--elevated);color:var(--ink);font-size:14px}
   input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow);background:var(--surface)}
-  textarea{resize:vertical;font-family:ui-monospace,SF Mono,Monaco,Consolas,monospace;line-height:1.5}
-
+  textarea{resize:vertical;font-family:ui-monospace,Consolas,monospace;line-height:1.5}
   .swatch-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(80px,1fr));gap:8px;margin-top:8px}
-  .swatch{padding:8px 12px;border-radius:10px;border:1px solid var(--border);background:var(--elevated);font-size:12px;font-weight:500;cursor:pointer;transition:var(--transition);text-align:center;position:relative;overflow:hidden}
-  .swatch::before{content:'';position:absolute;inset:0;background:var(--accent-glow);opacity:0;transition:var(--transition)}
-  .swatch:hover::before{opacity:1}
-  .swatch[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);font-weight:600}
-  .swatch[aria-pressed="true"]::before{opacity:.5}
+  .swatch{padding:8px 12px;border-radius:10px;border:1px solid var(--border);background:var(--elevated);font-size:12px;font-weight:500;cursor:pointer}
+  .swatch[aria-pressed="true"]{border-color:var(--accent);color:var(--accent)}
 
   .tabs{display:flex;gap:4px;background:var(--elevated);padding:4px;border-radius:12px;margin-bottom:20px}
-  .tab{flex:1;padding:10px 16px;border-radius:8px;color:var(--muted);cursor:pointer;transition:var(--transition);text-align:center;font-weight:500;background:transparent;border:none}
+  .tab{flex:1;padding:10px 16px;border-radius:8px;color:var(--muted);cursor:pointer;background:transparent;border:none}
   .tab[aria-selected="true"]{color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent-2));box-shadow:0 4px 12px -4px var(--accent)}
   .tabpanel[hidden]{display:none}
 
-  .stage-container{position:relative}
-  .stage{height:70vh;min-height:400px;border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;background:var(--elevated);position:relative;cursor:grab;background-image:radial-gradient(circle at 1px 1px, var(--border) 1px, transparent 0);background-size:20px 20px;background-position:-10px -10px}
+  .stage{height:70vh;min-height:400px;border:1px solid var(--border);border-radius:16px;overflow:hidden;background:var(--elevated);position:relative;cursor:grab;background-image:radial-gradient(circle at 1px 1px, var(--border) 1px, transparent 0);background-size:20px 20px;background-position:-10px -10px}
   .stage:active{cursor:grabbing}
-  .stage.light{background:#fff;background-image:radial-gradient(circle at 1px 1px,#e5e7eb 1px,transparent 0)}
   #inner{position:absolute;top:50%;left:50%;transform-origin:0 0;transition:transform .1s ease-out}
+  /* Crisp preview container */
+  #inner svg{contain:layout paint size; transform:translateZ(0); image-rendering:optimizeQuality}
 
-  .hud{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;padding:12px;background:var(--glass);border:1px solid var(--glass-border);border-radius:12px;backdrop-filter:blur(10px)}
-  .profiles{display:grid;gap:12px;max-height:60vh;overflow-y:auto;scrollbar-width:thin}
-  .profile{display:grid;grid-template-columns:48px 1fr auto;gap:12px;align-items:center;padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--elevated);cursor:pointer;transition:var(--transition)}
-  .profile:hover{border-color:var(--accent);transform:translateY(-1px)}
-  .profile-thumb{width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:grid;place-items:center;color:#fff;font-weight:800;font-size:13px}
-  .profile-info .name{font-weight:600;font-size:14px;margin-bottom:2px}
-  .profile-info .note{color:var(--muted);font-size:12px}
+  .hud{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;padding:12px;background:var(--glass);border:1px solid var(--glass-border);border-radius:12px}
 
-  dialog{border:1px solid var(--border);border-radius:var(--r-lg);padding:0;background:var(--surface);color:var(--ink);width:min(600px,90vw);backdrop-filter:blur(20px);box-shadow:var(--shadow-lg)}
-  dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(4px)}
-  .modal-head{padding:20px 24px;border-bottom:1px solid var(--border);font-weight:700;font-size:18px;background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#fff;margin:-1px -1px 0;border-radius:var(--r-lg) var(--r-lg) 0 0}
-  .modal-body{padding:24px}
-  .modal-actions{padding:20px 24px;border-top:1px solid var(--border);display:flex;gap:12px;justify-content:flex-end}
-
-  .toast{position:fixed;top:24px;right:24px;background:var(--surface);border:1px solid var(--border);padding:16px 20px;border-radius:12px;box-shadow:var(--shadow-lg);backdrop-filter:blur(20px);opacity:0;transform:translateY(-20px) scale(.95);transition:var(--transition);z-index:1000;max-width:400px}
+  .toast{position:fixed;top:24px;right:24px;background:var(--surface);border:1px solid var(--border);
+    padding:16px 20px;border-radius:12px;box-shadow:var(--shadow-lg);backdrop-filter:blur(20px);
+    opacity:0;transform:translateY(-20px) scale(.95);transition:var(--transition);z-index:1000;max-width:400px}
   .toast.show{opacity:1;transform:translateY(0) scale(1)}
   .toast.success{border-left:4px solid var(--success)}
   .toast.error{border-left:4px solid var(--danger)}
-  .toast.warning{border-left:4px solid var(--warning)}
-
-  @media (max-width:1000px){.stage{height:50vh;min-height:300px}.profiles{max-height:40vh}.hud{padding:8px;gap:6px}}
-  .sr-only{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
-  ::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-track{background:var(--elevated);border-radius:4px}::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;border:2px solid var(--elevated)}::-webkit-scrollbar-thumb:hover{background:var(--muted)}
 </style>
 </head>
 <body>
 <header>
   <div class="header-inner">
     <div class="brand">
-      <div class="logo" aria-hidden="true"></div>
+      <div class="logo">⚡</div>
       <div class="brand-text">
         <strong>Medallion Forge</strong>
-        <div class="subtitle">Enhanced Edition</div>
+        <div class="subtitle">Crisp Vector Edition</div>
       </div>
     </div>
     <div class="toolbar" role="group" aria-label="Global controls">
@@ -131,10 +102,10 @@
         </select>
       </label>
       <button id="themeToggle" class="chip" type="button" aria-pressed="false" title="Toggle theme">
-        <span class="material-icons-round" aria-hidden="true">dark_mode</span><span id="themeLabel">Dark</span>
+        <span class="material-icons-round">dark_mode</span><span id="themeLabel">Dark</span>
       </button>
       <button id="fullscreenBtn" class="chip" type="button" title="Toggle fullscreen preview">
-        <span class="material-icons-round" aria-hidden="true">fullscreen</span>
+        <span class="material-icons-round">fullscreen</span>
       </button>
     </div>
   </div>
@@ -144,27 +115,19 @@
   <div class="grid">
     <div class="card">
       <h1>Preset Library</h1>
-      <div class="search-wrapper" style="position:relative;margin-bottom:16px">
+      <div style="position:relative;margin-bottom:16px">
         <span class="material-icons-round" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted)">search</span>
         <input id="profileSearch" placeholder="Search presets..." aria-label="Search presets" style="padding-left:44px">
       </div>
-      <div id="profiles" class="profiles"></div>
+      <div id="profiles" class="profiles" style="display:grid;gap:12px;max-height:60vh;overflow:auto"></div>
       <div class="toolbar" style="margin-top:16px;justify-content:space-between">
         <div style="display:flex;gap:8px">
-          <button id="addPresetBtn" class="chip" type="button" title="Save current configuration">
-            <span class="material-icons-round">bookmark_add</span>Save
-          </button>
-          <button id="randBtn" class="chip" type="button" title="Generate random configuration">
-            <span class="material-icons-round">casino</span>Random
-          </button>
+          <button id="addPresetBtn" class="chip" type="button"><span class="material-icons-round">bookmark_add</span>Save</button>
+          <button id="randBtn" class="chip" type="button"><span class="material-icons-round">casino</span>Random</button>
         </div>
         <div style="display:flex;gap:8px">
-          <button id="exportJsonBtn" class="chip" type="button" title="Export all data">
-            <span class="material-icons-round">upload</span>Export
-          </button>
-          <button id="importJsonBtn" class="chip" type="button" title="Import data">
-            <span class="material-icons-round">download</span>Import
-          </button>
+          <button id="exportJsonBtn" class="chip" type="button"><span class="material-icons-round">upload</span>Export</button>
+          <button id="importJsonBtn" class="chip" type="button"><span class="material-icons-round">download</span>Import</button>
         </div>
       </div>
     </div>
@@ -196,7 +159,7 @@
           <div class="form-group full">
             <label for="rim_finish">Rim Material</label>
             <input id="rim_finish" placeholder="polished steel with subtle etching">
-            <div class="swatch-grid" id="rim_swatches" role="group" aria-label="Rim material presets">
+            <div class="swatch-grid" id="rim_swatches">
               <button class="swatch" data-val="polished steel">Steel</button>
               <button class="swatch" data-val="brushed silver">Silver</button>
               <button class="swatch" data-val="antique gold">Gold</button>
@@ -208,7 +171,7 @@
           <div class="form-group full">
             <label for="plate_color">Base Plate</label>
             <input id="plate_color" placeholder="deep obsidian with subtle texture">
-            <div class="swatch-grid" id="plate_swatches" role="group" aria-label="Plate color presets">
+            <div class="swatch-grid" id="plate_swatches">
               <button class="swatch" data-val="deep obsidian">Obsidian</button>
               <button class="swatch" data-val="pearl white">Pearl</button>
               <button class="swatch" data-val="midnight navy">Navy</button>
@@ -296,16 +259,10 @@
           <div class="form-group">
             <label for="detail_level">Detail Level</label>
             <input type="range" id="detail_level" min="1" max="10" value="7" style="width:100%">
-            <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:4px">
-              <span>Minimal</span><span>Moderate</span><span>Intricate</span>
-            </div>
           </div>
           <div class="form-group">
             <label for="age_patina">Age/Patina</label>
             <input type="range" id="age_patina" min="0" max="10" value="2" style="width:100%">
-            <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:4px">
-              <span>New</span><span>Aged</span><span>Ancient</span>
-            </div>
           </div>
         </div>
       </div>
@@ -324,7 +281,7 @@
           <button id="copySvgBtn" class="btn" type="button"><span class="material-icons-round">code</span>Copy SVG</button>
           <button id="downloadSvgBtn" class="btn" type="button"><span class="material-icons-round">image</span>Save SVG</button>
           <button id="downloadPngBtn" class="btn" type="button"><span class="material-icons-round">photo</span>Export PNG</button>
-          <button id="clearBtn" class="btn" type="button" title="Reset to defaults"><span class="material-icons-round">refresh</span>Reset</button>
+          <button id="clearBtn" class="btn" type="button"><span class="material-icons-round">refresh</span>Reset</button>
         </div>
       </div>
     </div>
@@ -332,45 +289,40 @@
     <div class="card">
       <h1>Live Preview</h1>
       <div class="hud">
-        <button class="chip" id="fit" type="button" title="Fit to view"><span class="material-icons-round">fit_screen</span>Fit</button>
-        <button class="chip" id="fillView" type="button" title="Fill viewport"><span class="material-icons-round">fullscreen</span>Fill</button>
-        <button class="chip" id="resetView" type="button" title="Reset view"><span class="material-icons-round">center_focus_strong</span>Reset</button>
-        <button class="chip" id="rotateView" type="button" title="Rotate 45°"><span class="material-icons-round">rotate_right</span>Rotate</button>
+        <button class="chip" id="fit" type="button"><span class="material-icons-round">fit_screen</span>Fit</button>
+        <button class="chip" id="fillView" type="button"><span class="material-icons-round">fullscreen</span>Fill</button>
+        <button class="chip" id="resetView" type="button"><span class="material-icons-round">center_focus_strong</span>Reset</button>
+        <button class="chip" id="rotateView" type="button"><span class="material-icons-round">rotate_right</span>Rotate</button>
         <span class="chip" id="hudZoom">100%</span>
         <span class="chip" id="hudSize">—</span>
-        <button class="chip" id="animateBtn" type="button" title="Toggle animation"><span class="material-icons-round">play_circle</span>Animate</button>
+        <button class="chip" id="animateBtn" type="button"><span class="material-icons-round">play_circle</span>Animate</button>
       </div>
-      <div class="stage-container">
-        <div class="stage" id="stage" aria-label="Interactive preview - pan, zoom, and rotate">
-          <div id="inner"></div>
-        </div>
+      <div class="stage" id="stage" aria-label="Interactive preview - pan, zoom, and rotate">
+        <div id="inner"></div>
       </div>
     </div>
   </div>
 </div>
 
-<dialog id="jsonModal" aria-labelledby="jsonTitle" aria-modal="true">
-  <div class="modal-head"><strong id="jsonTitle">Import / Export Configuration</strong></div>
-  <div class="modal-body">
-    <p style="color:var(--muted);margin-bottom:16px;font-size:14px">Export your current setup or import saved configurations. JSON format preserves all settings and presets.</p>
-    <textarea id="jsonArea" style="width:100%;min-height:300px;font-family:ui-monospace,monospace;font-size:12px" placeholder="Paste JSON configuration here..."></textarea>
-  </div>
-  <div class="modal-actions">
+<dialog id="jsonModal"><div style="padding:0">
+  <div style="padding:20px 24px;background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#fff;font-weight:700">Import / Export Configuration</div>
+  <div style="padding:20px"><textarea id="jsonArea" style="width:100%;min-height:300px;font-family:ui-monospace,monospace"></textarea></div>
+  <div style="padding:16px;display:flex;gap:12px;justify-content:flex-end;border-top:1px solid var(--border)">
     <button id="applyJson" class="btn primary" type="button"><span class="material-icons-round">check</span>Apply</button>
     <button id="copyJson" class="btn" type="button"><span class="material-icons-round">content_copy</span>Copy</button>
     <button id="validateJson" class="btn" type="button"><span class="material-icons-round">fact_check</span>Validate</button>
     <button id="closeJson" class="btn" type="button">Cancel</button>
   </div>
-</dialog>
+</div></dialog>
 
-<dialog id="fullscreenModal" aria-labelledby="fullscreenTitle" aria-modal="true" style="max-width:95vw;max-height:95vh">
-  <div class="modal-head"><strong id="fullscreenTitle">Fullscreen Preview</strong></div>
-  <div class="modal-body" style="padding:12px">
+<dialog id="fullscreenModal" style="max-width:95vw;max-height:95vh">
+  <div style="padding:20px 24px;background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#fff;font-weight:700">Fullscreen Preview</div>
+  <div style="padding:12px">
     <div id="fullscreenStage" style="width:80vh;height:80vh;border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--elevated);position:relative">
       <div id="fullscreenInner" style="position:absolute;top:50%;left:50%;transform-origin:0 0"></div>
     </div>
   </div>
-  <div class="modal-actions"><button id="closeFullscreen" class="btn" type="button">Close</button></div>
+  <div style="padding:16px;display:flex;justify-content:flex-end"><button id="closeFullscreen" class="btn" type="button">Close</button></div>
 </dialog>
 
 <div id="toastContainer" style="position:fixed;top:24px;right:24px;z-index:1000;display:flex;flex-direction:column;gap:8px;pointer-events:none"></div>
@@ -386,104 +338,70 @@
   const byId = id => document.getElementById(id);
   const NS = 'http://www.w3.org/2000/svg';
   const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
+  const snap   = n => Math.round(n);          // integer pixel for filled shapes
+  const snap05 = n => Math.round(n) + 0.5;    // center single-pixel strokes
 
-  // ---- Eruda: try-init once, otherwise silence warnings ----
-  try {
-    if (window.eruda) {
-      if (typeof window.eruda.init === 'function') { try { window.eruda.init(); } catch {} }
-      else { window.eruda.init = function(){}; }
-    }
-  } catch {}
+  // Eruda (quiet)
+  try { if (window.eruda && typeof window.eruda.init === 'function') { try { window.eruda.init(); } catch {} } } catch {}
 
-  // ---- Storage (safe) ----
+  // Storage
   const STORAGE_KEYS = { FORM:'medallion:enhanced:form', PRESETS:'medallion:enhanced:presets', THEME:'medallion:enhanced:theme', VIEW:'medallion:enhanced:view' };
-  const storage = {
-    get:k=>{ try { return localStorage.getItem(k) } catch { return null } },
-    set:(k,v)=>{ try { localStorage.setItem(k,v) } catch {} },
-    del:k=>{ try { localStorage.removeItem(k) } catch {} }
-  };
+  const storage = { get:k=>{try{return localStorage.getItem(k)}catch{return null}}, set:(k,v)=>{try{localStorage.setItem(k,v)}catch{}}, del:k=>{try{localStorage.removeItem(k)}catch{}} };
 
-  // ===== Toasts (DOM-safe with queue) =====
+  // Toasts (queue-safe)
   const toastQueue = [];
-  function getToastContainer(){ return byId('toastContainer'); }
-  function _showToastNow(message, type='success', duration=3000){
-    const tc = getToastContainer(); if (!tc) return;
-    const toast = document.createElement('div');
-    toast.className = `toast ${type} show`;
-    toast.innerHTML = `<div style="display:flex;align-items:center;gap:10px">
-      <span class="material-icons-round">${type==='success'?'check_circle':type==='error'?'error':'info'}</span>
-      <span>${message}</span></div>`;
-    tc.appendChild(toast);
+  const _showToastNow = (message, type='success', duration=3000) => {
+    const tc = byId('toastContainer'); if (!tc) return;
+    const el = document.createElement('div');
+    el.className = `toast ${type} show`;
+    el.innerHTML = `<div style="display:flex;align-items:center;gap:10px">
+      <span class="material-icons-round">${type==='success'?'check_circle':type==='error'?'error':'info'}</span><span>${message}</span></div>`;
+    tc.appendChild(el);
     const live = byId('live'); if (live) live.textContent = message;
-    setTimeout(()=>{ toast.style.opacity='0'; toast.style.transform='translateX(100%) scale(0.95)'; setTimeout(()=>toast.remove(),200); }, duration);
-  }
-  function showToast(message, type='success', duration=3000){
-    const tc = getToastContainer();
-    if (!tc) { toastQueue.push([message,type,duration]); return; }
-    _showToastNow(message,type,duration);
-  }
-  function flushToasts(){
-    if (!toastQueue.length) return;
-    const tc = getToastContainer(); if (!tc) return;
-    while (toastQueue.length) { const [m,t,d] = toastQueue.shift(); _showToastNow(m,t,d); }
-  }
+    setTimeout(()=>{ el.style.opacity='0'; el.style.transform='translateX(100%) scale(0.95)'; setTimeout(()=>el.remove(),200); }, duration);
+  };
+  const showToast = (m,t='success',d=3000) => (byId('toastContainer') ? _showToastNow(m,t,d) : toastQueue.push([m,t,d]));
+  const flushToasts = () => { const tc = byId('toastContainer'); if (!tc) return; while(toastQueue.length){ const [m,t,d]=toastQueue.shift(); _showToastNow(m,t,d) } };
 
-  // ---------- Tabs ----------
+  // Tabs
   function initTabs(){
-    const tabs = $$('.tab');
-    const panels = { basic:byId('panel-basic'), symbols:byId('panel-symbols'), advanced:byId('panel-advanced'), export:byId('panel-export') };
-    const setTab = (active) => {
-      const id = active.dataset.tab;
-      tabs.forEach(t => { const on = t===active; t.setAttribute('aria-selected', String(on)); t.tabIndex = on?0:-1; });
-      Object.entries(panels).forEach(([k,p]) => p.hidden = (k!==id));
-      active.focus();
-    };
-    tabs.forEach((t,i)=>{
-      t.addEventListener('click',()=>setTab(t));
-      t.addEventListener('keydown',e=>{
-        if(e.key==='ArrowRight'){e.preventDefault();setTab(tabs[(i+1)%tabs.length]);}
-        if(e.key==='ArrowLeft'){e.preventDefault();setTab(tabs[(i-1+tabs.length)%tabs.length]);}
-        if(e.key==='Home'){e.preventDefault();setTab(tabs[0]);}
-        if(e.key==='End'){e.preventDefault();setTab(tabs[tabs.length-1]);}
-      });
-    });
+    const tabs = $$('.tab'); const panels = { basic:byId('panel-basic'), symbols:byId('panel-symbols'), advanced:byId('panel-advanced'), export:byId('panel-export') };
+    const setTab = t => { const id=t.dataset.tab; tabs.forEach(x=>{const on=x===t; x.setAttribute('aria-selected',String(on)); x.tabIndex=on?0:-1}); Object.entries(panels).forEach(([k,p])=>p.hidden=(k!==id)); t.focus(); };
+    tabs.forEach((t,i)=>{ t.addEventListener('click',()=>setTab(t)); t.addEventListener('keydown',e=>{ if(e.key==='ArrowRight'){e.preventDefault();setTab(tabs[(i+1)%tabs.length])} if(e.key==='ArrowLeft'){e.preventDefault();setTab(tabs[(i-1+tabs.length)%tabs.length])} }); });
     setTab(tabs[0]);
   }
 
-  // ---------- Form / Presets ----------
+  // Form / Presets
   const FORM_FIELDS=['text_top','rim_finish','plate_color','text_colors','state_shape','outline_color','main_symbol','symbol_color','badge_elements','secondary_symbol','aurebesh_style','sabers_desc','style_keywords','flip_arc','lighting_mood','material_finish','detail_level','age_patina'];
   const getDefaultForm=()=>({text_top:"GALACTIC JEDI ORDER",rim_finish:"polished steel with subtle etching",plate_color:"deep obsidian with subtle texture",text_colors:"luminous white with shadow outline",state_shape:"ornate circular mandala pattern",outline_color:"electric blue glow",main_symbol:"stylized phoenix rising",symbol_color:"gradient gold to crimson",badge_elements:"intricate geometric patterns with Celtic knots",secondary_symbol:"constellation of stars",aurebesh_style:"glowing runic inscriptions around border",sabers_desc:"twin energy beams with particle effects",style_keywords:"cinematic, photorealistic, dramatic lighting, high detail",flip_arc:"auto",lighting_mood:"soft",material_finish:"polished",detail_level:"7",age_patina:"2"});
   let currentForm=(()=>{const s=storage.get(STORAGE_KEYS.FORM);if(!s)return getDefaultForm();try{return{...getDefaultForm(),...JSON.parse(s)}}catch{return getDefaultForm()}})();
   const readForm=()=>{const f={};FORM_FIELDS.forEach(id=>{const el=byId(id);if(el)f[id]=el.value.trim()});return f};
-  const writeForm=(d)=>{FORM_FIELDS.forEach(id=>{const el=byId(id);if(el&&d[id]!=null)el.value=d[id]});currentForm=d;storage.set(STORAGE_KEYS.FORM,JSON.stringify(currentForm))};
+  const writeForm=d=>{FORM_FIELDS.forEach(id=>{const el=byId(id);if(el&&d[id]!=null)el.value=d[id]});currentForm=d;storage.set(STORAGE_KEYS.FORM,JSON.stringify(currentForm))};
 
   const getDefaultPresets=()=>[
     {id:'jedi_classic',name:'Classic Jedi Order',note:'Traditional design • Blue energy',thumb:'JEDI',form:getDefaultForm()},
-    {id:'sith_dark',name:'Dark Side Order',note:'Crimson accents • Gothic styling',thumb:'SITH',form:{...getDefaultForm(),text_top:"SITH ETERNAL",plate_color:"midnight black with red veins",text_colors:"blood red with black outline",outline_color:"crimson glow",main_symbol:"dark star with spikes",symbol_color:"deep crimson with shadow",sabers_desc:"crossed red lightsabers with dark energy"}},
-    {id:'mandalorian',name:'Mandalorian Clan',note:'Beskar steel • Warrior heritage',thumb:'MAND',form:{...getDefaultForm(),text_top:"THIS IS THE WAY",rim_finish:"beskar steel with battle worn edges",plate_color:"gunmetal gray with scratches",main_symbol:"mythosaur skull",symbol_color:"metallic silver with wear marks",badge_elements:"clan sigils and honor marks"}}
+    {id:'sith_dark',name:'Dark Side Order',note:'Crimson accents • Gothic styling',thumb:'SITH',form:{...getDefaultForm(),text_top:"SITH ETERNAL",plate_color:"midnight black with red veins",text_colors:"blood red with black outline",outline_color:"crimson glow",main_symbol:"dark star with spikes",symbol_color:"deep crimson with shadow",sabers_desc:"crossed red lightsabers with dark energy"}}
   ];
   const getPresets=()=>{const s=storage.get(STORAGE_KEYS.PRESETS);if(!s)return getDefaultPresets();try{const p=JSON.parse(s);return Array.isArray(p)&&p.length?p:getDefaultPresets()}catch{return getDefaultPresets()}};
   const setPresets=p=>{storage.set(STORAGE_KEYS.PRESETS,JSON.stringify(p));renderPresets()};
-
   function renderPresets(){
-    const el = byId('profiles'); const q=(byId('profileSearch').value||'').toLowerCase(); el.innerHTML='';
-    const list = getPresets().filter(p=>!q||p.name.toLowerCase().includes(q)||p.note.toLowerCase().includes(q)||p.thumb.toLowerCase().includes(q));
-    list.forEach(preset=>{
-      const div=document.createElement('div'); div.className='profile';
-      div.innerHTML=`<div class="profile-thumb">${preset.thumb}</div>
-        <div class="profile-info"><div class="name">${preset.name}</div><div class="note">${preset.note}</div></div>
-        <div class="profile-actions">
-          <button class="chip" data-action="apply" title="Apply this preset"><span class="material-icons-round">check</span></button>
-          <button class="chip" data-action="delete" title="Delete preset"><span class="material-icons-round">delete</span></button>
+    const cont=byId('profiles'); const q=(byId('profileSearch').value||'').toLowerCase(); cont.innerHTML='';
+    const list=getPresets().filter(p=>!q||p.name.toLowerCase().includes(q)||p.note.toLowerCase().includes(q)||p.thumb.toLowerCase().includes(q));
+    list.forEach(p=>{const div=document.createElement('div');div.className='profile';div.style.cssText='display:grid;grid-template-columns:48px 1fr auto;gap:12px;align-items:center;padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--elevated);cursor:pointer';
+      div.innerHTML=`<div style="width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:grid;place-items:center;color:#fff;font-weight:800">${p.thumb}</div>
+        <div><div style="font-weight:600">${p.name}</div><div style="color:var(--muted);font-size:12px">${p.note}</div></div>
+        <div style="display:flex;gap:6px">
+          <button class="chip" data-action="apply"><span class="material-icons-round">check</span></button>
+          <button class="chip" data-action="delete"><span class="material-icons-round">delete</span></button>
         </div>`;
-      div.querySelector('[data-action="apply"]').addEventListener('click',(e)=>{e.stopPropagation();writeForm(preset.form);generatePreview();showToast(`Applied "${preset.name}"`)});
-      div.querySelector('[data-action="delete"]').addEventListener('click',(e)=>{e.stopPropagation();if(getDefaultPresets().some(p=>p.id===preset.id))return showToast('Cannot delete default presets','error');if(confirm(`Delete "${preset.name}"?`)){setPresets(getPresets().filter(p=>p.id!==preset.id));showToast('Preset deleted')}});
-      div.addEventListener('click',()=>{writeForm(preset.form);generatePreview();showToast(`Loaded "${preset.name}"`)});
-      el.appendChild(div);
+      div.querySelector('[data-action="apply"]').addEventListener('click',(e)=>{e.stopPropagation();writeForm(p.form);generatePreview();showToast(`Applied "${p.name}"`)});
+      div.querySelector('[data-action="delete"]').addEventListener('click',(e)=>{e.stopPropagation();if(getDefaultPresets().some(x=>x.id===p.id))return showToast('Cannot delete default presets','error');setPresets(getPresets().filter(x=>x.id!==p.id));showToast('Preset deleted')});
+      div.addEventListener('click',()=>{writeForm(p.form);generatePreview();showToast(`Loaded "${p.name}"`)});
+      cont.appendChild(div);
     });
   }
 
-  // ---------- SVG (upgraded) ----------
+  // ===== Crisp SVG generator =====
   function generateSvg(form) {
     const size = parseInt(byId('sizeSelect').value) || 640;
     const R = size / 2;
@@ -492,65 +410,73 @@
     svg.setAttribute('viewBox', `0 0 ${size} ${size}`);
     svg.setAttribute('width', size);
     svg.setAttribute('height', size);
+    svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
     svg.setAttribute('shape-rendering', 'geometricPrecision');
-    svg.setAttribute('text-rendering', 'optimizeLegibility');
+    svg.setAttribute('text-rendering', 'geometricPrecision');
 
-    const defs = document.createElementNS(NS, 'defs');
-    svg.appendChild(defs);
+    const defs = document.createElementNS(NS, 'defs'); svg.appendChild(defs);
 
-    const getColor = (input = '', fallback = '#ffffff') => {
-      const colors = { obsidian:'#0f1419', black:'#111827', white:'#ffffff', pearl:'#f8fafc', navy:'#1e293b', midnight:'#0b2346', crimson:'#991b1b', red:'#ef4444', forest:'#166534', emerald:'#10b981', gold:'#d6a446', bronze:'#8d5a2b', copper:'#c46b3c', silver:'#bfc7d5', steel:'#6b7280', iron:'#374151', purple:'#6b21a8', blue:'#3b82f6' };
-      const s = input.toLowerCase(); for (const [k,v] of Object.entries(colors)) if (s.includes(k)) return v; return fallback;
+    const getColor = (input='', fallback='#ffffff') => {
+      const map = { obsidian:'#0f1419', black:'#111827', white:'#ffffff', pearl:'#f8fafc', navy:'#1e293b', crimson:'#991b1b', forest:'#166534', gold:'#d6a446', bronze:'#8d5a2b', copper:'#c46b3c', silver:'#bfc7d5', steel:'#6b7280', iron:'#374151', purple:'#6b21a8', blue:'#3b82f6', emerald:'#10b981' };
+      const s=input.toLowerCase(); for(const [k,v] of Object.entries(map)) if(s.includes(k)) return v; return fallback;
     };
 
-    const rimGrad = document.createElementNS(NS, 'radialGradient');
-    rimGrad.setAttribute('id', 'rimGrad'); rimGrad.setAttribute('cx','50%'); rimGrad.setAttribute('cy','40%'); rimGrad.setAttribute('r','65%');
-    [['0%','rgba(255,255,255,0.9)'],['25%',getColor(form.rim_finish,'#bfc7d5')],['55%','rgba(0,0,0,0.35)'],['100%',getColor(form.rim_finish,'#9aa3b2')]]
-      .forEach(([offset,color])=>{const s=document.createElementNS(NS,'stop');s.setAttribute('offset',offset);s.setAttribute('stop-color',color);rimGrad.appendChild(s)});
+    // Gradients + filters (DPR/size aware)
+    const rimGrad = document.createElementNS(NS,'radialGradient');
+    rimGrad.setAttribute('id','rimGrad'); rimGrad.setAttribute('cx','50%'); rimGrad.setAttribute('cy','40%'); rimGrad.setAttribute('r','65%');
+    [['0%','rgba(255,255,255,0.85)'],['25%',getColor(form.rim_finish,'#bfc7d5')],['70%','rgba(0,0,0,0.35)'],['100%',getColor(form.rim_finish,'#9aa3b2')]]
+      .forEach(([o,c])=>{const st=document.createElementNS(NS,'stop');st.setAttribute('offset',o);st.setAttribute('stop-color',c);rimGrad.appendChild(st)});
     defs.appendChild(rimGrad);
 
-    const plateGrad = document.createElementNS(NS, 'radialGradient');
-    plateGrad.setAttribute('id', 'plateGrad'); plateGrad.setAttribute('cx','50%'); plateGrad.setAttribute('cy','50%'); plateGrad.setAttribute('r','80%');
-    [['0%',getColor(form.plate_color,'#0f1419')],['100%','rgba(0,0,0,0.4)']].forEach(([offset,color])=>{const s=document.createElementNS(NS,'stop');s.setAttribute('offset',offset);s.setAttribute('stop-color',color);plateGrad.appendChild(s)});
+    const plateGrad = document.createElementNS(NS,'radialGradient');
+    plateGrad.setAttribute('id','plateGrad'); plateGrad.setAttribute('cx','50%'); plateGrad.setAttribute('cy','50%'); plateGrad.setAttribute('r','80%');
+    [['0%',getColor(form.plate_color,'#0f1419')],['100%','rgba(0,0,0,0.4)']]
+      .forEach(([o,c])=>{const st=document.createElementNS(NS,'stop');st.setAttribute('offset',o);st.setAttribute('stop-color',c);plateGrad.appendChild(st)});
     defs.appendChild(plateGrad);
 
     const glow = document.createElementNS(NS, 'filter');
-    glow.setAttribute('id','glow'); glow.setAttribute('x','-40%'); glow.setAttribute('y','-40%'); glow.setAttribute('width','180%'); glow.setAttribute('height','180%');
-    glow.innerHTML = `<feGaussianBlur in="SourceGraphic" stdDeviation="3" result="b1"/><feGaussianBlur in="SourceGraphic" stdDeviation="6" result="b2"/><feMerge><feMergeNode in="b2"/><feMergeNode in="b1"/><feMergeNode in="SourceGraphic"/></feMerge>`;
+    glow.setAttribute('id','glow');
+    glow.setAttribute('filterUnits','objectBoundingBox');
+    glow.setAttribute('x','-30%'); glow.setAttribute('y','-30%'); glow.setAttribute('width','160%'); glow.setAttribute('height','160%');
+    glow.setAttribute('color-interpolation-filters','sRGB');
+    const blurSD = Math.max(1.5, size * 0.004);
+    glow.innerHTML = `<feGaussianBlur in="SourceGraphic" stdDeviation="${blurSD}" result="b1"/>
+                      <feMerge><feMergeNode in="b1"/><feMergeNode in="SourceGraphic"/></feMerge>`;
     defs.appendChild(glow);
 
-    const beamGrad = document.createElementNS(NS, 'linearGradient');
-    beamGrad.setAttribute('id','beam'); beamGrad.setAttribute('x1','0%'); beamGrad.setAttribute('y1','0%'); beamGrad.setAttribute('x2','100%'); beamGrad.setAttribute('y2','100%');
-    [['0%','#baf1ff'],['50%','#6ee7ff'],['100%','#2dd4bf']].forEach(([o,c])=>{const s=document.createElementNS(NS,'stop');s.setAttribute('offset',o);s.setAttribute('stop-color',c);beamGrad.appendChild(s)});
-    defs.appendChild(beamGrad);
+    const beam = document.createElementNS(NS, 'linearGradient');
+    beam.setAttribute('id','beam'); beam.setAttribute('x1','0%'); beam.setAttribute('y1','0%'); beam.setAttribute('x2','100%'); beam.setAttribute('y2','100%');
+    [['0%','#baf1ff'],['50%','#6ee7ff'],['100%','#2dd4bf']]
+      .forEach(([o,c])=>{const st=document.createElementNS(NS,'stop');st.setAttribute('offset',o);st.setAttribute('stop-color',c);beam.appendChild(st)});
+    defs.appendChild(beam);
 
     const g = (name, attrs={}, parent=svg) => { const el=document.createElementNS(NS,name); for(const [k,v] of Object.entries(attrs)) el.setAttribute(k,String(v)); parent.appendChild(el); return el; };
 
-    // Bail loop
-    const bailOuterR = R * 0.13;
-    g('circle',{cx:R,cy:R*0.12+bailOuterR,r:bailOuterR,fill:'url(#rimGrad)',stroke:'rgba(0,0,0,0.35)','stroke-width':size*0.01});
-    g('circle',{cx:R,cy:R*0.12+bailOuterR,r:bailOuterR*0.55,fill:getColor(form.plate_color,'#0f1419')});
+    // Bail ring (snap for crisp outline)
+    const bailR = R*0.13;
+    g('circle',{cx:snap(R),cy:snap(R*0.12+bailR),r:bailR,fill:'url(#rimGrad)',stroke:'rgba(0,0,0,0.35)','stroke-width':Math.max(1,snap( size*0.01))});
+    g('circle',{cx:snap(R),cy:snap(R*0.12+bailR),r:bailR*0.55,fill:getColor(form.plate_color,'#0f1419')});
 
-    // Rim + Plate
-    g('circle',{cx:R,cy:R,r:R*0.95,fill:'url(#rimGrad)'});
-    g('circle',{cx:R,cy:R,r:R*0.85,fill:'url(#plateGrad)'});
-    g('circle',{cx:R,cy:R,r:R*0.62,fill:'none',stroke:getColor(form.outline_color,'#cbd5e1'),'stroke-width':Math.max(2,size*0.006),opacity:'0.7'});
+    // Rim + plate (fill shapes can be snapped to integers)
+    g('circle',{cx:snap(R),cy:snap(R),r:R*0.95,fill:'url(#rimGrad)'});
+    g('circle',{cx:snap(R),cy:snap(R),r:R*0.85,fill:'url(#plateGrad)'});
+    // Thin inner highlight (1px stroke → place on .5 coordinates)
+    g('circle',{cx:snap05(R),cy:snap05(R),r:R*0.62,fill:'none',stroke:getColor(form.outline_color,'#cbd5e1'),'stroke-width':1,opacity:'0.7'});
 
     // Arc text helper
     const addArcText=(text,radius,side='top')=>{
       if(!text||!text.trim()) return;
       const id=`arc-${side}-${Math.random().toString(36).slice(2,7)}`;
       const path = g('path',{id,d:''},defs);
-      const sweepR=radius, y= side==='top' ? R - sweepR : R + sweepR;
-      const d = side==='top' ? `M ${R - sweepR} ${y} A ${sweepR} ${sweepR} 0 0 1 ${R + sweepR} ${y}`
-                              : `M ${R + sweepR} ${y} A ${sweepR} ${sweepR} 0 0 1 ${R - sweepR} ${y}`;
+      const sweepR=radius, y= side==='top' ? snap(R - sweepR) : snap(R + sweepR);
+      const d = side==='top' ? `M ${snap(R - sweepR)} ${y} A ${sweepR} ${sweepR} 0 0 1 ${snap(R + sweepR)} ${y}`
+                              : `M ${snap(R + sweepR)} ${y} A ${sweepR} ${sweepR} 0 0 1 ${snap(R - sweepR)} ${y}`;
       path.setAttribute('d', d);
       const t = g('text',{'font-size':Math.max(18,size*0.05),'font-weight':'800','font-family':'Inter,system-ui,sans-serif',fill:getColor(form.text_colors,'#ffffff'),'letter-spacing':'1.2px'});
       const tp = g('textPath',{href:`#${id}`,startOffset:'50%'},t); tp.textContent = text.substring(0,36).toUpperCase();
       if(side==='bottom') t.setAttribute('dominant-baseline','hanging');
       svg.appendChild(t);
     };
-    // Top/bottom (respects flip auto when rotated)
     const useFlipped = (form.flip_arc==='flipped') || (form.flip_arc==='auto' && (view.rotation%360)>=180);
     addArcText(form.text_top, R*0.72, useFlipped?'bottom':'top');
     addArcText(form.secondary_symbol||'', R*0.72, useFlipped?'top':'bottom');
@@ -560,49 +486,40 @@
     const main = (form.main_symbol||'').toLowerCase();
     if (main.includes('phoenix')) {
       const S=R*0.30;
-      g('path',{d:`M ${R} ${R - S*0.9}
+      g('path',{d:`M ${snap(R)} ${snap(R - S*0.9)}
         Q ${R + S*0.45} ${R - S*0.65} ${R + S*0.7} ${R - S*0.15}
         Q ${R + S*0.9} ${R + S*0.15} ${R + S*0.45} ${R + S*0.5}
         Q ${R} ${R + S*0.75} ${R - S*0.45} ${R + S*0.5}
         Q ${R - S*0.9} ${R + S*0.15} ${R - S*0.7} ${R - S*0.15}
-        Q ${R - S*0.45} ${R - S*0.65} ${R} ${R - S*0.9}`, fill:getColor(form.symbol_color,'#d6a446'),stroke:'rgba(255,255,255,0.35)','stroke-width':Math.max(1.5,size*0.003)},emblem);
-      g('circle',{cx:R,cy:R - S*0.45,r:Math.max(1.2,size*0.004),fill:'#fff',opacity:'0.85'},emblem);
-    } else if (main.includes('death')||main.includes('star')) {
-      const S=R*0.26;
-      g('circle',{cx:R,cy:R,r:S,fill:getColor(form.symbol_color,'#6b7280'),stroke:getColor(form.outline_color,'#e5e7eb'),'stroke-width':Math.max(2,size*0.005)},emblem);
-      g('line',{x1:R - S*0.95,y1:R - S*0.05,x2:R + S*0.95,y2:R - S*0.05,stroke:'rgba(255,255,255,0.45)','stroke-width':Math.max(1,size*0.003)},emblem);
-      g('circle',{cx:R + S*0.35,cy:R - S*0.25,r:S*0.28,fill:'rgba(255,255,255,0.15)'},emblem);
-      g('circle',{cx:R + S*0.35,cy:R - S*0.25,r:S*0.12,fill:'rgba(255,255,255,0.35)'},emblem);
+        Q ${R - S*0.45} ${R - S*0.65} ${R} ${R - S*0.9}`,
+        fill:getColor(form.symbol_color,'#d6a446'),stroke:'rgba(255,255,255,0.35)','stroke-width':Math.max(1.5,size*0.003)},emblem);
     } else {
       const S=R*0.27;
-      g('circle',{cx:R,cy:R,r:S,fill:getColor(form.symbol_color,'#3b82f6'),stroke:getColor(form.outline_color,'#e5e7eb'),'stroke-width':Math.max(2,size*0.005)},emblem);
-      g('circle',{cx:R,cy:R,r:S*0.68,fill:'none',stroke:'rgba(255,255,255,0.35)','stroke-width':Math.max(1,size*0.003)},emblem);
-      const k=i=>{const outer=S*0.58,inner=S*0.24,a=-90+i*72,ao=a*Math.PI/180,ai=(a+36)*Math.PI/180;return [R+outer*Math.cos(ao),R+outer*Math.sin(ao),R+inner*Math.cos(ai),R+inner*Math.sin(ai)]};
-      let d='M '; for(let i=0;i<5;i++){const [x1,y1,x2,y2]=k(i); d+=`${x1} ${y1} L ${x2} ${y2} `} d+='Z';
-      g('path',{d,fill:'#fff',opacity:'0.85'},emblem);
+      g('circle',{cx:snap(R),cy:snap(R),r:S,fill:getColor(form.symbol_color,'#3b82f6'),stroke:getColor(form.outline_color,'#e5e7eb'),'stroke-width':Math.max(2,size*0.005)},emblem);
+      g('circle',{cx:snap(R),cy:snap(R),r:S*0.68,fill:'none',stroke:'rgba(255,255,255,0.35)','stroke-width':1},emblem);
     }
     svg.appendChild(emblem);
 
-    // Sabers / beams
+    // Energy beams (sharp endpoints)
     const sabers = (form.sabers_desc||'').toLowerCase();
     if (sabers.includes('twin')||sabers.includes('cross')||sabers.includes('saber')||sabers.includes('beam')) {
       const L=R*0.58, w=Math.max(3,size*0.006);
       const mk=(x1,y1,x2,y2)=>{ const grp=g('g',{filter:'url(#glow)',opacity:'0.95'});
-        g('line',{x1,y1,x2,y2,stroke:'#ffffff','stroke-width':w*2.2,'stroke-linecap':'round',opacity:'0.25'},grp);
-        g('line',{x1,y1,x2,y2,stroke:'url(#beam)','stroke-width':w,'stroke-linecap':'round'},grp);
+        g('line',{x1:snap05(x1),y1:snap05(y1),x2:snap05(x2),y2:snap05(y2),stroke:'#ffffff','stroke-width':w*2.2,'stroke-linecap':'round',opacity:'0.25'},grp);
+        g('line',{x1:snap05(x1),y1:snap05(y1),x2:snap05(x2),y2:snap05(y2),stroke:'url(#beam)','stroke-width':w,'stroke-linecap':'round'},grp);
         return grp;
       };
       mk(R - L*0.7, R + L*0.7, R + L*0.7, R - L*0.7);
       mk(R + L*0.7, R + L*0.7, R - L*0.7, R - L*0.7);
     }
 
-    // Fine inner highlight ring
-    g('circle',{cx:R,cy:R,r:R*0.84,fill:'none',stroke:'rgba(255,255,255,0.35)','stroke-width':Math.max(1,size*0.003)});
+    // Fine outer ring (1px)
+    g('circle',{cx:snap05(R),cy:snap05(R),r:R*0.84,fill:'none',stroke:'rgba(255,255,255,0.35)','stroke-width':1});
 
     return svg;
   }
 
-  // ---------- View / Preview ----------
+  // View / Preview
   let view={x:0,y:0,scale:1,rotation:0,minScale:0.1,maxScale:5,width:640,height:640};
   function loadViewState(){try{const s=storage.get(STORAGE_KEYS.VIEW);if(s)view={...view,...JSON.parse(s)}}catch{}}
   function saveViewState(){storage.set(STORAGE_KEYS.VIEW,JSON.stringify(view))}
@@ -613,20 +530,17 @@
     byId('hudSize').textContent=`${Math.round(r.width)}×${Math.round(r.height)}px`;
     saveViewState();
   }
-
   function generatePreview(){
     const form=readForm(); const svg=generateSvg(form);
     svg.querySelectorAll('path,circle,line,polygon').forEach(el=>{ if(!el.hasAttribute('vector-effect')) el.setAttribute('vector-effect','non-scaling-stroke'); });
     const inner=byId('inner'); inner.innerHTML=''; inner.appendChild(svg);
     updatePreview(); generatePrompt(); const live=byId('live'); if(live) live.textContent='Preview updated';
   }
-
   function generatePrompt(){
     const f=readForm(), detail=+f.detail_level||7, age=+f.age_patina||2;
     const detailTerms=detail>7?'highly detailed, intricate craftsmanship':detail>4?'moderate detail, quality craftsmanship':'clean, minimalist design';
     const ageTerms=age>7?'ancient, heavily weathered, archaeological artifact':age>4?'aged, battle-worn, historical piece':'pristine, newly forged';
-    const txt=`
-Professional medallion design render, ${f.style_keywords}.
+    byId('out').value = `Professional medallion design render, ${f.style_keywords}.
 
 STRUCTURE & MATERIALS:
 • Base: Circular pendant, ${f.rim_finish} rim with ${f.plate_color} central plate
@@ -645,11 +559,10 @@ EFFECTS & LIGHTING:
 • Mood: ${f.lighting_mood} lighting with ${detailTerms}
 • Quality: Photorealistic rendering, studio lighting, premium materials
 
-Technical: 4K resolution, physically accurate materials, professional product photography style.`.trim();
-    byId('out').value=txt;
+Technical: 4K resolution, physically accurate materials, professional product photography style.`;
   }
 
-  // ---------- Interactions ----------
+  // Interactions
   function initInteractions(){
     const stage=byId('stage'); let pointers=new Map(), lastCenter=null, lastDist=null;
     stage.addEventListener('pointerdown',e=>{stage.setPointerCapture?.(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY})});
@@ -695,15 +608,74 @@ Technical: 4K resolution, physically accurate materials, professional product ph
     });
   }
 
+  // ====== Export helpers: crisp SVG/PNG ======
+  function getCurrentSvgXml(){
+    const svg=byId('inner').querySelector('svg'); if(!svg) return null;
+    const clone=svg.cloneNode(true),wrap=document.createElementNS(NS,'g');
+    while(clone.firstChild) wrap.appendChild(clone.firstChild);
+    if(view.rotation) wrap.setAttribute('transform',`rotate(${view.rotation} ${view.width/2} ${view.height/2})`);
+    clone.appendChild(wrap);
+    clone.setAttribute('xmlns',NS);
+    // lock font for consistency in exports
+    clone.setAttribute('font-family','Inter,system-ui,sans-serif');
+    return `<?xml version="1.0" encoding="UTF-8"?>\n${clone.outerHTML}`;
+  }
+
+  async function svgToPngBlob(svgXml, outW, outH) {
+    const blob = new Blob([svgXml], { type:'image/svg+xml' });
+    const url = URL.createObjectURL(blob);
+    // createImageBitmap gives better resampling than <img> on many browsers
+    let bmp = null;
+    try { bmp = await createImageBitmap(blob); } catch { /* fallback below */ }
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    // DPR-aware sizing
+    const dpr = window.devicePixelRatio || 1;
+    const scale = Math.max(1, Math.floor(dpr)); // 1x/2x/3x …
+    canvas.width  = Math.round(outW * scale);
+    canvas.height = Math.round(outH * scale);
+    ctx.setTransform(scale,0,0,scale,0,0);
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+
+    if (bmp) {
+      ctx.drawImage(bmp, 0, 0, outW, outH);
+    } else {
+      // Fallback via HTMLImageElement
+      await new Promise((res, rej) => {
+        const img = new Image();
+        img.onload = () => { ctx.drawImage(img, 0, 0, outW, outH); URL.revokeObjectURL(url); res(); };
+        img.onerror = (e) => { URL.revokeObjectURL(url); rej(e); };
+        img.crossOrigin = 'anonymous';
+        img.src = url;
+      });
+    }
+    return new Promise(r => canvas.toBlob(b => r(b), 'image/png', 0.96));
+  }
+
   function initExports(){
-    byId('copyBtn').addEventListener('click',async()=>{const t=byId('out').value;if(!t.trim())return showToast('No content to copy','error');try{await navigator.clipboard.writeText(t);showToast('Prompt copied to clipboard')}catch{showToast('Copy failed','error')}});
+    byId('copyBtn').addEventListener('click',async()=>{const t=byId('out').value;if(!t.trim())return showToast('No content to copy','error');try{await navigator.clipboard.writeText(t);showToast('Prompt copied')}catch{showToast('Copy failed','error')}});
     byId('downloadBtn').addEventListener('click',()=>{const t=byId('out').value;if(!t.trim())return showToast('No content to download','error');const b=new Blob([t],{type:'text/plain'}),u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=`medallion_prompt_${Date.now()}.txt`;a.click();URL.revokeObjectURL(u);showToast('Prompt downloaded')});
 
-    const getSvgXml=()=>{const svg=byId('inner').querySelector('svg');if(!svg)return null;const clone=svg.cloneNode(true),wrap=document.createElementNS(NS,'g');while(clone.firstChild)wrap.appendChild(clone.firstChild);if(view.rotation)wrap.setAttribute('transform',`rotate(${view.rotation} ${view.width/2} ${view.height/2})`);clone.appendChild(wrap);clone.setAttribute('xmlns',NS);return `<?xml version="1.0" encoding="UTF-8"?>\n${clone.outerHTML}`};
+    byId('copySvgBtn').addEventListener('click',async()=>{const xml=getCurrentSvgXml();if(!xml)return showToast('No SVG to copy','error');try{await navigator.clipboard.writeText(xml);showToast('SVG copied')}catch{showToast('SVG copy failed','error')}});
+    byId('downloadSvgBtn').addEventListener('click',()=>{const xml=getCurrentSvgXml();if(!xml)return showToast('No SVG to export','error');const b=new Blob([xml],{type:'image/svg+xml'}),u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=`medallion_${view.width}x${view.height}.svg`;a.click();URL.revokeObjectURL(u);showToast('SVG downloaded')});
 
-    byId('copySvgBtn').addEventListener('click',async()=>{const xml=getSvgXml();if(!xml)return showToast('No SVG to copy','error');try{await navigator.clipboard.writeText(xml);showToast('SVG copied to clipboard')}catch{showToast('SVG copy failed','error')}});
-    byId('downloadSvgBtn').addEventListener('click',()=>{const xml=getSvgXml();if(!xml)return showToast('No SVG to export','error');const b=new Blob([xml],{type:'image/svg+xml'}),u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=`medallion_${view.width}x${view.height}.svg`;a.click();URL.revokeObjectURL(u);showToast('SVG downloaded')});
-    byId('downloadPngBtn').addEventListener('click',()=>{const xml=getSvgXml();if(!xml)return showToast('No image to export','error');const b=new Blob([xml],{type:'image/svg+xml'}),u=URL.createObjectURL(b),img=new Image();img.onload=()=>{const c=document.createElement('canvas'),s=2;c.width=view.width*s;c.height=view.height*s;const ctx=c.getContext('2d');ctx.scale(s,s);ctx.drawImage(img,0,0);URL.revokeObjectURL(u);c.toBlob(blob=>{if(!blob)return showToast('PNG export failed','error');const u2=URL.createObjectURL(blob);const a=document.createElement('a');a.href=u2;a.download=`medallion_${view.width}x${view.height}_${Date.now()}.png`;a.click();URL.revokeObjectURL(u2);showToast('PNG exported successfully')},'image/png',0.95)};img.onerror=()=>{URL.revokeObjectURL(u);showToast('PNG export failed','error')};img.crossOrigin='anonymous';img.src=u});
+    byId('downloadPngBtn').addEventListener('click', async () => {
+      const xml=getCurrentSvgXml(); if(!xml) return showToast('No image to export','error');
+      // Choose an export scale (2x is a good default; change to 3 or 4 for posters)
+      const exportScale = 2;
+      const outW = view.width  * exportScale;
+      const outH = view.height * exportScale;
+      try {
+        const pngBlob = await svgToPngBlob(xml, outW, outH);
+        if (!pngBlob) return showToast('PNG export failed','error');
+        const url = URL.createObjectURL(pngBlob);
+        const a = document.createElement('a');
+        a.href = url; a.download = `medallion_${outW}x${outH}_${Date.now()}.png`;
+        a.click(); URL.revokeObjectURL(url);
+        showToast('PNG exported (DPR-aware)');
+      } catch(e){ console.error(e); showToast('PNG export failed','error'); }
+    });
   }
 
   function initPresetActions(){
@@ -722,18 +694,17 @@ Technical: 4K resolution, physically accurate materials, professional product ph
 
   function initJsonModal(){
     const modal=byId('jsonModal'), ta=byId('jsonArea');
-    byId('exportJsonBtn').addEventListener('click',()=>{ta.value=JSON.stringify({version:'2.0',timestamp:new Date().toISOString(),form:readForm(),presets:getPresets(),view},null,2);modal.showModal();showToast('Export data prepared')});
-    byId('importJsonBtn').addEventListener('click',()=>{ta.value='';ta.placeholder='Paste your configuration JSON here...';modal.showModal()});
-    byId('validateJson').addEventListener('click',()=>{try{const d=JSON.parse(ta.value||'{}');showToast('JSON is valid','success');const info=[];if(d.form)info.push('Form configuration');if(d.presets)info.push(`${d.presets.length} presets`);if(d.view)info.push('View settings');if(info.length)showToast(`Will import: ${info.join(', ')}`,'info')}catch(e){showToast(`Invalid JSON: ${e.message}`,'error')}});
-    byId('applyJson').addEventListener('click',()=>{try{const d=JSON.parse(ta.value||'{}');if(d.form)writeForm({...getDefaultForm(),...d.form});if(Array.isArray(d.presets))setPresets(d.presets);if(d.view)view={...view,...d.view};generatePreview();renderPresets();modal.close();showToast('Configuration imported successfully')}catch(e){showToast(`Import failed: ${e.message}`,'error')}});
-    byId('copyJson').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(ta.value);showToast('JSON copied to clipboard')}catch{showToast('Copy failed','error')}});
+    byId('exportJsonBtn').addEventListener('click',()=>{ta.value=JSON.stringify({version:'2.0',timestamp:new Date().toISOString(),form:readForm(),presets:getPresets(),view},null,2);modal.showModal();showToast('Export ready')});
+    byId('importJsonBtn').addEventListener('click',()=>{ta.value='';modal.showModal()});
+    byId('validateJson').addEventListener('click',()=>{try{JSON.parse(ta.value||'{}');showToast('JSON is valid','success')}catch(e){showToast(`Invalid JSON: ${e.message}`,'error')}});
+    byId('applyJson').addEventListener('click',()=>{try{const d=JSON.parse(ta.value||'{}');if(d.form)writeForm({...getDefaultForm(),...d.form});if(Array.isArray(d.presets))setPresets(d.presets);if(d.view)view={...view,...d.view};generatePreview();renderPresets();modal.close();showToast('Imported')}catch(e){showToast(`Import failed: ${e.message}`,'error')}});
+    byId('copyJson').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(ta.value);showToast('JSON copied')}catch{showToast('Copy failed','error')}});
     byId('closeJson').addEventListener('click',()=>modal.close());
   }
 
   function initFullscreen(){
     const modal=byId('fullscreenModal'), inner=byId('fullscreenInner');
-    byId('fullscreenBtn').addEventListener('click',()=>{const cur=byId('inner').querySelector('svg');if(!cur)return showToast('No preview to show','error');
-      const clone=cur.cloneNode(true); inner.innerHTML=''; inner.appendChild(clone);
+    byId('fullscreenBtn').addEventListener('click',()=>{const cur=byId('inner').querySelector('svg');if(!cur)return showToast('No preview to show','error');const clone=cur.cloneNode(true); inner.innerHTML=''; inner.appendChild(clone);
       const stageSize=600, scale=Math.min(stageSize/view.width, stageSize/view.height)*0.9;
       inner.style.transform=`translate(${stageSize/2}px,${stageSize/2}px) scale(${scale}) translate(${-view.width/2}px,${-view.height/2}px)`;
       modal.showModal();
@@ -748,34 +719,29 @@ Technical: 4K resolution, physically accurate materials, professional product ph
   function stopAnimation(){ animating=false; if(animationId)cancelAnimationFrame(animationId),animationId=null; byId('animateBtn').querySelector('.material-icons-round').textContent='play_circle'; showToast('Animation stopped'); }
 
   const debouncedGenerate=(()=>{let t;return(d=300)=>{clearTimeout(t);t=setTimeout(generatePreview,d)}})();
-  function initFormReactivity(){ FORM_FIELDS.forEach(id=>{const el=byId(id);if(!el)return;const ev=el.type==='range'?['input']:['input','change'];ev.forEach(e=>el.addEventListener(e,()=>debouncedGenerate(el.type==='range'?100:300)))}); byId('clearBtn').addEventListener('click',()=>{if(confirm('Reset all settings to defaults?')){writeForm(getDefaultForm());generatePreview();showToast('Settings reset to defaults')}}); byId('gen').addEventListener('click',()=>{generatePreview();showToast('Preview regenerated')}); }
+  function initFormReactivity(){ FORM_FIELDS.forEach(id=>{const el=byId(id);if(!el)return;const ev=el.type==='range'?['input']:['input','change'];ev.forEach(e=>el.addEventListener(e,()=>debouncedGenerate(el.type==='range'?100:300)))}); byId('clearBtn').addEventListener('click',()=>{if(confirm('Reset all settings to defaults?')){writeForm(getDefaultForm());generatePreview();showToast('Reset')}}); byId('gen').addEventListener('click',()=>{generatePreview();showToast('Preview regenerated')}); }
 
   function initKeyboardShortcuts(){
     document.addEventListener('keydown',e=>{
-      if(e.ctrlKey||e.metaKey){
-        const k=e.key.toLowerCase();
-        if(k==='enter'){e.preventDefault();generatePreview();showToast('Generated via shortcut')}
+      if(e.ctrlKey||e.metaKey){ const k=e.key.toLowerCase();
+        if(k==='enter'){e.preventDefault();generatePreview();showToast('Generated')}
         if(k==='r'&&e.shiftKey){e.preventDefault();resetView()}
         if(k==='s'&&e.shiftKey){e.preventDefault();byId('addPresetBtn').click()}
         if(k==='f'){e.preventDefault();fitToView()}
       }
-      if(e.key==='Tab'){
-        const activeTab=document.querySelector('.tab[aria-selected="true"]');
-        if(activeTab&&document.activeElement===activeTab){
-          const panel=document.querySelector('.tabpanel:not([hidden])'); const first=panel?.querySelector('input,select,textarea');
-          if(first){e.preventDefault();first.focus()}
-        }
-      }
     });
   }
 
-  function initResponsive(){ const ro=new ResizeObserver(es=>{for(const e of es) if(e.target.id==='stage') updatePreview()}); ro.observe(byId('stage')); }
-  function initSearch(){ const i=byId('profileSearch'); i.addEventListener('input',()=>{clearTimeout(i.searchTimeout); i.searchTimeout=setTimeout(renderPresets,200)}); i.addEventListener('keydown',e=>{if(e.key==='Escape'){i.value='';renderPresets();i.blur()}}); }
-
   function init(){
     try{
-      loadViewState(); initTabs(); initSearch();
-      // theme needs DOM; safe either way
+      loadViewState(); initTabs(); initSwatches(); initInteractions(); initExports();
+      initPresetActions(); initJsonModal(); initFullscreen(); initAnimation();
+      initFormReactivity(); initKeyboardShortcuts(); renderPresets();
+      writeForm(currentForm);
+      view.width=view.height=parseInt(byId('sizeSelect').value)||640;
+      flushToasts(); // now DOM exists
+      setTimeout(()=>{generatePreview();fitToView();showToast('Crisp Vector Edition ready')},100);
+      // Theme toggle (after DOM)
       (function initTheme(){
         const stored = storage.get(STORAGE_KEYS.THEME);
         if (stored==='light') document.body.classList.add('theme-light');
@@ -785,7 +751,6 @@ Technical: 4K resolution, physically accurate materials, professional product ph
           byId('themeToggle').setAttribute('aria-pressed', String(light));
           icon.textContent = light ? 'light_mode' : 'dark_mode';
           byId('themeLabel').textContent = light ? 'Light' : 'Dark';
-          byId('stage').classList.toggle('light', light);
         };
         update();
         byId('themeToggle').addEventListener('click',()=>{
@@ -793,21 +758,8 @@ Technical: 4K resolution, physically accurate materials, professional product ph
           storage.set(STORAGE_KEYS.THEME, isLight ? 'light':'dark'); update(); showToast(`Switched to ${isLight?'Light':'Dark'} theme`);
         });
       })();
-
-      initSwatches(); initInteractions(); initExports(); initPresetActions();
-      initJsonModal(); initFullscreen(); initAnimation(); initFormReactivity(); initKeyboardShortcuts(); initResponsive();
-
-      writeForm(currentForm); renderPresets();
-
-      view.width=view.height=parseInt(byId('sizeSelect').value)||640;
-
-      // Now DOM exists: flush any queued toasts
-      flushToasts();
-
-      setTimeout(()=>{generatePreview();fitToView();showToast('Medallion Forge Enhanced ready')},100);
     }catch(err){console.error('Initialization error:',err);showToast('Initialization error - check console','error')}
   }
-
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init); else init();
 })();
 </script>
