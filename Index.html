@@ -220,123 +220,253 @@
   }
 
   // --- svg generation --------------------------------------------------------
-  function generateSvg(form) {
-    const size = parseInt(byId('sizeSelect').value) || 640;
-    const R = size / 2;
+  // --- DROP-IN REPLACEMENT ---
+function generateSvg(form) {
+  const size = parseInt(byId('sizeSelect').value) || 640;
+  const R = size / 2;
 
-    const svg = document.createElementNS(NS, 'svg');
-    svg.setAttribute('viewBox', `0 0 ${size} ${size}`);
-    svg.setAttribute('width', size);
-    svg.setAttribute('height', size);
-    svg.setAttribute('shape-rendering', 'geometricPrecision');
-    svg.setAttribute('text-rendering', 'optimizeLegibility');
+  const svg = document.createElementNS(NS, 'svg');
+  svg.setAttribute('viewBox', `0 0 ${size} ${size}`);
+  svg.setAttribute('width', size);
+  svg.setAttribute('height', size);
+  svg.setAttribute('shape-rendering', 'geometricPrecision');
+  svg.setAttribute('text-rendering', 'optimizeLegibility');
 
-    const defs = document.createElementNS(NS, 'defs');
-    svg.appendChild(defs);
+  // ----- defs: gradients & filters -----------------------------------------
+  const defs = document.createElementNS(NS, 'defs');
+  svg.appendChild(defs);
 
-    const getColor = (input = '', fallback = '#ffffff') => {
-      const colors = {
-        obsidian:'#0f1419', pearl:'#f8fafc', navy:'#1e293b', crimson:'#991b1b',
-        forest:'#166534', purple:'#7c2d12', gold:'#d97706', silver:'#64748b',
-        steel:'#475569', bronze:'#92400e', iron:'#374151', copper:'#ea580c', white:'#ffffff', black:'#111827'
-      };
-      const lower = input.toLowerCase();
-      for (const [k, c] of Object.entries(colors)) if (lower.includes(k)) return c;
-      return fallback;
+  const getColor = (input = '', fallback = '#ffffff') => {
+    const colors = {
+      obsidian:'#0f1419', black:'#111827', white:'#ffffff', pearl:'#f8fafc',
+      navy:'#1e293b', midnight:'#0b2346', crimson:'#991b1b', red:'#ef4444',
+      forest:'#166534', emerald:'#10b981', gold:'#d6a446', bronze:'#8d5a2b',
+      copper:'#c46b3c', silver:'#bfc7d5', steel:'#6b7280', iron:'#374151',
+      purple:'#6b21a8', blue:'#3b82f6'
     };
+    const s = input.toLowerCase();
+    for (const [k, v] of Object.entries(colors)) if (s.includes(k)) return v;
+    return fallback;
+  };
 
-    // rim gradient
-    const rimGradient = document.createElementNS(NS, 'radialGradient');
-    rimGradient.setAttribute('id', 'rimGrad');
-    rimGradient.setAttribute('cx', '50%'); rimGradient.setAttribute('cy', '50%'); rimGradient.setAttribute('r', '60%');
-    [
-      { offset:'0%',   color:'rgba(255,255,255,0.3)' },
-      { offset:'40%',  color:getColor(form.rim_finish, '#64748b') },
-      { offset:'100%', color:'rgba(0,0,0,0.4)' }
-    ].forEach(s => {
-      const st = document.createElementNS(NS, 'stop');
-      st.setAttribute('offset', s.offset); st.setAttribute('stop-color', s.color); rimGradient.appendChild(st);
+  // Rim metal gradient (gives bevel)
+  const rimGrad = document.createElementNS(NS, 'radialGradient');
+  rimGrad.setAttribute('id', 'rimGrad');
+  rimGrad.setAttribute('cx', '50%');
+  rimGrad.setAttribute('cy', '40%');
+  rimGrad.setAttribute('r', '65%');
+  [
+    ['0%','rgba(255,255,255,0.9)'],
+    ['25%', getColor(form.rim_finish, '#bfc7d5')],
+    ['55%','rgba(0,0,0,0.35)'],
+    ['100%', getColor(form.rim_finish, '#9aa3b2')]
+  ].forEach(([offset, color])=>{
+    const s = document.createElementNS(NS,'stop');
+    s.setAttribute('offset',offset); s.setAttribute('stop-color',color); rimGrad.appendChild(s);
+  });
+  defs.appendChild(rimGrad);
+
+  // Plate gradient (subtle vignette)
+  const plateGrad = document.createElementNS(NS, 'radialGradient');
+  plateGrad.setAttribute('id', 'plateGrad');
+  plateGrad.setAttribute('cx', '50%');
+  plateGrad.setAttribute('cy', '50%');
+  plateGrad.setAttribute('r', '80%');
+  [
+    ['0%', getColor(form.plate_color, '#0f1419')],
+    ['100%', 'rgba(0,0,0,0.4)']
+  ].forEach(([offset, color])=>{
+    const s = document.createElementNS(NS,'stop');
+    s.setAttribute('offset',offset); s.setAttribute('stop-color',color); plateGrad.appendChild(s);
+  });
+  defs.appendChild(plateGrad);
+
+  // Glow filter for energy beams / highlights
+  const glow = document.createElementNS(NS, 'filter');
+  glow.setAttribute('id','glow');
+  glow.setAttribute('x','-40%'); glow.setAttribute('y','-40%');
+  glow.setAttribute('width','180%'); glow.setAttribute('height','180%');
+  glow.innerHTML = `
+    <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur1"/>
+    <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur2"/>
+    <feMerge>
+      <feMergeNode in="blur2"/>
+      <feMergeNode in="blur1"/>
+      <feMergeNode in="SourceGraphic"/>
+    </feMerge>
+  `;
+  defs.appendChild(glow);
+
+  // Stroke gradient for beams
+  const beamGrad = document.createElementNS(NS, 'linearGradient');
+  beamGrad.setAttribute('id','beam');
+  beamGrad.setAttribute('x1','0%'); beamGrad.setAttribute('y1','0%');
+  beamGrad.setAttribute('x2','100%'); beamGrad.setAttribute('y2','100%');
+  [
+    ['0%','#baf1ff'],
+    ['50%','#6ee7ff'],
+    ['100%','#2dd4bf']
+  ].forEach(([offset,color])=>{
+    const s = document.createElementNS(NS,'stop');
+    s.setAttribute('offset',offset); s.setAttribute('stop-color',color); beamGrad.appendChild(s);
+  });
+  defs.appendChild(beamGrad);
+
+  // ----- badge geometry -----------------------------------------------------
+  const g = (name, attrs={}, parent=svg) => {
+    const el = document.createElementNS(NS,name);
+    for (const [k,v] of Object.entries(attrs)) el.setAttribute(k,String(v));
+    parent.appendChild(el);
+    return el;
+  };
+
+  // Bail loop (top ring)
+  const bailOuterR = R * 0.13;
+  const bail = g('circle', {
+    cx: R, cy: R * 0.12 + bailOuterR, r: bailOuterR,
+    fill: 'url(#rimGrad)', stroke: 'rgba(0,0,0,0.35)', 'stroke-width': size*0.01
+  });
+  g('circle', {
+    cx: R, cy: R * 0.12 + bailOuterR, r: bailOuterR * 0.55,
+    fill: getColor(form.plate_color, '#0f1419')
+  });
+
+  // Outer rim (bevelled)
+  const rim = g('circle', {
+    cx:R, cy:R, r:R*0.95, fill:'url(#rimGrad)'
+  });
+
+  // Inner cut to create a ring
+  g('circle', {
+    cx:R, cy:R, r:R*0.85, fill:'url(#plateGrad)'
+  });
+
+  // Tiny inner inset ring for detail
+  g('circle', {
+    cx:R, cy:R, r:R*0.62, fill:'none',
+    stroke:getColor(form.outline_color,'#cbd5e1'),
+    'stroke-width': Math.max(2, size*0.006), 'opacity':'0.7'
+  });
+
+  // ----- Top + bottom arced text -------------------------------------------
+  const addArcText = (text, radius, side='top') => {
+    if (!text || !text.trim()) return;
+    const id = `arc-${side}`;
+    const arc = g('path', { id, d:'' }, defs);
+    const sweepR = radius;
+    const y = side === 'top' ? R - sweepR : R + sweepR;
+    const pathD = side === 'top'
+      ? `M ${R - sweepR} ${y} A ${sweepR} ${sweepR} 0 0 1 ${R + sweepR} ${y}`
+      : `M ${R + sweepR} ${y} A ${sweepR} ${sweepR} 0 0 1 ${R - sweepR} ${y}`;
+    arc.setAttribute('d', pathD);
+
+    const t = g('text', {
+      'font-size': Math.max(18, size * 0.05),
+      'font-weight':'800',
+      'font-family':'Inter,system-ui,sans-serif',
+      fill: getColor(form.text_colors, '#ffffff'),
+      'letter-spacing':'1.2px'
     });
-    defs.appendChild(rimGradient);
+    const tp = g('textPath', { href:`#${id}`, startOffset:'50%' }, t);
+    tp.textContent = text.substring(0, 36).toUpperCase();
+    if (side === 'bottom') t.setAttribute('dominant-baseline','hanging');
+    svg.appendChild(t);
+  };
 
-    // base plate + rim stroke
-    const plate = document.createElementNS(NS, 'circle');
-    plate.setAttribute('cx', R); plate.setAttribute('cy', R);
-    plate.setAttribute('r', R * 0.92);
-    plate.setAttribute('fill', getColor(form.plate_color, '#0f1419'));
-    plate.setAttribute('stroke', 'url(#rimGrad)');
-    plate.setAttribute('stroke-width', Math.max(8, size * 0.02));
-    svg.appendChild(plate);
+  // Top text (your field) + optional bottom from badge_elements (fallback)
+  addArcText(form.text_top,        R * 0.72, 'top');
+  addArcText(form.secondary_symbol || '', R * 0.72, 'bottom');
 
-    // arced top text
-    if (form.text_top.trim()) {
-      const sweepRadius = R * 0.75;
-      const arcY = R - sweepRadius;
-      const useFlipped = form.flip_arc === 'flipped' || (form.flip_arc === 'auto' && (view.rotation % 360) >= 180);
-      const pathD = useFlipped
-        ? `M ${R + sweepRadius} ${arcY} A ${sweepRadius} ${sweepRadius} 0 0 0 ${R - sweepRadius} ${arcY}`
-        : `M ${R - sweepRadius} ${arcY} A ${sweepRadius} ${sweepRadius} 0 0 1 ${R + sweepRadius} ${arcY}`;
-      const textPath = document.createElementNS(NS, 'path');
-      textPath.setAttribute('id','textArc'); textPath.setAttribute('d', pathD); defs.appendChild(textPath);
+  // ----- Central emblem -----------------------------------------------------
+  const emblem = g('g', {});
 
-      const text = document.createElementNS(NS, 'text');
-      text.setAttribute('font-size', Math.max(20, size * 0.04));
-      text.setAttribute('font-weight', '800');
-      text.setAttribute('fill', getColor(form.text_colors, '#ffffff'));
-      text.setAttribute('text-anchor', 'middle');
-      text.setAttribute('letter-spacing', '1px');
-
-      const tp = document.createElementNS(NS, 'textPath');
-      tp.setAttribute('href', '#textArc'); tp.setAttribute('startOffset', '50%');
-      tp.textContent = form.text_top.substring(0, 40).toUpperCase();
-      text.appendChild(tp);
-      svg.appendChild(text);
+  // If user asked for a phoenix, draw stylized mark; else a crisp medallion glyph.
+  const hasPhoenix = (form.main_symbol || '').toLowerCase().includes('phoenix');
+  if (hasPhoenix) {
+    const S = R * 0.30;
+    const p = g('path', {
+      d: `
+        M ${R} ${R - S*0.9}
+        Q ${R + S*0.45} ${R - S*0.65} ${R + S*0.7} ${R - S*0.15}
+        Q ${R + S*0.9} ${R + S*0.15} ${R + S*0.45} ${R + S*0.5}
+        Q ${R} ${R + S*0.75} ${R - S*0.45} ${R + S*0.5}
+        Q ${R - S*0.9} ${R + S*0.15} ${R - S*0.7} ${R - S*0.15}
+        Q ${R - S*0.45} ${R - S*0.65} ${R} ${R - S*0.9}
+      `,
+      fill: getColor(form.symbol_color, '#d6a446'),
+      stroke: 'rgba(255,255,255,0.35)', 'stroke-width': Math.max(1.5, size*0.003)
+    }, emblem);
+    // Eye highlight
+    g('circle', { cx:R, cy:R - S*0.45, r:Math.max(1.2, size*0.004), fill:'#fff', opacity:'0.85' }, emblem);
+  } else if ((form.main_symbol || '').toLowerCase().includes('death') ||
+             (form.main_symbol || '').toLowerCase().includes('star')) {
+    // Simple "Death Star" motif with dish
+    const S = R * 0.26;
+    g('circle', {
+      cx:R, cy:R, r:S, fill:getColor(form.symbol_color, '#6b7280'),
+      stroke:getColor(form.outline_color, '#e5e7eb'), 'stroke-width': Math.max(2, size*0.005)
+    }, emblem);
+    // Equator line
+    g('line', {
+      x1:R - S*0.95, y1:R - S*0.05, x2:R + S*0.95, y2:R - S*0.05,
+      stroke:'rgba(255,255,255,0.45)', 'stroke-width': Math.max(1, size*0.003)
+    }, emblem);
+    // Dish
+    g('circle', { cx:R + S*0.35, cy:R - S*0.25, r:S*0.28, fill:'rgba(255,255,255,0.15)' }, emblem);
+    g('circle', { cx:R + S*0.35, cy:R - S*0.25, r:S*0.12, fill:'rgba(255,255,255,0.35)' }, emblem);
+  } else {
+    // Default sigil: concentric crest + star
+    const S = R * 0.27;
+    g('circle', {
+      cx:R, cy:R, r:S, fill:getColor(form.symbol_color, '#3b82f6'),
+      stroke:getColor(form.outline_color, '#e5e7eb'), 'stroke-width': Math.max(2, size*0.005)
+    }, emblem);
+    g('circle', { cx:R, cy:R, r:S*0.68, fill:'none', stroke:'rgba(255,255,255,0.35)', 'stroke-width': Math.max(1, size*0.003) }, emblem);
+    // 5-point star
+    const k = (i) => {
+      const outer = S*0.58, inner = S*0.24;
+      const a = -90 + i*72;
+      const ao = (a * Math.PI)/180, ai = ((a+36) * Math.PI)/180;
+      return [
+        R + outer*Math.cos(ao), R + outer*Math.sin(ao),
+        R + inner*Math.cos(ai), R + inner*Math.sin(ai)
+      ];
+    };
+    let d = 'M ';
+    for (let i=0;i<5;i++){
+      const [x1,y1,x2,y2] = k(i);
+      d += `${x1} ${y1} L ${x2} ${y2} `;
     }
-
-    // central symbol
-    const symbolGroup = document.createElementNS(NS, 'g');
-    const symbolSize = R * 0.3;
-    if ((form.main_symbol || '').toLowerCase().includes('phoenix')) {
-      const phoenix = document.createElementNS(NS, 'path');
-      const p = `
-        M ${R} ${R - symbolSize * 0.8}
-        Q ${R + symbolSize * 0.4} ${R - symbolSize * 0.6} ${R + symbolSize * 0.6} ${R - symbolSize * 0.2}
-        Q ${R + symbolSize * 0.8} ${R} ${R + symbolSize * 0.4} ${R + symbolSize * 0.4}
-        Q ${R} ${R + symbolSize * 0.6} ${R - symbolSize * 0.4} ${R + symbolSize * 0.4}
-        Q ${R - symbolSize * 0.8} ${R} ${R - symbolSize * 0.6} ${R - symbolSize * 0.2}
-        Q ${R - symbolSize * 0.4} ${R - symbolSize * 0.6} ${R} ${R - symbolSize * 0.8}`;
-      phoenix.setAttribute('d', p);
-      phoenix.setAttribute('fill', getColor(form.symbol_color, '#d97706'));
-      phoenix.setAttribute('stroke', 'rgba(255,255,255,0.3)');
-      phoenix.setAttribute('stroke-width', 2);
-      symbolGroup.appendChild(phoenix);
-    } else {
-      const dot = document.createElementNS(NS, 'circle');
-      dot.setAttribute('cx', R); dot.setAttribute('cy', R); dot.setAttribute('r', symbolSize);
-      dot.setAttribute('fill', getColor(form.symbol_color, '#6366f1'));
-      dot.setAttribute('stroke', getColor(form.outline_color, '#ffffff'));
-      dot.setAttribute('stroke-width', 3);
-      symbolGroup.appendChild(dot);
-    }
-    svg.appendChild(symbolGroup);
-
-    // crossed energy beams if requested
-    const desc = (form.sabers_desc || '').toLowerCase();
-    if (desc.includes('twin') || desc.includes('crossed')) {
-      const mk = (x1,y1,x2,y2) => {
-        const l = document.createElementNS(NS, 'line');
-        l.setAttribute('x1', x1); l.setAttribute('y1', y1);
-        l.setAttribute('x2', x2); l.setAttribute('y2', y2);
-        l.setAttribute('stroke', '#00bfff'); l.setAttribute('stroke-width', 4);
-        l.setAttribute('stroke-linecap', 'round'); l.setAttribute('opacity', '0.85');
-        return l;
-      };
-      svg.appendChild(mk(R - R*0.3, R - R*0.3, R + R*0.3, R + R*0.3));
-      svg.appendChild(mk(R + R*0.3, R - R*0.3, R - R*0.3, R + R*0.3));
-    }
-
-    return svg;
+    d += 'Z';
+    g('path', { d, fill:'#fff', opacity:'0.85' }, emblem);
   }
+  svg.appendChild(emblem);
+
+  // ----- Energy / sabers with glow ------------------------------------------
+  const sabers = (form.sabers_desc || '').toLowerCase();
+  if (sabers.includes('twin') || sabers.includes('cross') || sabers.includes('saber') || sabers.includes('beam')) {
+    const L = R * 0.58;
+    const w = Math.max(3, size*0.006);
+    const mk = (x1,y1,x2,y2, rot=0) => {
+      const group = g('g', { filter:'url(#glow)', opacity:'0.95' });
+      // soft halo
+      g('line', { x1, y1, x2, y2, stroke:'#ffffff', 'stroke-width': w*2.2, 'stroke-linecap':'round', opacity:'0.25' }, group);
+      // core
+      g('line', { x1, y1, x2, y2, stroke:'url(#beam)', 'stroke-width': w, 'stroke-linecap':'round' }, group);
+      return group;
+    };
+    mk(R - L*0.7, R + L*0.7, R + L*0.7, R - L*0.7);
+    mk(R + L*0.7, R + L*0.7, R - L*0.7, R - L*0.7);
+  }
+
+  // ----- Fine ring highlight -------------------------------------------------
+  g('circle', {
+    cx:R, cy:R, r:R*0.84, fill:'none',
+    stroke:'rgba(255,255,255,0.35)', 'stroke-width': Math.max(1, size*0.003)
+  });
+
+  return svg;
+}
 
   // --- view state ------------------------------------------------------------
   let view = { x:0, y:0, scale:1, rotation:0, minScale:0.1, maxScale:5, width:640, height:640 };
