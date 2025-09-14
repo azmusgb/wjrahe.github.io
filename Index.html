@@ -6,9 +6,8 @@
 <meta name="color-scheme" content="dark light" />
 <meta name="theme-color" content="#0b0d13" media="(prefers-color-scheme: dark)">
 <meta name="theme-color" content="#f6f8fc" media="(prefers-color-scheme: light)">
-<title>Medallion Forge — v6 Overhaul</title>
+<title>Medallion Forge — v6.1 (Scoped SVG + Single Init)</title>
 
-<!-- Fonts -->
 <link href="https://fonts.cdnfonts.com/css/aurebesh" rel="stylesheet" />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons&display=swap" rel="stylesheet" />
@@ -20,8 +19,7 @@
     --line:#252b39; --ok:#22c55e; --warn:#f59e0b; --bad:#ef4444;
     --mono:"JetBrains Mono","Fira Code",ui-monospace,Menlo,Consolas,monospace;
     --sans:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;
-    --r:16px; --shadow:0 16px 40px rgba(0,0,0,.28);
-    --header:64px;
+    --r:16px; --shadow:0 16px 40px rgba(0,0,0,.28); --header:64px;
   }
   @media (prefers-color-scheme: light){
     :root{
@@ -35,8 +33,6 @@
     --accent:#2563eb; --accent2:#22d3ee; --glow:rgba(37,99,235,.22);
     --line:#e7eaf0; --ok:#16a34a; --warn:#d97706; --bad:#dc2626;
   }
-
-  /* Base */
   *{box-sizing:border-box}
   html,body{height:100%}
   body{
@@ -48,23 +44,15 @@
     -webkit-text-size-adjust:100%;
     padding-bottom:max(16px,env(safe-area-inset-bottom));
   }
-
   header{
     position:sticky; top:0; z-index:50; height:var(--header);
-    border-bottom:1px solid var(--line);
-    backdrop-filter: blur(6px);
-    background:
-      linear-gradient(90deg, color-mix(in oklab,var(--panel) 92%, black 8%), color-mix(in oklab,var(--panel) 96%, black 4%));
+    border-bottom:1px solid var(--line); backdrop-filter: blur(6px);
+    background:linear-gradient(90deg, color-mix(in oklab,var(--panel) 92%, black 8%), color-mix(in oklab,var(--panel) 96%, black 4%));
     display:flex; align-items:center; justify-content:space-between; gap:12px; padding:0 16px;
   }
   .brand{display:flex;gap:12px;align-items:center}
-  .logo{
-    width:36px;height:36px;border-radius:12px;display:grid;place-items:center;
-    background:linear-gradient(135deg,var(--accent),var(--accent2)); box-shadow:0 0 18px var(--glow); color:#fff;
-    font-weight:900
-  }
+  .logo{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,var(--accent),var(--accent2)); box-shadow:0 0 18px var(--glow); color:#fff; font-weight:900}
   .pill{padding:4px 10px;border-radius:999px;background:linear-gradient(90deg,var(--accent),var(--accent2));color:#fff;font-size:11px;font-weight:700;letter-spacing:.4px}
-
   .chip,.btn{
     border:1px solid var(--line); background:var(--panel); color:var(--ink);
     border-radius:10px; padding:10px 14px; display:inline-flex; align-items:center; gap:6px;
@@ -74,7 +62,6 @@
   .primary{border:none; background:linear-gradient(90deg,var(--accent),var(--accent2)); color:#fff}
   .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 
-  /* Layout */
   .app{max-width:1400px; margin:20px auto; padding:0 16px; display:grid; grid-template-columns:340px 1fr 1fr; gap:20px; align-items:start}
   @media (max-width:1200px){ .app{grid-template-columns:1fr 1fr} .aside{grid-column:1/-1;order:-1} }
   @media (max-width:800px){ .app{grid-template-columns:1fr} .aside{order:-1} }
@@ -83,7 +70,6 @@
   .card h2{margin:0 0 12px; font-size:15px; display:flex; align-items:center; gap:8px; color:color-mix(in oklab,var(--ink) 85%, var(--muted) 15%)}
   .subtle{font-size:12px; color:var(--muted)}
 
-  /* Profiles */
   .profiles{display:grid; gap:10px}
   .profile{
     display:grid; grid-template-columns:48px 1fr auto; gap:12px; align-items:center;
@@ -92,12 +78,9 @@
   .profile:hover{border-color:var(--accent); box-shadow:0 0 0 3px var(--glow)}
   .thumb{width:48px;height:48px;border-radius:12px;display:grid;place-items:center;background:radial-gradient(120% 100% at 25% 20%,var(--accent) 0%,var(--accent2) 100%); color:#fff; font-weight:800}
   .tag{font-size:10px; padding:3px 8px; border-radius:999px; background:color-mix(in oklab, var(--accent) 20%, transparent); color:var(--accent)}
-
-  .profile-tools{display:flex; gap:8px}
   .searchbar{display:flex; gap:8px; margin-bottom:10px}
   .searchbar input{flex:1}
 
-  /* Controls */
   .grid{display:grid; gap:12px; grid-template-columns:1fr 1fr}
   @media (max-width:640px){ .grid{grid-template-columns:1fr} }
   .row{display:grid; gap:6px}
@@ -110,14 +93,12 @@
   .colorrow{display:grid; grid-template-columns:1fr auto; gap:8px; align-items:center}
   .swatch{width:42px;height:42px;border-radius:10px;border:1px solid var(--line)}
 
-  /* Tabs */
   .tabs{display:flex; gap:8px; border-bottom:1px solid var(--line); padding-bottom:8px; margin-bottom:12px}
   .tab{padding:10px 14px; background:transparent; border:1px solid transparent; border-radius:10px; color:var(--muted); font-weight:600; cursor:pointer}
   .tab:hover{background:color-mix(in oklab, var(--accent) 10%, transparent); color:var(--accent)}
   .tab[aria-selected="true"]{background:var(--glow); border-color:var(--accent); color:var(--accent)}
   .tabpanel[hidden]{display:none}
 
-  /* Stage */
   .stage{position:relative; height:64vh; min-height:420px; border:1px solid var(--line); border-radius:14px; overflow:hidden;
     background:
       linear-gradient( to bottom right, #ffffff08, #0000 ),
@@ -126,11 +107,9 @@
   }
   #inner{position:absolute; top:50%; left:50%; transform-origin:0 0; will-change:transform}
 
-  /* Mini badge */
   .badgePreview{display:grid; gap:8px; justify-items:center; border:1px dashed var(--line); border-radius:12px; padding:12px}
   #svgBadge{width:280px; height:280px}
 
-  /* Toast & dialog */
   dialog{border:1px solid var(--line); background:var(--panel); color:var(--ink); border-radius:16px; padding:0; max-width:92vw; width:560px; box-shadow:var(--shadow)}
   dialog::backdrop{background:rgba(0,0,0,.5); backdrop-filter: blur(4px)}
   .modal-head{display:flex; justify-content:space-between; align-items:center; padding:16px 18px; border-bottom:1px solid var(--line)}
@@ -142,15 +121,8 @@
   .toast.show{transform:translateY(0); opacity:1}
   .toast.error{border-left-color:var(--bad)}
 
-  /* Mobile tweaks */
-  @media (max-width:480px){
-    header{height:56px}
-    .logo{width:32px;height:32px}
-    .card{padding:16px}
-  }
-  @media (prefers-reduced-motion: reduce){
-    *{transition:none!important; animation:none!important}
-  }
+  @media (max-width:480px){ header{height:56px} .logo{width:32px;height:32px} .card{padding:16px} }
+  @media (prefers-reduced-motion: reduce){ *{transition:none!important; animation:none!important} }
 </style>
 </head>
 <body>
@@ -160,7 +132,7 @@
     <div>
       <div style="display:flex;gap:8px;align-items:center">
         <strong style="font-size:18px">Medallion Forge</strong>
-        <span class="pill">v6 Overhaul</span>
+        <span class="pill">v6.1</span>
       </div>
       <div class="subtle">Profiles • Builder • Live SVG • Export</div>
     </div>
@@ -179,7 +151,6 @@
 </header>
 
 <main class="app">
-  <!-- Aside: Profiles -->
   <aside class="aside card">
     <h2><span class="material-icons" aria-hidden="true" style="font-size:18px">view_carousel</span> Profiles</h2>
 
@@ -190,7 +161,7 @@
 
     <div class="profiles" id="profiles" role="list"></div>
 
-    <div class="profile-tools">
+    <div class="toolbar" style="margin-top:8px">
       <button id="exportJsonBtn" class="chip" type="button"><span class="material-icons" aria-hidden="true">ios_share</span>Export</button>
       <button id="importJsonBtn" class="chip" type="button"><span class="material-icons" aria-hidden="true">download</span>Import</button>
       <button id="randBtn" class="chip" type="button"><span class="material-icons" aria-hidden="true">casino</span>Random</button>
@@ -203,7 +174,6 @@
     </div>
   </aside>
 
-  <!-- Builder -->
   <section class="card" aria-label="Builder">
     <h2><span class="material-icons" aria-hidden="true" style="font-size:18px">tune</span> Builder</h2>
 
@@ -213,7 +183,6 @@
       <button class="tab" data-tab="style" aria-controls="panel-style" aria-selected="false" tabindex="-1">Style & Export</button>
     </div>
 
-    <!-- Basic -->
     <div id="panel-basic" class="tabpanel" role="tabpanel">
       <div class="grid">
         <div class="row">
@@ -270,7 +239,6 @@
       </div>
     </div>
 
-    <!-- Symbols -->
     <div id="panel-symbols" class="tabpanel" role="tabpanel" hidden>
       <div class="grid">
         <div class="row">
@@ -308,26 +276,22 @@
       </div>
     </div>
 
-    <!-- Style & Export -->
     <div id="panel-style" class="tabpanel" role="tabpanel" hidden>
       <div class="grid">
         <div class="row">
           <label for="style_keywords"><span class="material-icons">style</span>Style Keywords</label>
           <input id="style_keywords" placeholder="cinematic, heraldic, symmetrical">
         </div>
-
         <div class="row">
           <label for="arc_radius"><span class="material-icons">trip_origin</span>Top Arc Radius</label>
           <input id="arc_radius" type="range" min="55" max="88" step="1" value="78">
           <div class="subtle">Fine-tune the text arc (percent of radius)</div>
         </div>
-
         <div class="row">
           <label for="out"><span class="material-icons">notes</span>Generated Prompt</label>
           <textarea id="out" spellcheck="false" placeholder="Generated prompt appears here…" style="min-height:160px; font:13px/1.55 var(--mono)"></textarea>
         </div>
       </div>
-
       <div class="toolbar" style="margin-top:8px" role="group" aria-label="Export">
         <button id="gen" class="btn primary" type="button"><span class="material-icons" aria-hidden="true">bolt</span>Generate</button>
         <button id="copyBtn" class="btn" type="button"><span class="material-icons">content_copy</span>Copy Text</button>
@@ -340,7 +304,6 @@
     </div>
   </section>
 
-  <!-- Preview -->
   <section class="card" aria-label="Preview">
     <h2><span class="material-icons" aria-hidden="true" style="font-size:18px">visibility</span> Live SVG Preview</h2>
     <div class="toolbar" style="margin-bottom:10px">
@@ -356,7 +319,6 @@
   </section>
 </main>
 
-<!-- Modal -->
 <dialog id="jsonModal" aria-labelledby="jsonTitle" aria-modal="true">
   <div class="modal-head">
     <strong id="jsonTitle">Import / Export JSON</strong>
@@ -371,7 +333,6 @@
   </div>
 </dialog>
 
-<!-- Toast -->
 <div id="toast" class="toast" role="status" aria-live="polite"><span class="material-icons" aria-hidden="true">check_circle</span><span id="toastMsg">Done</span></div>
 
 <script>
@@ -381,26 +342,15 @@ const $$=s=>Array.from(document.querySelectorAll(s));
 const byId=id=>document.getElementById(id);
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const NS='http://www.w3.org/2000/svg';
-const LS_FORM='medallion:form:v6';
+const LS_FORM='medallion:form:v6.1';
 const LS_THEME='medallion:theme:light';
 const LS_PRESETS='medallion:presets:v2';
-
 const safeLS={ get:k=>{try{return localStorage.getItem(k)}catch{return null}}, set:(k,v)=>{try{localStorage.setItem(k,v)}catch{}} };
-
 function toast(msg,err=false){ const el=byId('toast'); if(!el) return; el.classList.toggle('error',!!err); byId('toastMsg').textContent=msg; el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),2200); }
 
 /* ===== Theme ===== */
-(function initTheme(){
-  const stored=safeLS.get(LS_THEME);
-  if(stored==='1') document.body.classList.add('theme-light');
-  paintTheme();
-})();
-function paintTheme(){
-  const light=document.body.classList.contains('theme-light');
-  byId('themeToggle').setAttribute('aria-pressed',String(light));
-  byId('themeToggle').querySelector('.material-icons').textContent=light?'light_mode':'dark_mode';
-  byId('themeLabel').textContent=light?'Light':'Dark';
-}
+(function initTheme(){ const stored=safeLS.get(LS_THEME); if(stored==='1') document.body.classList.add('theme-light'); paintTheme(); })();
+function paintTheme(){ const light=document.body.classList.contains('theme-light'); byId('themeToggle').setAttribute('aria-pressed',String(light)); byId('themeToggle').querySelector('.material-icons').textContent=light?'light_mode':'dark_mode'; byId('themeLabel').textContent=light?'Light':'Dark'; }
 byId('themeToggle').addEventListener('click',()=>{ const l=document.body.classList.toggle('theme-light'); safeLS.set(LS_THEME,l?'1':'0'); paintTheme(); });
 
 /* ===== Tabs ===== */
@@ -412,49 +362,30 @@ setTab(tabs[0]);
 
 /* ===== Presets & Profiles ===== */
 const DEFAULT_PRESETS=[
-  {id:'fl_army',name:'Florida + Army',note:'Aurebesh rim • Crossed sabers',thumb:'FL',form:{
-    text_top:"SAINT CLOUD JEDI",rim_finish:"metallic silver",plate_color:"black",text_colors:"white with black outline",
-    state_shape:"state of Florida",outline_color:"white",main_symbol:"Death Star",symbol_color:"red with etched lines",
-    badge_elements:"concentric rings",secondary_symbol:"Army star emblem",aurebesh_style:"glowing Aurebesh along rim",
-    sabers_desc:"two crossed sabers glow",style_keywords:"cinematic, heraldic, symmetrical",flip_arc:"auto"
-  }},
-  {id:'det_wings',name:'Detroit + Wings',note:'Sports fusion • 3 beams',thumb:'DET',form:{
-    text_top:"DETROIT JEDI",rim_finish:"polished steel",plate_color:"black",text_colors:"white",
-    state_shape:"medallion field",outline_color:"red/black",main_symbol:"Death Star",symbol_color:"red etched",
-    badge_elements:"concentric rings",secondary_symbol:"",aurebesh_style:"glowing inscriptions",
-    sabers_desc:"three angled beams glow",style_keywords:"sports fusion, symmetrical",flip_arc:"auto"
-  }},
-  {id:'jedi_generic',name:'Galactic Jedi',note:'Navy plate • Vertical glow',thumb:'JEDI',form:{
-    text_top:"GALACTIC JEDI ORDER",rim_finish:"brushed silver",plate_color:"navy",text_colors:"silver outline",
-    state_shape:"medallion field",outline_color:"white",main_symbol:"Jedi crest",symbol_color:"silver",
-    badge_elements:"imperial ticks",secondary_symbol:"",aurebesh_style:"cyan glow runes",
-    sabers_desc:"single vertical saber glow",style_keywords:"heraldic, luminous",flip_arc:"auto"
-  }},
+  {id:'fl_army',name:'Florida + Army',note:'Aurebesh rim • Crossed sabers',thumb:'FL',form:{text_top:"SAINT CLOUD JEDI",rim_finish:"metallic silver",plate_color:"black",text_colors:"white with black outline",state_shape:"state of Florida",outline_color:"white",main_symbol:"Death Star",symbol_color:"red with etched lines",badge_elements:"concentric rings",secondary_symbol:"Army star emblem",aurebesh_style:"glowing Aurebesh along rim",sabers_desc:"two crossed sabers glow",style_keywords:"cinematic, heraldic, symmetrical",flip_arc:"auto"}},
+  {id:'det_wings',name:'Detroit + Wings',note:'Sports fusion • 3 beams',thumb:'DET',form:{text_top:"DETROIT JEDI",rim_finish:"polished steel",plate_color:"black",text_colors:"white",state_shape:"medallion field",outline_color:"red/black",main_symbol:"Death Star",symbol_color:"red etched",badge_elements:"concentric rings",secondary_symbol:"",aurebesh_style:"glowing inscriptions",sabers_desc:"three angled beams glow",style_keywords:"sports fusion, symmetrical",flip_arc:"auto"}},
+  {id:'jedi_generic',name:'Galactic Jedi',note:'Navy plate • Vertical glow',thumb:'JEDI',form:{text_top:"GALACTIC JEDI ORDER",rim_finish:"brushed silver",plate_color:"navy",text_colors:"silver outline",state_shape:"medallion field",outline_color:"white",main_symbol:"Jedi crest",symbol_color:"silver",badge_elements:"imperial ticks",secondary_symbol:"",aurebesh_style:"cyan glow runes",sabers_desc:"single vertical saber glow",style_keywords:"heraldic, luminous",flip_arc:"auto"}},
 ];
-
 function getPresets(){ const raw=safeLS.get(LS_PRESETS); if(!raw) return DEFAULT_PRESETS; try{const arr=JSON.parse(raw); return Array.isArray(arr)&&arr.length?arr:DEFAULT_PRESETS}catch{return DEFAULT_PRESETS} }
 function setPresets(arr){ safeLS.set(LS_PRESETS, JSON.stringify(arr)); renderProfiles(); }
-
 const profilesHost=byId('profiles');
 function renderProfiles(){
   profilesHost.innerHTML='';
   const q=(byId('profileSearch').value||'').toLowerCase();
   getPresets().filter(p=>!q || p.name.toLowerCase().includes(q) || p.thumb.toLowerCase().includes(q)).forEach(p=>{
-    const li=document.createElement('button');
-    li.className='profile'; li.type='button'; li.setAttribute('role','listitem');
+    const li=document.createElement('div'); li.className='profile'; li.setAttribute('role','listitem');
     li.innerHTML=`<div class="thumb">${p.thumb}</div>
       <div><div style="font-weight:700">${p.name}</div><div class="subtle">${p.note}</div><span class="tag">Preset</span></div>
       <div style="display:flex; gap:6px">
         <button class="chip" data-act="apply" type="button" title="Apply"><span class="material-icons">play_arrow</span></button>
         <button class="chip" data-act="delete" type="button" title="Delete"><span class="material-icons">delete</span></button>
       </div>`;
-    li.querySelector('[data-act="apply"]').addEventListener('click',e=>{ e.stopPropagation(); fillForm(p.form,true); toast('Preset applied'); });
-    li.querySelector('[data-act="delete"]').addEventListener('click',e=>{
-      e.stopPropagation();
-      const all=getPresets().filter(x=>x.id!==p.id || DEFAULT_PRESETS.find(d=>d.id===p.id)); // keep defaults undeletable
-      if(!DEFAULT_PRESETS.find(d=>d.id===p.id)){ setPresets(all); toast('Preset deleted'); } else { toast('Default presets cannot be deleted', true); }
+    li.querySelector('[data-act="apply"]').addEventListener('click',()=>{ fillForm(p.form,true); toast('Preset applied'); });
+    li.querySelector('[data-act="delete"]').addEventListener('click',()=>{
+      if (DEFAULT_PRESETS.find(d=>d.id===p.id)) return toast('Default presets cannot be deleted', true);
+      const all=getPresets().filter(x=>x.id!==p.id); setPresets(all); toast('Preset deleted');
     });
-    li.addEventListener('click',()=>{ fillForm(p.form,true); toast('Preset loaded'); });
+    li.addEventListener('click',e=>{ if(e.target.closest('[data-act]')) return; fillForm(p.form,true); toast('Preset loaded'); });
     profilesHost.appendChild(li);
   });
 }
@@ -464,11 +395,11 @@ byId('addPresetBtn').addEventListener('click', ()=>{
   const name=(v.text_top||'Custom Preset').trim().slice(0,40);
   const id='user_'+Date.now().toString(36);
   const arr=getPresets().concat({id,name,thumb:(name.split(' ')[0]||'CUST').toUpperCase().slice(0,4),note:'Saved from form',form:v});
-  setPresets(arr);
-  toast('Preset saved');
+  setPresets(arr); toast('Preset saved');
 });
 
-/* ===== Form IO ===== */
+/* ===== Form IO (with mute guard) ===== */
+let MUTE=false;   // prevents generate() on programmatic updates
 const FIELDS=["text_top","rim_finish","plate_color","text_colors","state_shape","outline_color","main_symbol","symbol_color","badge_elements","secondary_symbol","aurebesh_style","sabers_desc","style_keywords","flip_arc"];
 function readForm(){
   const v={}; FIELDS.forEach(id=>v[id]=(byId(id)?.value||'').trim());
@@ -486,35 +417,32 @@ function readForm(){
   v.style_keywords||="cinematic, heraldic, symmetrical";
   v.flip_arc||="auto";
   v.arc_radius = Number(byId('arc_radius').value||78);
-  // hex overrides
   v._hex_plate = byId('plate_hex').value;
   v._hex_text = byId('text_hex').value;
   v._hex_outline = byId('outline_hex').value;
   v._hex_symbol = byId('symbol_hex').value;
   return v;
 }
-function fillForm(data,andGen=false){
+function fillForm(data, andGenerate=false){
+  MUTE=true;
   FIELDS.concat(['arc_radius']).forEach(k=>{ const el=byId(k); if(el && data[k]!=null){ el.value=data[k]; }});
   if(data._hex_plate) byId('plate_hex').value=data._hex_plate;
   if(data._hex_text) byId('text_hex').value=data._hex_text;
   if(data._hex_outline) byId('outline_hex').value=data._hex_outline;
   if(data._hex_symbol) byId('symbol_hex').value=data._hex_symbol;
-  if(andGen) generate();
+  MUTE=false;
+  if(andGenerate) generate();
 }
 let saveT;
-function autosave(){ clearTimeout(saveT); saveT=setTimeout(()=>safeLS.set(LS_FORM, JSON.stringify(readForm())), 200); }
-[...FIELDS, 'arc_radius'].forEach(id=>{
+function autosave(){ clearTimeout(saveT); saveT=setTimeout(()=>safeLS.set(LS_FORM, JSON.stringify(readForm())),200); }
+[...FIELDS,'arc_radius'].forEach(id=>{
   const el=byId(id); if(!el) return;
-  ['input','change'].forEach(ev=>el.addEventListener(ev,()=>{ generate(); autosave(); }, {passive:true}));
+  ['input','change'].forEach(ev=>el.addEventListener(ev,()=>{ if(MUTE) return; generate(); autosave(); }, {passive:true}));
 });
 ['plate_hex','text_hex','outline_hex','symbol_hex'].forEach(id=>{
-  byId(id).addEventListener('input', ()=>{ generate(); autosave(); }, {passive:true});
+  byId(id).addEventListener('input', ()=>{ if(MUTE) return; generate(); autosave(); }, {passive:true});
 });
-byId('clearBtn').addEventListener('click', ()=>{
-  localStorage.removeItem(LS_FORM);
-  fillForm({}, true);
-  toast('Cleared');
-});
+byId('clearBtn').addEventListener('click', ()=>{ localStorage.removeItem(LS_FORM); fillForm({}, true); toast('Cleared'); });
 
 /* ===== Prompt ===== */
 function buildPrompt(v){
@@ -532,29 +460,33 @@ function buildPrompt(v){
 /* ===== Color helpers ===== */
 function colorPick(key, table, fallback){ key=(key||'').toLowerCase(); for(const [k,v] of table){ if(k && key.includes(k)) return v; } return fallback; }
 
-/* ===== SVG Builder ===== */
-const stage=byId('stage'), inner=byId('inner'), hudZoom=byId('hudZoom'), hudSize=byId('hudSize'), meta=byId('meta');
-const sizeSelect=byId('sizeSelect');
+/* ===== Stage & SVG ===== */
+const stage=byId('stage'), inner=byId('inner'), hudZoom=byId('hudZoom'), hudSize=byId('hudSize'), meta=byId('meta'), sizeSelect=byId('sizeSelect');
 let view={x:0,y:0,k:1,min:.06,max:10,w:640,h:640,rot:0};
-
 new ResizeObserver(()=>{ const r=stage.getBoundingClientRect(); hudSize.textContent=`${Math.round(r.width)}×${Math.round(r.height)}px`; renderPreview(); }).observe(stage);
 sizeSelect.addEventListener('change',()=>{ view.w=view.h=Number(sizeSelect.value||640); generate(); setTimeout(fit,0); });
 
-function make(name, attrs={}, parent){
-  const el=document.createElementNS(NS,name);
-  for(const [k,v] of Object.entries(attrs)){
-    if(v==null) continue;
-    if(k==='href'){ el.setAttributeNS('http://www.w3.org/1999/xlink','xlink:href',String(v)); el.setAttribute('href',String(v)); }
-    else el.setAttribute(k,String(v));
-  }
-  (parent||inner).appendChild(el);
-  return el;
+/* Scoped element factory — NO default to #inner */
+function makeFactory(root){
+  return function M(name, attrs={}, parent){
+    const el=document.createElementNS(NS,name);
+    for(const [k,v] of Object.entries(attrs)){
+      if(v==null) continue;
+      if(k==='href'){ el.setAttributeNS('http://www.w3.org/1999/xlink','xlink:href',String(v)); el.setAttribute('href',String(v)); }
+      else el.setAttribute(k,String(v));
+    }
+    (parent || root).appendChild(el);
+    return el;
+  };
 }
 
 function buildMedallionSvg(v){
   const D=view.w, R=D/2;
-  const svg=document.createElementNS(NS,'svg'); svg.setAttribute('xmlns',NS); svg.setAttribute('viewBox',`0 0 ${D} ${D}`); svg.setAttribute('width',D); svg.setAttribute('height',D);
+  const svg=document.createElementNS(NS,'svg');
+  svg.setAttribute('xmlns',NS); svg.setAttribute('viewBox',`0 0 ${D} ${D}`); svg.setAttribute('width',D); svg.setAttribute('height',D);
   svg.setAttribute('shape-rendering','geometricPrecision');
+
+  const M = makeFactory(svg);
 
   // Palette
   const plateFill = v._hex_plate || colorPick(v.plate_color,[['black','#121316'],['navy','#0b2346'],['crimson','#5c0b12'],['gray','#2a2f3a'],['white','#f3f6f9']], '#121316');
@@ -563,30 +495,32 @@ function buildMedallionSvg(v){
   const symColor   = v._hex_symbol || colorPick(v.symbol_color,[['red','#e43b44'],['silver','#c0c7ce'],['gold','#ffd54a'],['white','#fff'],['blue','#3b6ee4'],['cyan','#6ee7ff']], '#6ee7ff');
   const outlineCol = v._hex_outline || colorPick(v.outline_color,[['white','#ffffff'],['gold','#ffd54a'],['silver','#c0c7ce'],['red','#e43b44'],['blue','#3b6ee4']], '#ffffff');
 
-  const defs=make('defs',{},svg);
-  make('style',{},defs).textContent=`.ns{vector-effect:non-scaling-stroke;shape-rendering:crispEdges}.round{stroke-linecap:round;stroke-linejoin:round}`;
+  // Defs & arcs
+  const defs=M('defs');
+  M('style',{},defs).textContent=`.ns{vector-effect:non-scaling-stroke;shape-rendering:crispEdges}.round{stroke-linecap:round;stroke-linejoin:round}`;
   const sweepA=R*(Number(v.arc_radius||78)/100), y=R-sweepA;
-  make('path',{id:'topArc',d:`M ${R- sweepA} ${y} A ${sweepA} ${sweepA} 0 0 1 ${R+ sweepA} ${y}`},defs);
-  make('path',{id:'topArcRev',d:`M ${R+ sweepA} ${y} A ${sweepA} ${sweepA} 0 0 0 ${R- sweepA} ${y}`},defs);
+  M('path',{id:'topArc',d:`M ${R- sweepA} ${y} A ${sweepA} ${sweepA} 0 0 1 ${R+ sweepA} ${y}`},defs);
+  M('path',{id:'topArcRev',d:`M ${R+ sweepA} ${y} A ${sweepA} ${sweepA} 0 0 0 ${R- sweepA} ${y}`},defs);
 
-  // Base rings
-  const gBase=make('g',{},svg);
-  make('circle',{cx:R,cy:R,r:R*0.94,fill:plateFill,stroke:rimColor,'stroke-width':Math.max(8,D*0.015),class:'ns'},gBase);
-  make('circle',{cx:R,cy:R,r:R*0.985,fill:'none',stroke:rimColor,'stroke-width':Math.max(2,D*0.004),class:'ns'},gBase);
-  make('circle',{cx:R,cy:R,r:R*0.86,fill:'none',stroke:'#ffffff20','stroke-width':Math.max(1.5,D*0.003),class:'ns'},gBase);
+  // Rings
+  const gBase=M('g');
+  M('circle',{cx:R,cy:R,r:R*0.94,fill:plateFill,stroke:rimColor,'stroke-width':Math.max(8,D*0.015),class:'ns'},gBase);
+  M('circle',{cx:R,cy:R,r:R*0.985,fill:'none',stroke:rimColor,'stroke-width':Math.max(2,D*0.004),class:'ns'},gBase);
+  M('circle',{cx:R,cy:R,r:R*0.86,fill:'none',stroke:'#ffffff20','stroke-width':Math.max(1.5,D*0.003),class:'ns'},gBase);
 
   if((v.badge_elements||'').toLowerCase().includes('ring')){
-    [0.76,0.64,0.54].forEach((p,i)=>make('circle',{cx:R,cy:R,r:R*p,fill:'none',stroke: i===1 ? '#7fbbe0' : rimColor,'stroke-width':Math.max(1,D*0.0026),'stroke-dasharray': i===1?'6 6':null,class:'ns'},gBase));
+    [0.76,0.64,0.54].forEach((p,i)=>M('circle',{cx:R,cy:R,r:R*p,fill:'none',stroke: i===1 ? '#7fbbe0' : rimColor,'stroke-width':Math.max(1,D*0.0026),'stroke-dasharray': i===1?'6 6':null,class:'ns'},gBase));
   }
 
-  // Top arc text
+  // Arc text
   if((v.text_top||'').trim()){
     const wantsOutline=(v.text_colors||'').toLowerCase().includes('outline') || plateFill==='#121316';
-    const t=make('text',{'font-size':Math.max(26,D*0.047),'font-weight':900,fill:textFill,'text-anchor':'middle','letter-spacing':'.8'},svg);
+    const t=M('text',{'font-size':Math.max(26,D*0.047),'font-weight':900,fill:textFill,'text-anchor':'middle','letter-spacing':'.8'});
     if(wantsOutline){ t.setAttribute('stroke','#000'); t.setAttribute('stroke-width',Math.max(1.6,D*0.003)); t.setAttribute('paint-order','stroke'); }
     const useRev = (v.flip_arc==='flipped') || (v.flip_arc==='auto' && view.rot%360>=180);
-    const tp=make('textPath',{href:useRev?'#topArcRev':'#topArc',startOffset:'50%',method:'align',spacing:'auto'},t);
+    const tp=M('textPath',{href:useRev?'#topArcRev':'#topArc',startOffset:'50%',method:'align',spacing:'auto'},t);
     tp.textContent=(v.text_top.length>42 ? v.text_top.slice(0,41)+'…' : v.text_top).toUpperCase();
+    svg.appendChild(t);
   }
 
   // Central outline
@@ -596,29 +530,29 @@ function buildMedallionSvg(v){
                 C ${R+82} ${R+78}, ${R+70} ${R+64}, ${R+50} ${R+62}
                 C ${R+28} ${R+60}, ${R+22} ${R+76}, ${R-4} ${R+78}
                 C ${R-40} ${R+82}, ${R-72} ${R+68}, ${R-90} ${R+58} Z`;
-    make('path',{d:path,fill:'none',stroke:outlineCol,'stroke-width':Math.max(4.5,D*0.007),'stroke-linejoin':'round','class':'ns'},svg);
+    M('path',{d:path,fill:'none',stroke:outlineCol,'stroke-width':Math.max(4.5,D*0.007),'stroke-linejoin':'round','class':'ns'});
   } else {
-    make('circle',{cx:R,cy:R,r:R*0.34,fill:'none',stroke:outlineCol,'stroke-width':Math.max(3,D*0.005),'class':'ns'},svg);
+    M('circle',{cx:R,cy:R,r:R*0.34,fill:'none',stroke:outlineCol,'stroke-width':Math.max(3,D*0.005),'class':'ns'});
   }
 
   // Main symbol
-  const g=make('g',{},svg);
+  const g=M('g');
   const ms=(v.main_symbol||'').toLowerCase();
   if(ms.includes('death')){
-    make('circle',{cx:R,cy:R,r:R*0.31,fill:symColor,stroke:'#222','stroke-width':Math.max(2,D*0.0032),class:'ns'},g);
-    make('line',{x1:R-R*0.31,y1:R,x2:R+R*0.31,y2:R,stroke: plateFill==='#121316' ? '#0a0a0a' : '#111','stroke-width':Math.max(8,D*0.0125),class:'ns'},g);
-    make('circle',{cx:R+R*0.11,cy:R-R*0.09,r:R*0.065,fill: plateFill==='#121316' ? '#0a0a0a' : '#111',stroke:'#3b3f48','stroke-width':Math.max(1.5,D*0.0023),class:'ns'},g);
+    M('circle',{cx:R,cy:R,r:R*0.31,fill:symColor,stroke:'#222','stroke-width':Math.max(2,D*0.0032),class:'ns'},g);
+    M('line',{x1:R-R*0.31,y1:R,x2:R+R*0.31,y2:R,stroke: plateFill==='#121316' ? '#0a0a0a' : '#111','stroke-width':Math.max(8,D*0.0125),class:'ns'},g);
+    M('circle',{cx:R+R*0.11,cy:R-R*0.09,r:R*0.065,fill: plateFill==='#121316' ? '#0a0a0a' : '#111',stroke:'#3b3f48','stroke-width':Math.max(1.5,D*0.0023),class:'ns'},g);
     for(let i=0;i<12;i++){ const a=i*15*Math.PI/180, r1=R*0.16, r2=R*0.31;
-      make('line',{x1:R+r1*Math.cos(a),y1:R+r1*Math.sin(a),x2:R+r2*Math.cos(a),y2:R+r2*Math.sin(a),stroke:'#27303d','stroke-width':Math.max(1.3,D*0.002),'stroke-linecap':'round',class:'ns'},g);
+      M('line',{x1:R+r1*Math.cos(a),y1:R+r1*Math.sin(a),x2:R+r2*Math.cos(a),y2:R+r2*Math.sin(a),stroke:'#27303d','stroke-width':Math.max(1.3,D*0.002),'stroke-linecap':'round',class:'ns'},g);
     }
-    make('path',{d:`M ${R-R*0.2} ${R+R*0.22} A ${R*0.2} ${R*0.2} 0 0 0 ${R+R*0.2} ${R+R*0.22}`,stroke:'#27303d','stroke-width':Math.max(1.3,D*0.002),fill:'none','class':'ns'},g);
+    M('path',{d:`M ${R-R*0.2} ${R+R*0.22} A ${R*0.2} ${R*0.2} 0 0 0 ${R+R*0.2} ${R+R*0.22}`,stroke:'#27303d','stroke-width':Math.max(1.3,D*0.002),fill:'none','class':'ns'},g);
   } else if(ms.includes('jedi')){
-    make('path',{d:`M${R} ${R-0.22*D} L${R+0.035*D} ${R-0.26*D} L${R+0.035*D} ${R}
+    M('path',{d:`M${R} ${R-0.22*D} L${R+0.035*D} ${R-0.26*D} L${R+0.035*D} ${R}
       L${R+0.07*D} ${R+0.028*D} L${R+0.035*D} ${R+0.056*D} L${R+0.035*D} ${R+0.29*D}
       L${R} ${R+0.23*D} L${R-0.035*D} ${R+0.29*D} L${R-0.035*D} ${R+0.056*D}
       L${R-0.07*D} ${R+0.028*D} L${R-0.035*D} ${R} L${R-0.035*D} ${R-0.26*D} Z`,fill:symColor},g);
   } else {
-    make('polygon',{points:
+    M('polygon',{points:
       `${R},${R-0.26*D} ${R+0.06*D},${R-0.15*D} ${R+0.11*D},${R-0.14*D} ${R+0.05*D},${R-0.01*D}
        ${R+0.07*D},${R+0.07*D} ${R},${R+0.03*D} ${R-0.07*D},${R+0.07*D} ${R-0.05*D},${R-0.01*D}
        ${R-0.11*D},${R-0.14*D} ${R-0.06*D},${R-0.15*D}`, fill:symColor},g);
@@ -626,14 +560,14 @@ function buildMedallionSvg(v){
 
   if((v.secondary_symbol||'').trim()){
     const starPts=(cx,cy,or,ir,n=5)=>{let s=''; const step=Math.PI/n; for(let i=0;i<n*2;i++){ const r=(i%2===0)?or:ir, a=i*step-Math.PI/2; s+=`${cx+r*Math.cos(a)},${cy+r*Math.sin(a)} `;} return s.trim();};
-    make('polygon',{points:starPts(R+0.4*D,R-0.25*D,0.075*D,0.04*D,5),fill:'none',stroke:'#d4af37','stroke-width':Math.max(3,D*0.0046),class:'ns'},svg);
+    M('polygon',{points:starPts(R+0.4*D,R-0.25*D,0.075*D,0.04*D,5),fill:'none',stroke:'#d4af37','stroke-width':Math.max(3,D*0.0046),class:'ns'});
   }
 
   // Sabers
   const saber=(x1,y1,x2,y2)=>{
-    make('line',{x1,y1,x2,y2,stroke:'#9feaff','stroke-opacity':.22,'stroke-width':Math.max(12,D*0.02),class:'ns round'},svg);
-    make('line',{x1,y1,x2,y2,stroke:'#79e4ff','stroke-opacity':.38,'stroke-width':Math.max(7,D*0.011),class:'ns round'},svg);
-    make('line',{x1,y1,x2,y2,stroke:'#fff','stroke-width':Math.max(3.2,D*0.005),class:'ns round'},svg);
+    M('line',{x1,y1,x2,y2,stroke:'#9feaff','stroke-opacity':.22,'stroke-width':Math.max(12,D*0.02),class:'ns round'});
+    M('line',{x1,y1,x2,y2,stroke:'#79e4ff','stroke-opacity':.38,'stroke-width':Math.max(7,D*0.011),class:'ns round'});
+    M('line',{x1,y1,x2,y2,stroke:'#fff','stroke-width':Math.max(3.2,D*0.005),class:'ns round'});
   };
   const s=(v.sabers_desc||'').toLowerCase();
   if(s.includes('cross')||/\bx\b/.test(s)){ saber(R-0.28*D,R-0.28*D,R+0.28*D,R+0.28*D); saber(R+0.28*D,R-0.28*D,R-0.28*D,R+0.28*D); }
@@ -643,13 +577,13 @@ function buildMedallionSvg(v){
   // Aurebesh ring
   const aure=(v.aurebesh_style||'').toLowerCase();
   if(aure.includes('glow')||aure.includes('aurebesh')||aure.includes('rune')||aure.includes('inscription')){
-    make('circle',{cx:R,cy:R,r:R*0.68,fill:'none',stroke:'#6ee7ff','stroke-width':Math.max(2,D*0.003),'stroke-dasharray':'6 6','stroke-opacity':.75,class:'ns'},svg);
+    M('circle',{cx:R,cy:R,r:R*0.68,fill:'none',stroke:'#6ee7ff','stroke-width':Math.max(2,D*0.003),'stroke-dasharray':'6 6','stroke-opacity':.75,class:'ns'});
   }
 
   return svg;
 }
 
-/* ===== Stage: mount & gestures ===== */
+/* ===== Mount & preview ===== */
 function mount(svg){
   svg.querySelectorAll('path,rect,circle,ellipse,line,polyline,polygon').forEach(el=>{ if(!el.hasAttribute('vector-effect')) el.setAttribute('vector-effect','non-scaling-stroke'); });
   inner.innerHTML=''; inner.appendChild(svg);
@@ -664,13 +598,12 @@ function fit(){ const r=stage.getBoundingClientRect(); const k=Math.min(r.width/
 function fillView(){ const r=stage.getBoundingClientRect(); const k=Math.max(r.width/view.w, r.height/view.h); view={...view,x:0,y:0,k}; renderPreview(); }
 function resetView(){ view={...view,x:0,y:0,k:1,rot:0}; renderPreview(); }
 function rotateView(){ view.rot=(view.rot+45)%360; renderPreview(); }
-
 byId('fit').addEventListener('click',fit);
 byId('fillView').addEventListener('click',fillView);
 byId('resetView').addEventListener('click',resetView);
 byId('rotateView').addEventListener('click',rotateView);
 
-// Gestures
+/* ===== Gestures ===== */
 let pointers=new Map(), lastCenter=null, lastDist=null;
 stage.addEventListener('pointerdown',e=>{ stage.setPointerCapture(e.pointerId); pointers.set(e.pointerId,{x:e.clientX,y:e.clientY}); }, {passive:true});
 stage.addEventListener('pointerup',e=>{ try{stage.releasePointerCapture(e.pointerId)}catch{} pointers.delete(e.pointerId); if(pointers.size<2){ lastCenter=lastDist=null } }, {passive:true});
@@ -704,7 +637,7 @@ stage.addEventListener('wheel',e=>{
 },{passive:false});
 stage.addEventListener('dblclick',()=>fit(),{passive:true});
 
-/* ===== Mini badge mirror ===== */
+/* ===== Badge mirror ===== */
 function renderBadge(svg){
   const badge=byId('svgBadge'); if(!badge) return;
   badge.innerHTML='';
@@ -715,24 +648,18 @@ function renderBadge(svg){
 
 /* ===== Export ===== */
 function toXml(svg){ const clone=svg.cloneNode(true); clone.setAttribute('xmlns',NS); return `<?xml version="1.0" encoding="UTF-8"?>\n`+clone.outerHTML; }
-function revokeLater(url){ setTimeout(()=>URL.revokeObjectURL(url), 1200); }
-
-byId('copySvgBtn').addEventListener('click',()=>{
-  const svg=inner.querySelector('svg'); if(!svg) return toast('Nothing to copy',true);
-  navigator.clipboard?.writeText(toXml(svg)).then(()=>toast('SVG copied')).catch(()=>toast('Clipboard blocked',true));
-});
+function revokeLater(url){ setTimeout(()=>URL.revokeObjectURL(url),1200); }
+byId('copySvgBtn').addEventListener('click',()=>{ const svg=inner.querySelector('svg'); if(!svg) return toast('Nothing to copy',true); navigator.clipboard?.writeText(toXml(svg)).then(()=>toast('SVG copied')).catch(()=>toast('Clipboard blocked',true)); });
 byId('downloadSvgBtn').addEventListener('click',()=>{
   const svg=inner.querySelector('svg'); if(!svg) return toast('Nothing to export',true);
-  const clone=svg.cloneNode(true);
-  const g=document.createElementNS(NS,'g'); while(clone.firstChild) g.appendChild(clone.firstChild);
+  const clone=svg.cloneNode(true); const g=document.createElementNS(NS,'g'); while(clone.firstChild) g.appendChild(clone.firstChild);
   g.setAttribute('transform',`rotate(${view.rot} ${view.w/2} ${view.h/2})`); clone.appendChild(g);
   const blob=new Blob([toXml(clone)],{type:'image/svg+xml'}); const url=URL.createObjectURL(blob);
   const a=document.createElement('a'); a.href=url; a.download='medallion.svg'; a.click(); revokeLater(url); toast('SVG downloaded');
 });
 byId('downloadPngBtn').addEventListener('click',()=>{
   const svg=inner.querySelector('svg'); if(!svg) return toast('Nothing to export',true);
-  const clone=svg.cloneNode(true);
-  const g=document.createElementNS(NS,'g'); while(clone.firstChild) g.appendChild(clone.firstChild);
+  const clone=svg.cloneNode(true); const g=document.createElementNS(NS,'g'); while(clone.firstChild) g.appendChild(clone.firstChild);
   g.setAttribute('transform',`rotate(${view.rot} ${view.w/2} ${view.h/2})`); clone.appendChild(g);
   const xml=toXml(clone); const url=URL.createObjectURL(new Blob([xml],{type:'image/svg+xml'}));
   const img=new Image(); const scale=Math.max(2, Math.ceil((window.devicePixelRatio||1)));
@@ -764,7 +691,6 @@ byId('applyJson').addEventListener('click',()=>{ try{ const obj=JSON.parse(byId(
 function updateOutputs(v){
   const svg=buildMedallionSvg(v);
   mount(svg); renderPreview(); renderBadge(svg);
-  // swatches
   byId('sw_rim').style.background = colorPick(v.rim_finish,[['gold','#ffd54a'],['silver','#c0c7ce'],['steel','#b0b7c3'],['bronze','#c18b52'],['obsidian','#000']], '#a9bdd1');
 }
 function generate(){
@@ -778,12 +704,14 @@ addEventListener('keydown',e=>{
   if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='c' && document.activeElement.id==='out'){ e.preventDefault(); navigator.clipboard?.writeText(byId('out').value||'').then(()=>toast('Copied')); }
 },{passive:false});
 
-/* ===== Boot ===== */
+/* ===== Boot (single generate) ===== */
 (function boot(){
   renderProfiles();
   const saved=safeLS.get(LS_FORM);
-  if(saved){ try{ fillForm(JSON.parse(saved), true); }catch{ fillForm(DEFAULT_PRESETS[0].form, true); } }
-  else { fillForm(DEFAULT_PRESETS[0].form, true); }
+  if(saved){ try{ fillForm(JSON.parse(saved), false); }catch{ fillForm(DEFAULT_PRESETS[0].form, false); } }
+  else { fillForm(DEFAULT_PRESETS[0].form, false); }
+  // single, explicit render
+  generate();
   setTimeout(()=>fit(), 80);
 })();
 </script>
