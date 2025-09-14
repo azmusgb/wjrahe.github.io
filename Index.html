@@ -1,636 +1,585 @@
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-<title>Medallion Forge — Badge Builder</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Medallion – SVG Preview Pro</title>
 <style>
   :root{
-    --bg:#0f1115; --panel:#151923; --ink:#e8ecf1; --muted:#a0a8b8; --line:#252b39;
-    --accent:#6ee7ff; --accent-2:#7c8cff; --danger:#ff5c5c; --ok:#4ade80;
-    --mono: ui-monospace,Menlo,Consolas,monospace;
-    --sans: Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
+    --bg:#0b0e14; --panel:#0f1420; --line:#1e2635; --text:#e8ecf1; --muted:#9aa7bd;
+    --accent:#3aa3ff;
+    --btn:#131a29; --btnBorder:#22304b; --btnHover:#18233a;
   }
-  @media (prefers-color-scheme: light){
-    :root{ --bg:#f6f7fb; --panel:#ffffff; --ink:#0e1218; --muted:#5b6472; --line:#e6e8ef; --accent:#0ea5e9; --accent-2:#6366f1; }
-  }
-  *{box-sizing:border-box}
   html,body{height:100%}
-  body{margin:0;background:linear-gradient(180deg, var(--bg) 0%, #0b0d13 100%);color:var(--ink);font:14px/1.5 var(--sans)}
-  a{color:var(--accent)}
-  .wrap{
-    display:grid; gap:16px; padding:16px; max-width:1200px; margin:0 auto;
-    grid-template-columns: 380px 1fr;
+  body{
+    margin:0; background:var(--bg); color:var(--text); font:14px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Helvetica Neue",Arial;
+    display:grid; place-items:stretch;
   }
-  @media (max-width: 960px){
-    .wrap{grid-template-columns:1fr}
+  .container{max-width:1100px; margin:0 auto; padding:16px}
+  h1{margin:0 0 8px 0; font-size:18px; font-weight:600}
+  .subtitle{color:var(--muted); margin-bottom:16px}
+
+  .panel{background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:12px}
+  .toolbarRow{display:flex; gap:8px; flex-wrap:wrap; align-items:center; justify-content:space-between; margin:8px 0}
+  .left, .right{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+  .btn, select, input[type="text"]{
+    appearance:none; border-radius:10px; border:1px solid var(--btnBorder); background:var(--btn); color:var(--text);
+    padding:8px 10px; cursor:pointer; font:inherit
   }
-  header{grid-column:1/-1; display:flex; gap:12px; align-items:center; justify-content:space-between}
-  .brand{display:flex; gap:10px; align-items:center}
-  .badge{width:28px; height:28px; border-radius:50%; background:radial-gradient(circle at 30% 30%, var(--accent), var(--accent-2)); box-shadow:0 0 0 2px #0004, inset 0 0 16px #0006}
-  h1{margin:0;font-size:18px;letter-spacing:.3px}
-  .panel{
-    background:linear-gradient(180deg, var(--panel), color-mix(in srgb, var(--panel) 92%, black));
-    border:1px solid var(--line); border-radius:12px; padding:14px;
-    box-shadow: 0 2px 12px #0004;
-  }
-  .controls{display:grid; gap:12px; align-content:start; position:relative}
-  .section{border:1px dashed var(--line); border-radius:10px; padding:12px}
-  .section h3{margin:0 0 8px 0; font-size:13px; letter-spacing:.2px; color:var(--muted)}
-  .row{display:grid; grid-template-columns: 1fr 1fr; gap:8px}
-  .row-3{display:grid; grid-template-columns: 1fr 1fr 1fr; gap:8px}
-  .field{display:flex; flex-direction:column; gap:6px}
-  label{font-size:12px; color:var(--muted)}
-  input[type="text"], input[type="number"], select, textarea{
-    background:#0b0e14; color:var(--ink); border:1px solid var(--line); border-radius:8px; padding:10px 10px; outline:none;
-  }
-  input[type="color"]{height:36px; padding:0; border-radius:8px; border:1px solid var(--line); background:#0b0e14}
-  input[type="checkbox"]{transform:translateY(2px)}
-  .btn{
-    display:inline-flex; align-items:center; justify-content:center; gap:8px;
-    padding:10px 12px; border-radius:10px; border:1px solid var(--line);
-    background:#0b0e14; color:var(--ink); cursor:pointer; user-select:none;
-  }
-  .btn.primary{background:linear-gradient(180deg, var(--accent), var(--accent-2)); color:white; border-color:transparent}
+  .btn:hover{background:var(--btnHover)}
+  .btn.primary{border-color:color-mix(in srgb, var(--accent) 35%, var(--btnBorder)); box-shadow:0 0 0 1px color-mix(in srgb, var(--accent) 25%, transparent) inset}
   .btn.ghost{background:transparent}
-  .btn:active{transform:translateY(1px)}
-  .stack{display:flex; gap:8px; flex-wrap:wrap}
-  .profiles{display:grid; grid-template-columns:repeat(3,1fr); gap:8px}
-  @media (max-width:960px){ .profiles{grid-template-columns:repeat(2,1fr)} }
-  @media (max-width:520px){ .profiles{grid-template-columns:1fr} }
-  .card{
-    padding:10px; border:1px solid var(--line); border-radius:10px; cursor:pointer; position:relative; overflow:hidden;
-    background:linear-gradient(180deg,#0b0e14,#0c111a);
+  .badge{padding:4px 8px; border-radius:20px; background:#00000055; border:1px solid #ffffff20; font-size:12px; color:#d7e3f7}
+  .k{font-size:12px; color:var(--muted)}
+
+  .previewTabs{display:flex; gap:8px}
+  .tab{padding:6px 10px; border:1px solid var(--line); border-radius:8px; background:#0b0e14; cursor:pointer}
+  .tab.active{outline:1px solid color-mix(in srgb, var(--accent) 60%, transparent)}
+
+  .stageWrap{position:relative; border:1px solid var(--line); border-radius:12px; overflow:hidden; background:#0b0e14}
+  .checker{
+    --c1:#111418; --c2:#151a22;
+    background:
+      linear-gradient(45deg, var(--c1) 25%, transparent 25%) -8px 0/16px 16px,
+      linear-gradient(-45deg, var(--c1) 25%, transparent 25%) 0px 0/16px 16px,
+      linear-gradient(45deg, transparent 75%, var(--c1) 75%) -8px 8px/16px 16px,
+      linear-gradient(-45deg, transparent 75%, var(--c1) 75%) 0px 8px/16px 16px,
+      var(--c2);
   }
-  .card:hover{outline:1px solid color-mix(in srgb, var(--accent) 60%, transparent)}
-  .card h4{margin:0 0 4px 0; font-size:13px}
-  .card p{margin:0; font-size:12px; color:var(--muted)}
-  .previewWrap{position:relative}
-  .previewBar{display:flex; gap:8px; justify-content:space-between; align-items:center; margin-bottom:10px}
-  #svgStage{
-    width:100%; aspect-ratio:1/1; display:block; border-radius:12px; background:#0b0e14;
-    border:1px solid var(--line); box-shadow: inset 0 0 40px #0007;
+  .stage{width:100%; aspect-ratio:1/1; touch-action:none; user-select:none; display:block}
+  .overlay{position:absolute; inset:0; pointer-events:none}
+  .badgeBox{
+    position:absolute; bottom:8px; left:8px;
+    padding:6px 8px; border-radius:8px; background:#0008; color:#e8ecf1; font-size:12px
   }
-  .hint{font-size:12px; color:var(--muted)}
-  .toolbar{display:flex; gap:8px; flex-wrap:wrap}
-  .kvs{display:grid; grid-template-columns:1fr auto; gap:8px; align-items:center}
-  .toast{
-    position:fixed; left:50%; bottom:18px; transform:translateX(-50%); padding:10px 14px;
-    background:#0b0e14; color:var(--ink); border:1px solid var(--line); border-radius:999px; box-shadow:0 6px 30px #0008;
-    opacity:0; pointer-events:none; transition:.25s ease; font-size:13px;
+  .error{position:absolute; inset:0; background:#1b0f12; color:#ffd3d3; display:none; align-items:center; justify-content:center; text-align:center; padding:16px}
+  .error.show{display:flex}
+
+  .grid{display:grid; grid-template-columns:1fr 340px; gap:12px}
+  @media (max-width: 980px){ .grid{grid-template-columns:1fr} }
+
+  .aside .group{display:grid; gap:6px; margin-bottom:10px}
+  .aside label{font-weight:600; font-size:12px; color:var(--muted)}
+  textarea.svgIn{
+    width:100%; min-height:180px; resize:vertical;
+    font:12px/1.35 ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono";
+    background:#0b0e14; color:#e8ecf1; border:1px solid var(--line); border-radius:8px; padding:8px
   }
-  .toast.show{opacity:1; transform:translateX(-50%) translateY(-6px)}
-  /* Tight mobile spacing */
-  @media (max-width:420px){
-    .row, .row-3{grid-template-columns:1fr}
-    .previewBar{flex-direction:column; align-items:stretch}
-  }
+  .help{font-size:12px; color:#9ab; opacity:0.9}
 </style>
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <div class="brand">
-        <div class="badge" aria-hidden="true"></div>
-        <h1>Medallion Forge — Imperial Badge Builder</h1>
-      </div>
-      <div class="stack">
-        <button class="btn" id="toggleTheme" title="Toggle theme">Theme</button>
-        <button class="btn ghost" id="resetAll">Reset</button>
-      </div>
-    </header>
+  <div class="container">
+    <h1>Medallion Preview</h1>
+    <div class="subtitle">High-fidelity inline + canvas preview, zoom/pan, outline QA, checkerboard transparency.</div>
 
-    <!-- LEFT: Controls -->
-    <aside class="panel controls" aria-label="Controls">
-      <div class="section">
-        <h3>Profile presets</h3>
-        <div class="profiles" id="profiles"></div>
-      </div>
-
-      <div class="section">
-        <h3>Text & Rings</h3>
-        <div class="row">
-          <div class="field">
-            <label for="titleText">Top text</label>
-            <input id="titleText" type="text" placeholder="SAINT CLOUD JEDI" value="SAINT CLOUD JEDI">
+    <div class="grid">
+      <section class="panel">
+        <div class="toolbarRow">
+          <div class="left previewTabs">
+            <button class="tab active" id="tabInline" aria-pressed="true">Inline SVG</button>
+            <button class="tab" id="tabCanvas" aria-pressed="false">Canvas</button>
+            <span class="badge" id="renderBadge">Ready</span>
           </div>
-          <div class="field">
-            <label for="titleFontSize">Font size (px)</label>
-            <input id="titleFontSize" type="number" min="10" max="120" value="26">
-          </div>
-        </div>
-        <div class="row">
-          <div class="field">
-            <label for="subtitleText">Aurebesh rim (optional)</label>
-            <input id="subtitleText" type="text" placeholder="AUREBESH · IMPERIAL · INSIGNIA">
-          </div>
-          <div class="field">
-            <label for="subtitleSize">Aurebesh size (px)</label>
-            <input id="subtitleSize" type="number" min="8" max="40" value="12">
-          </div>
-        </div>
-        <div class="row-3">
-          <div class="field"><label>Rim color</label><input id="rimColor" type="color" value="#ffffff"></div>
-          <div class="field"><label>Plate color</label><input id="plateColor" type="color" value="#0b0e14"></div>
-          <div class="field"><label>Ink color</label><input id="inkColor" type="color" value="#ffffff"></div>
-        </div>
-        <div class="row">
-          <div class="field kvs">
-            <label for="diameter">Diameter (px)</label>
-            <input id="diameter" type="number" min="200" max="1400" value="640">
-          </div>
-          <div class="field kvs">
-            <label><input id="showBail" type="checkbox" checked> Bail loop</label>
-          </div>
-        </div>
-      </div>
-
-      <div class="section">
-        <h3>Center motif</h3>
-        <div class="row">
-          <div class="field">
-            <label for="motif">Preset</label>
-            <select id="motif">
-              <option value="deathstar">Death Star + Florida (simplified)</option>
-              <option value="deathstar_basic">Death Star only</option>
-              <option value="custom">Custom SVG upload</option>
+          <div class="right">
+            <select id="fitMode" class="btn" title="Scale mode">
+              <option value="fit">Fit</option>
+              <option value="contain">Contain</option>
+              <option value="cover">Cover</option>
+              <option value="1x">1×</option>
+              <option value="2x">2×</option>
             </select>
-          </div>
-          <div class="field">
-            <label for="motifScale">Motif scale (%)</label>
-            <input id="motifScale" type="number" min="20" max="120" value="72">
-          </div>
-        </div>
-        <div class="row-3">
-          <div class="field"><label>Death Star color</label><input id="dsColor" type="color" value="#ff2a2a"></div>
-          <div class="field"><label>Dish/lines</label><input id="dsStroke" type="color" value="#111111"></div>
-          <div class="field"><label>Florida outline</label><input id="flColor" type="color" value="#ffffff"></div>
-        </div>
-        <div class="row">
-          <div class="field kvs">
-            <label><input id="showArmyStar" type="checkbox" checked> US Army star overlay (gold)</label>
-          </div>
-          <div class="field">
-            <label for="customSvg">Custom center SVG (if chosen)</label>
-            <input id="customSvg" type="file" accept=".svg">
+            <button class="btn" id="toggleChecker" title="Toggle checkerboard background">Checkerboard</button>
+            <button class="btn" id="toggleOutline" title="Force strokes for QA">Outline</button>
+            <button class="btn" id="resetView" title="Reset pan/zoom">Reset View</button>
           </div>
         </div>
-      </div>
 
-      <div class="section">
-        <h3>Lightsabers</h3>
-        <div class="row">
-          <div class="field">
-            <label for="saberCount">Count</label>
-            <select id="saberCount">
-              <option>0</option><option>1</option><option>2</option><option selected>3</option>
-            </select>
+        <div class="stageWrap checker" id="stageWrap">
+          <div class="stage" id="inlineStage" aria-label="Inline SVG preview"></div>
+          <canvas class="stage" id="canvasStage" aria-label="Canvas preview" style="display:none"></canvas>
+          <div class="overlay">
+            <div class="badgeBox" id="metaBox">—</div>
           </div>
-          <div class="field">
-            <label for="saberGlow">Glow strength</label>
-            <input id="saberGlow" type="number" min="0" max="16" value="6">
+          <div class="error" id="errBox"><div id="errMsg">Preview error.</div></div>
+        </div>
+
+        <div class="toolbarRow">
+          <div class="k" id="vbInfo">viewBox: — • size: —</div>
+          <div class="k">Tip: drag to pan · wheel to zoom · Shift+wheel slows zoom</div>
+        </div>
+      </section>
+
+      <aside class="panel aside">
+        <div class="group">
+          <label for="svgInput">SVG input (optional). Paste raw SVG here to preview/sanitize.</label>
+          <textarea id="svgInput" class="svgIn" placeholder="&lt;svg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'&gt;...&lt;/svg&gt;"></textarea>
+          <div class="help">If you don’t paste SVG, the built-in <code>buildSvg()</code> demo medallion is used. In production, call <code>setExternalSvg(svgElement)</code> with your generator’s output.</div>
+          <div class="left">
+            <button id="btnPreview" class="btn primary">Render</button>
+            <button id="btnLoadDemo" class="btn ghost">Load demo medallion</button>
           </div>
         </div>
-        <div class="row-3">
-          <div class="field"><label>Primary core</label><input id="sCore" type="color" value="#ffffff"></div>
-          <div class="field"><label>Primary aura</label><input id="sAura" type="color" value="#ff2a2a"></div>
-          <div class="field"><label>Secondary aura</label><input id="sAura2" type="color" value="#ffebeb"></div>
-        </div>
-      </div>
-
-      <div class="section">
-        <h3>Export</h3>
-        <div class="toolbar">
-          <button class="btn" id="copySvg">Copy SVG</button>
-          <button class="btn" id="downloadSvg">Download SVG</button>
-          <button class="btn" id="downloadPng">Download PNG</button>
-        </div>
-        <p class="hint">PNG export rasterizes the current preview at device pixel ratio for crisp output.</p>
-      </div>
-    </aside>
-
-    <!-- RIGHT: Preview -->
-    <main class="panel previewWrap" aria-label="Preview">
-      <div class="previewBar">
-        <div class="stack">
-          <button class="btn" id="centerFit">Center / Fit</button>
-          <button class="btn" id="resetZoom">Reset Zoom</button>
-        </div>
-        <div class="hint" id="meta">640×640 • live</div>
-      </div>
-      <div id="svgStage"></div>
-    </main>
+      </aside>
+    </div>
   </div>
-
-  <div class="toast" id="toast">Copied!</div>
 
 <script>
 (() => {
-  // ---------- Helpers ----------
-  const $ = sel => document.querySelector(sel);
-  const $$ = sel => Array.from(document.querySelectorAll(sel));
+  // --------------- DOM ---------------
+  const wrap = document.getElementById('stageWrap');
+  const inlineStage = document.getElementById('inlineStage');
+  const canvas = document.getElementById('canvasStage');
+  const ctx = canvas.getContext('2d', { alpha:true });
+  const metaBox = document.getElementById('metaBox');
+  const errBox = document.getElementById('errBox');
+  const errMsg = document.getElementById('errMsg');
+  const vbInfo = document.getElementById('vbInfo');
+  const badge = document.getElementById('renderBadge');
+
+  const tabInline = document.getElementById('tabInline');
+  const tabCanvas = document.getElementById('tabCanvas');
+  const fitModeSel = document.getElementById('fitMode');
+  const toggleChecker = document.getElementById('toggleChecker');
+  const toggleOutline = document.getElementById('toggleOutline');
+  const resetViewBtn = document.getElementById('resetView');
+
+  const svgInput = document.getElementById('svgInput');
+  const btnPreview = document.getElementById('btnPreview');
+  const btnLoadDemo = document.getElementById('btnLoadDemo');
+
+  // --------------- State ---------------
+  let currentSvgEl = null;          // sanitized SVG element
+  let originalSvgEl = null;         // unsanitized (never attached)
+  let outlineMode = false;
+  let checkerOn = true;
+  let activeTab = 'inline';         // 'inline' | 'canvas'
+  let fitMode = 'fit';              // 'fit'|'contain'|'cover'|'1x'|'2x'
+  let view = { x:0, y:0, k:1 };     // pan/zoom
+  let isPanning = false;
+  let lastPt = { x:0, y:0 };
+
+  // --------------- Utilities ---------------
   const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
-  const toRad = (deg) => deg * Math.PI / 180;
-
-  const state = {
-    customCenterSvgText: null,
-    profiles: [
-      {
-        id:'imperial_badge',
-        name:'Imperial Badge',
-        note:'Cinematic badge, Aurebesh rim, 3 sabers',
-        values:{
-          titleText:'SAINT CLOUD JEDI',
-          titleFontSize:26,
-          subtitleText:'AUREBESH · IMPERIAL · INSIGNIA',
-          subtitleSize:12,
-          rimColor:'#ffffff', plateColor:'#0b0e14', inkColor:'#ffffff',
-          diameter:640, showBail:true,
-          motif:'deathstar', motifScale:72,
-          dsColor:'#ff2a2a', dsStroke:'#111111', flColor:'#ffffff', showArmyStar:true,
-          saberCount:'3', saberGlow:6, sCore:'#ffffff', sAura:'#ff2a2a', sAura2:'#ffebeb',
-        }
-      },
-      {
-        id:'detroit_jedi',
-        name:'Detroit Jedi',
-        note:'Red theme, bold sabers',
-        values:{
-          titleText:'DETROIT JEDI',
-          titleFontSize:28,
-          subtitleText:'',
-          subtitleSize:12,
-          rimColor:'#ffffff', plateColor:'#0b0e14', inkColor:'#ffffff',
-          diameter:720, showBail:true,
-          motif:'deathstar_basic', motifScale:70,
-          dsColor:'#ff2a2a', dsStroke:'#0e1117', flColor:'#ffffff', showArmyStar:false,
-          saberCount:'3', saberGlow:10, sCore:'#ffffff', sAura:'#ff2a2a', sAura2:'#ffd2d2',
-        }
-      },
-      {
-        id:'army_florida',
-        name:'Army · Florida',
-        note:'Gold star overlay',
-        values:{
-          titleText:'SAINT CLOUD JEDI',
-          titleFontSize:24,
-          subtitleText:'SERVICE · HONOR · DUTY',
-          subtitleSize:12,
-          rimColor:'#ffffff', plateColor:'#0b0e14', inkColor:'#ffffff',
-          diameter:640, showBail:true,
-          motif:'deathstar', motifScale:68,
-          dsColor:'#e52424', dsStroke:'#111111', flColor:'#ffffff', showArmyStar:true,
-          saberCount:'2', saberGlow:6, sCore:'#ffffff', sAura:'#ffcc00', sAura2:'#ffe9a6',
-        }
-      }
-    ]
+  const debounce = (fn, ms=120) => {
+    let t; return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
   };
 
-  // Build profile cards
-  const profileHost = $('#profiles');
-  state.profiles.forEach(p => {
-    const el = document.createElement('div');
-    el.className = 'card';
-    el.innerHTML = `<h4>${p.name}</h4><p>${p.note}</p>`;
-    el.addEventListener('click', () => applyProfile(p.values));
-    profileHost.appendChild(el);
-  });
+  function setBadge(text, ok=true){
+    badge.textContent = text;
+    badge.style.background = ok ? '#063d1f' : '#4d1218';
+    badge.style.border = '1px solid ' + (ok ? '#1b6f3f' : '#8a2631');
+    badge.style.color = ok ? '#bff2d4' : '#ffd3d3';
+  }
 
-  // Map form controls
-  const C = {
-    titleText: $('#titleText'),
-    titleFontSize: $('#titleFontSize'),
-    subtitleText: $('#subtitleText'),
-    subtitleSize: $('#subtitleSize'),
-    rimColor: $('#rimColor'),
-    plateColor: $('#plateColor'),
-    inkColor: $('#inkColor'),
-    diameter: $('#diameter'),
-    showBail: $('#showBail'),
-    motif: $('#motif'),
-    motifScale: $('#motifScale'),
-    dsColor: $('#dsColor'),
-    dsStroke: $('#dsStroke'),
-    flColor: $('#flColor'),
-    showArmyStar: $('#showArmyStar'),
-    customSvg: $('#customSvg'),
-    saberCount: $('#saberCount'),
-    saberGlow: $('#saberGlow'),
-    sCore: $('#sCore'),
-    sAura: $('#sAura'),
-    sAura2: $('#sAura2'),
+  // ---------- SVG sanitizer (very strict) ----------
+  const FORBIDDEN = new Set([
+    'script','foreignobject','iframe','object','embed','audio','video','canvas','image' // 'image' optional; keep blocked for safety
+  ]);
+  const FORBIDDEN_ATTR_PREFIX = ['on']; // onload, onclick...
+  const FORBIDDEN_ATTRS = new Set(['href','xlink:href']); // remove external references
+
+  function sanitizeSvg(svg){
+    const clone = svg.cloneNode(true);
+    const walker = document.createTreeWalker(clone, NodeFilter.SHOW_ELEMENT, null);
+    const toRemove = [];
+    while(walker.nextNode()){
+      const el = walker.currentNode;
+      const tag = el.tagName.toLowerCase();
+      if(FORBIDDEN.has(tag)){ toRemove.push(el); continue; }
+
+      // Remove event handlers and dangerous URL-bearing attrs
+      for(const attr of [...el.attributes]){
+        const nm = attr.name.toLowerCase();
+        if(FORBIDDEN_ATTR_PREFIX.some(p => nm.startsWith(p))) el.removeAttribute(attr.name);
+        if(FORBIDDEN_ATTRS.has(nm)) el.removeAttribute(attr.name);
+
+        // url() sanitization within style attrs
+        if(nm === 'style' && /url\s*\(/i.test(attr.value)){
+          el.removeAttribute('style');
+        }
+        // external references in fill/stroke/filter via url(#id) are allowed
+        // but any absolute/relative URL (url(http...)) are stripped above
+      }
+      // Ensure vector-effect for crisp strokes on zoom
+      if(!el.hasAttribute('vector-effect')) el.setAttribute('vector-effect','non-scaling-stroke');
+      // Snap strokes to pixel grid for common shapes
+      if(['path','rect','circle','line','polyline','polygon'].includes(tag)){
+        const sw = parseFloat(el.getAttribute('stroke-width') || '1');
+        if(!Number.isNaN(sw)) el.setAttribute('shape-rendering','geometricPrecision');
+      }
+    }
+    for(const el of toRemove) el.remove();
+
+    // Ensure xmlns + viewBox present
+    clone.setAttribute('xmlns','http://www.w3.org/2000/svg');
+    if(!clone.getAttribute('viewBox')){
+      // derive from width/height if possible
+      let w = parseFloat(clone.getAttribute('width') || '0');
+      let h = parseFloat(clone.getAttribute('height') || '0');
+      if(!(w>0 && h>0)){ w = 100; h = 100; }
+      clone.setAttribute('viewBox', `0 0 ${w} ${h}`);
+    }
+    // Remove any external stylesheet links
+    clone.removeAttribute('style'); // top-level inline styles can reintroduce urls
+    return clone;
+  }
+
+  // ---------- Demo medallion generator (replace with your buildSvg) ----------
+  function buildSvg(){
+    // Simple concentric, golden-angle petals — parametric demo
+    const NS = 'http://www.w3.org/2000/svg';
+    const W = 1024, H = 1024;
+    const g = document.createElementNS(NS,'svg');
+    g.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    g.setAttribute('width', W); g.setAttribute('height', H);
+
+    const bg = document.createElementNS(NS,'rect');
+    bg.setAttribute('x','0'); bg.setAttribute('y','0'); bg.setAttribute('width',W); bg.setAttribute('height',H);
+    bg.setAttribute('fill','transparent');
+    g.appendChild(bg);
+
+    const root = document.createElementNS(NS,'g');
+    root.setAttribute('transform', `translate(${W/2},${H/2})`);
+    g.appendChild(root);
+
+    const TAU = Math.PI*2;
+    const GOLD = Math.PI*(3 - Math.sqrt(5)); // golden angle
+    const R = 440;
+    for(let i=0;i<420;i++){
+      const t = i*GOLD;
+      const r = Math.sqrt(i/420)*R;
+      const x = Math.cos(t)*r, y = Math.sin(t)*r;
+      const p = document.createElementNS(NS,'circle');
+      p.setAttribute('cx', x.toFixed(2));
+      p.setAttribute('cy', y.toFixed(2));
+      p.setAttribute('r', (2 + 2.5*Math.sin(i*0.17)) .toFixed(2));
+      p.setAttribute('fill', `hsl(${(i*0.9)%360} 60% 55% / 0.9)`);
+      p.setAttribute('stroke', 'hsl(210 20% 15% / 0.25)');
+      p.setAttribute('stroke-width','0.75');
+      root.appendChild(p);
+    }
+
+    // ring + star outlines (to test outline mode)
+    const ring = document.createElementNS(NS,'circle');
+    ring.setAttribute('cx','0'); ring.setAttribute('cy','0'); ring.setAttribute('r','470');
+    ring.setAttribute('fill','none'); ring.setAttribute('stroke','#dbe7ff'); ring.setAttribute('stroke-width','4');
+    root.appendChild(ring);
+
+    // tiny star
+    const star = document.createElementNS(NS,'path');
+    const spikes=8, outer=520, inner=495;
+    let d = '';
+    for(let i=0;i<spikes*2;i++){
+      const ang = i*Math.PI/spikes;
+      const rr = (i%2===0? outer:inner);
+      const xx = Math.cos(ang)*rr, yy = Math.sin(ang)*rr;
+      d += (i===0?'M':'L') + xx.toFixed(1) + ' ' + yy.toFixed(1);
+    }
+    d += 'Z';
+    star.setAttribute('d',d);
+    star.setAttribute('fill','none');
+    star.setAttribute('stroke','#9cc0ff');
+    star.setAttribute('stroke-width','2');
+    root.appendChild(star);
+
+    return g;
+  }
+
+  // Allow external integration to inject a prebuilt SVG element
+  window.setExternalSvg = function(svgEl){
+    originalSvgEl = svgEl;
+    scheduleRender();
   };
 
-  Object.values(C).forEach(inp => inp.addEventListener('input', scheduleRender));
-  C.customSvg.addEventListener('change', async (e) => {
-    const f = e.target.files?.[0];
-    if (!f) return;
-    if (f.type !== 'image/svg+xml') { toast('Please upload an .svg file'); return; }
-    const txt = await f.text();
-    state.customCenterSvgText = sanitizeSvg(txt);
-    render();
-  });
-
-  // Theme + reset
-  $('#toggleTheme').addEventListener('click', () => {
-    const dark = document.documentElement.dataset.theme !== 'light';
-    if (dark) document.documentElement.dataset.theme = 'light';
-    else document.documentElement.dataset.theme = 'dark';
-  });
-  $('#resetAll').addEventListener('click', () => { applyProfile(state.profiles[0].values); });
-
-  // ---------- SVG Generator ----------
-  function buildSvg(opts){
-    const D = +opts.diameter;
-    const R = D/2;
-    const rim = opts.rimColor, plate = opts.plateColor, ink = opts.inkColor;
-    const title = (opts.titleText||'').toUpperCase();
-    const tSize = +opts.titleFontSize;
-    const sub = (opts.subtitleText||'');
-    const subSize = +opts.subtitleSize;
-    const showBail = !!opts.showBail;
-
-    // Build root SVG
-    const svgns = 'http://www.w3.org/2000/svg';
-    const svg = document.createElementNS(svgns,'svg');
-    svg.setAttribute('xmlns', svgns);
-    svg.setAttribute('viewBox', `0 0 ${D} ${D}`);
-    svg.setAttribute('width', D);
-    svg.setAttribute('height', D);
-
-    // Defs: filters & paths
-    const defs = el('defs');
-    // Glow filter for sabers
-    const glow = el('filter', {id:'glow', x:'-50%', y:'-50%', width:'200%', height:'200%'});
-    glow.append(
-      el('feGaussianBlur', {in:'SourceGraphic', stdDeviation: opts.saberGlow||6, result:'blur'}),
-      el('feMerge', {}).appendChild(el('feMergeNode', {in:'blur'}))
-    );
-    defs.appendChild(glow);
-
-    // Text paths for arcs
-    const arcTopId = 'arcTop';
-    const arcTop = describeArc(R, R, R*0.72, 200, -20); // top arc
-    defs.appendChild(el('path', {id:arcTopId, d:arcTop}));
-    if (sub){
-      const arcSubId = 'arcSub';
-      const arcSub = describeArc(R, R, R*0.86, 210, -30);
-      defs.appendChild(el('path', {id:arcSubId, d:arcSub}));
-    }
-    svg.appendChild(defs);
-
-    // Background plate + rim
-    // Rim
-    svg.appendChild(el('circle', {cx:R, cy:R, r:R*0.98, fill:rim}));
-    // Inner plate
-    svg.appendChild(el('circle', {cx:R, cy:R, r:R*0.9, fill:plate}));
-
-    // Bail loop (top)
-    if (showBail){
-      svg.appendChild(el('rect', {x:R-18, y:8, width:36, height:24, rx:6, fill:rim}));
-      svg.appendChild(el('circle', {cx:R, cy:20, r:8, fill:plate}));
-    }
-
-    // Title along top arc
-    if (title){
-      const txt = el('text', {fill:ink, 'font-size':tSize, 'font-family':'Arial, Helvetica, sans-serif', 'letter-spacing':1.5, 'text-anchor':'middle'});
-      const textPath = el('textPath', {'href':'#'+arcTopId, startOffset:'50%'});
-      textPath.textContent = title;
-      txt.appendChild(textPath);
-      svg.appendChild(txt);
-    }
-    // Aurebesh rim (render as normal characters unless user pastes Aurebesh glyphs)
-    if (sub){
-      const st = el('text', {fill:ink, 'font-size':subSize, 'font-family':'Arial, Helvetica, sans-serif', 'letter-spacing':2, 'text-anchor':'middle', opacity:.8});
-      const tp = el('textPath', {'href':'#arcSub', startOffset:'50%'});
-      tp.textContent = sub;
-      st.appendChild(tp); svg.appendChild(st);
-    }
-
-    // Center motif group
-    const g = el('g', {transform:`translate(${R},${R}) scale(${(+opts.motifScale||70)/100})`});
-    // death star (basic)
-    if (opts.motif === 'deathstar' || opts.motif === 'deathstar_basic'){
-      g.appendChild(deathStar(opts));
-      if (opts.motif === 'deathstar'){
-        g.appendChild(floridaOutline(opts)); // simplified silhouette
-      }
-    } else if (opts.motif === 'custom'){
-      const svgtxt = state.customCenterSvgText;
-      if (svgtxt){
-        const frag = stringToFragment(svgtxt);
-        // normalize center
-        const box = el('rect', {x:-150,y:-150,width:300,height:300,fill:'none',stroke:'none'});
-        g.appendChild(box);
-        g.appendChild(frag);
-      }
-    }
-
-    if (opts.showArmyStar) g.appendChild(armyStar());
-
-    // Lightsabers
-    const sabers = parseInt(opts.saberCount||0,10);
-    if (sabers>0){
-      const saberGroup = el('g', {'filter':'url(#glow)'});
-      const angles = sabers===1 ? [0] : sabers===2 ? [-22, 22] : [-28, 0, 28];
-      angles.forEach((ang,i) => {
-        saberGroup.appendChild(lightsaber(ang, i, opts));
-      });
-      svg.appendChild(saberGroup);
-    }
-
-    svg.appendChild(g);
-    return svg;
-
-    // ---- element helpers ----
-    function el(name, attrs={}){
-      const node = document.createElementNS(svgns, name);
-      for (const [k,v] of Object.entries(attrs)) node.setAttribute(k, v);
-      return node;
-    }
-    function stringToFragment(s){
-      // very simple parser for safe inline
-      const tmp = document.createElement('div'); tmp.innerHTML = s;
-      const svg = tmp.querySelector('svg'); return svg ? svg : tmp.firstElementChild;
-    }
-    function deathStar(o){
-      const s = el('g', {transform:'translate(0,10)'});
-      const base = el('circle', {cx:0, cy:0, r:120, fill:o.dsColor, stroke:o.dsStroke, 'stroke-width':4});
-      s.appendChild(base);
-      // panel rings
-      [80, 40, -10].forEach((y,idx) => {
-        s.appendChild(el('ellipse', {cx:0, cy:y*0.7, rx:120 - idx*10, ry:14, fill:'none', stroke:o.dsStroke, 'stroke-width':3, opacity:.9}));
-      });
-      // trench
-      s.appendChild(el('rect', {x:-120, y:-8, width:240, height:16, fill:o.dsStroke, opacity:.9}));
-      // dish
-      s.appendChild(el('circle', {cx:36, cy:-36, r:28, fill:'#00000020', stroke:o.dsStroke, 'stroke-width':3}));
-      s.appendChild(el('circle', {cx:36, cy:-36, r:12, fill:'#00000010', stroke:o.dsStroke, 'stroke-width':2}));
-      return s;
-    }
-    function floridaOutline(o){
-      // Simplified path (stylized silhouette)
-      const path = "M -110,-90 C -80,-120, -30,-110, 10,-90 C 40,-70, 60,-20, 80,10 C 45,5, 35,-5, 18,-8 C 2,-10, -5,5, -18,8 C -38,12, -64,2, -92,-8 Z";
-      const g = el('g', {opacity:.9});
-      g.appendChild(el('path', {d:path, fill:'none', stroke:o.flColor, 'stroke-width':5}));
-      return g;
-    }
-    function armyStar(){
-      const g = el('g', {transform:'translate(0,-6) scale(0.7)'});
-      const poly = starPoints(0,0,80,38,5);
-      g.appendChild(el('polygon', {points:poly, fill:'none', stroke:'#d4af37', 'stroke-width':6}));
-      return g;
-    }
-    function starPoints(cx, cy, outerR, innerR, points){
-      let str = '';
-      const step = Math.PI / points;
-      for (let i=0;i<2*points;i++){
-        const r = (i%2===0) ? outerR : innerR;
-        const a = i * step - Math.PI/2;
-        const x = cx + r * Math.cos(a), y = cy + r * Math.sin(a);
-        str += `${x},${y} `;
-      }
-      return str.trim();
-    }
-    function lightsaber(angleDeg, idx, o){
-      const g = el('g', {transform:`translate(${D*0.22}, ${D*0.78}) rotate(${angleDeg})`});
-      // hilt
-      g.appendChild(el('rect', {x:-16, y:-10, width:32, height:20, rx:3, fill:'#9aa3af'}));
-      g.appendChild(el('rect', {x:16, y:-8, width:16, height:16, rx:3, fill:'#606874'}));
-      // blade (core + aura stroke)
-      const bladeLen = D*0.55;
-      const blade = el('rect', {x:32, y:-4, width:bladeLen, height:8, rx:4, fill:o.sCore, stroke:o.sAura, 'stroke-width':6});
-      g.appendChild(blade);
-      return g;
-    }
-    // describe circular arc (SVG path)
-    function describeArc(cx, cy, r, startAngle, endAngle){
-      const start = polarToCartesian(cx,cy,r,endAngle);
-      const end   = polarToCartesian(cx,cy,r,startAngle);
-      const large = endAngle - startAngle <= 180 ? 0 : 1;
-      return ["M", start.x, start.y, "A", r, r, 0, large, 0, end.x, end.y].join(" ");
-    }
-    function polarToCartesian(cx,cy,r,angle){
-      const a = toRad(angle);
-      return {x: cx + r*Math.cos(a), y: cy + r*Math.sin(a)};
-    }
+  // ---------- Render pipeline ----------
+  function clearStage(){
+    inlineStage.innerHTML = '';
+    ctx.clearRect(0,0,canvas.width,canvas.height);
   }
 
-  // ---------- Render Loop ----------
-  const stage = $('#svgStage');
-  function read(){
-    return {
-      titleText: C.titleText.value,
-      titleFontSize: +C.titleFontSize.value,
-      subtitleText: C.subtitleText.value,
-      subtitleSize: +C.subtitleSize.value,
-      rimColor: C.rimColor.value,
-      plateColor: C.plateColor.value,
-      inkColor: C.inkColor.value,
-      diameter: +C.diameter.value,
-      showBail: C.showBail.checked,
-      motif: C.motif.value,
-      motifScale: +C.motifScale.value,
-      dsColor: C.dsColor.value,
-      dsStroke: C.dsStroke.value,
-      flColor: C.flColor.value,
-      showArmyStar: C.showArmyStar.checked,
-      saberCount: C.saberCount.value,
-      saberGlow: +C.saberGlow.value,
-      sCore: C.sCore.value,
-      sAura: C.sAura.value,
-      sAura2: C.sAura2.value
-    };
-  }
-  function render(){
-    const v = read();
-    const svg = buildSvg(v);
-    stage.innerHTML = '';
-    stage.appendChild(svg);
-    $('#meta').textContent = `${v.diameter}×${v.diameter} • live`;
-    lastSvg = svg;
-  }
-  let raf = 0;
-  function scheduleRender(){ cancelAnimationFrame(raf); raf = requestAnimationFrame(render); }
-
-  function applyProfile(val){
-    Object.entries(val).forEach(([k,v])=>{
-      if (typeof C[k] === 'undefined') return;
-      if (C[k].type === 'checkbox') C[k].checked = !!v;
-      else C[k].value = v;
-    });
-    render();
-    toast('Profile loaded');
+  function updateMeta(){
+    if(!currentSvgEl){ metaBox.textContent = '—'; vbInfo.textContent = 'viewBox: — • size: —'; return; }
+    const vb = (currentSvgEl.getAttribute('viewBox')||'').trim();
+    const w = currentSvgEl.getAttribute('width') || 'auto';
+    const h = currentSvgEl.getAttribute('height') || 'auto';
+    vbInfo.textContent = `viewBox: ${vb || '—'} • size: ${w} × ${h}`;
+    const nodeCount = currentSvgEl.querySelectorAll('*').length;
+    metaBox.textContent = `${nodeCount} nodes • zoom ${view.k.toFixed(2)}× • pan ${view.x.toFixed(0)},${view.y.toFixed(0)}`;
   }
 
-  // ---------- Export ----------
-  let lastSvg = null;
-  $('#copySvg').addEventListener('click', async () => {
-    if (!lastSvg) return;
-    const xml = toXml(lastSvg);
-    try { await navigator.clipboard.writeText(xml); toast('SVG copied'); }
-    catch { toast('Copy failed'); }
-  });
-  $('#downloadSvg').addEventListener('click', () => {
-    if (!lastSvg) return;
-    const xml = toXml(lastSvg);
-    download('medallion.svg', new Blob([xml], {type:'image/svg+xml'}));
-  });
-  $('#downloadPng').addEventListener('click', async () => {
-    if (!lastSvg) return;
-    const xml = toXml(lastSvg);
-    const url = URL.createObjectURL(new Blob([xml], {type:'image/svg+xml'}));
+  function mountInline(){
+    inlineStage.style.display = '';
+    canvas.style.display = 'none';
+    const holder = document.createElement('div');
+    holder.style.width = '100%';
+    holder.style.height = '100%';
+    holder.style.display = 'grid';
+    holder.style.placeItems = 'center';
+    // a wrapper to apply pan/zoom via CSS transform
+    const inner = document.createElement('div');
+    inner.style.transform = `translate(${view.x}px,${view.y}px) scale(${view.k})`;
+    inner.style.transformOrigin = '50% 50%';
+    inner.style.willChange = 'transform';
+    inner.appendChild(currentSvgEl);
+    holder.appendChild(inner);
+    inlineStage.appendChild(holder);
+  }
+
+  function drawOnCanvas(){
+    inlineStage.style.display = 'none';
+    canvas.style.display = '';
+    const dpr = window.devicePixelRatio || 1;
+    const { width: cw, height: ch } = wrap.getBoundingClientRect();
+    canvas.width = Math.max(1, Math.round(cw * dpr));
+    canvas.height = Math.max(1, Math.round(ch * dpr));
+    canvas.style.width = '100%';
+    canvas.style.height = '100%';
+
+    // Serialize sanitized SVG -> Blob -> Image -> draw
+    const ser = new XMLSerializer();
+    const svgStr = ser.serializeToString(currentSvgEl);
+    const blob = new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
     const img = new Image();
-    const scale = Math.min(Math.max(window.devicePixelRatio||1, 1), 3);
     img.onload = () => {
-      const w = lastSvg.viewBox.baseVal.width, h = lastSvg.viewBox.baseVal.height;
-      const canvas = document.createElement('canvas'); canvas.width = w*scale; canvas.height = h*scale;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      canvas.toBlob(blob => download('medallion.png', blob), 'image/png');
+      ctx.save();
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+      ctx.clearRect(0,0,cw,ch);
+
+      // Compute fit/crop
+      const vb = (currentSvgEl.getAttribute('viewBox') || '0 0 100 100').split(/\s+/).map(Number);
+      const vbW = vb[2]||100, vbH = vb[3]||100;
+      let scale = 1, dx = 0, dy = 0;
+
+      if(fitMode === '1x' || fitMode === '2x'){
+        scale = (fitMode === '2x') ? 2 : 1;
+        // center
+        dx = (cw - vbW*scale)/2 + view.x;
+        dy = (ch - vbH*scale)/2 + view.y;
+      } else {
+        const sx = cw / vbW, sy = ch / vbH;
+        if(fitMode === 'fit' || fitMode === 'contain') scale = Math.min(sx, sy);
+        if(fitMode === 'cover') scale = Math.max(sx, sy);
+        scale *= view.k;
+        dx = (cw - vbW*scale)/2 + view.x;
+        dy = (ch - vbH*scale)/2 + view.y;
+      }
+
+      // Half-pixel align for crisper strokes
+      const half = (Math.round(scale) % 2 === 1) ? 0.5 : 0;
+      ctx.translate(Math.round(dx)+half, Math.round(dy)+half);
+      ctx.scale(scale, scale);
+      ctx.drawImage(img, 0, 0);
+      ctx.restore();
       URL.revokeObjectURL(url);
+      updateMeta();
+      setBadge('Rendered');
+    };
+    img.onerror = e => {
+      URL.revokeObjectURL(url);
+      showError('Canvas draw failed. (Possibly a blocked external reference.)');
     };
     img.src = url;
+  }
+
+  function applyOutlineMode(svg){
+    if(!outlineMode) return;
+    const walker = document.createTreeWalker(svg, NodeFilter.SHOW_ELEMENT, null);
+    while(walker.nextNode()){
+      const el = walker.currentNode;
+      const tag = el.tagName.toLowerCase();
+      if(['path','rect','circle','ellipse','line','polyline','polygon','g','text'].includes(tag)){
+        el.setAttribute('fill','none');
+        el.setAttribute('stroke','#87b7ff');
+        el.setAttribute('stroke-width', el.getAttribute('stroke-width') || '1');
+      }
+    }
+  }
+
+  function computeViewForFit(svg){
+    const vb = (svg.getAttribute('viewBox') || '0 0 100 100').split(/\s+/).map(Number);
+    const vbW = vb[2]||100, vbH = vb[3]||100;
+    const { width: cw, height: ch } = wrap.getBoundingClientRect();
+    const sx = cw / vbW, sy = ch / vbH;
+    let k = 1;
+    if(fitMode === 'fit' || fitMode === 'contain') k = Math.min(sx, sy);
+    if(fitMode === 'cover') k = Math.max(sx, sy);
+    if(fitMode === '1x') k = 1;
+    if(fitMode === '2x') k = 2;
+    return { x: 0, y: 0, k };
+  }
+
+  function render(){
+    try{
+      setBadge('Rendering…');
+      errBox.classList.remove('show');
+      clearStage();
+
+      // Source priority: textarea SVG -> external provided -> demo build
+      let sourceSvg = null;
+      if(svgInput.value.trim()){
+        sourceSvg = stringToSvg(svgInput.value.trim());
+      } else if(originalSvgEl){
+        sourceSvg = originalSvgEl;
+      } else {
+        sourceSvg = buildSvg();
+      }
+      if(!sourceSvg || sourceSvg.tagName?.toLowerCase() !== 'svg'){
+        throw new Error('No <svg> element found.');
+      }
+      // sanitize
+      currentSvgEl = sanitizeSvg(sourceSvg);
+      if(outlineMode) applyOutlineMode(currentSvgEl);
+
+      // reset view when fit mode changes or no pan established
+      if(render._first || render._fitChanged){
+        view = computeViewForFit(currentSvgEl);
+        render._fitChanged = false;
+        render._first = false;
+      }
+
+      // mount / draw
+      if(activeTab === 'inline'){
+        mountInline();
+      } else {
+        drawOnCanvas();
+      }
+      updateMeta();
+      setBadge('Rendered');
+    } catch(err){
+      showError(err.message || String(err));
+    }
+  }
+  render._first = true;
+  const scheduleRender = debounce(render, 50);
+  window.scheduleRender = scheduleRender; // expose for external controls
+
+  function showError(msg){
+    errMsg.textContent = msg;
+    errBox.classList.add('show');
+    setBadge('Error', false);
+  }
+
+  function stringToSvg(str){
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(str, 'image/svg+xml');
+    const svg = doc.documentElement;
+    if(svg.nodeName === 'parsererror') throw new Error('Invalid SVG XML.');
+    return svg;
+  }
+
+  // --------------- Interactions ---------------
+  // Tabs
+  function setTab(which){
+    activeTab = which;
+    tabInline.classList.toggle('active', which==='inline');
+    tabCanvas.classList.toggle('active', which==='canvas');
+    tabInline.setAttribute('aria-pressed', String(which==='inline'));
+    tabCanvas.setAttribute('aria-pressed', String(which==='canvas'));
+    scheduleRender();
+  }
+  tabInline.addEventListener('click', () => setTab('inline'));
+  tabCanvas.addEventListener('click', () => setTab('canvas'));
+
+  // Fit mode
+  fitModeSel.addEventListener('change', () => {
+    fitMode = fitModeSel.value;
+    render._fitChanged = true;
+    scheduleRender();
   });
-  function toXml(svgEl){
-    // clone to ensure inline styles/attributes are preserved
-    const clone = svgEl.cloneNode(true);
-    // ensure xmlns
-    clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-    return `<?xml version="1.0" encoding="UTF-8"?>\n` + clone.outerHTML;
-  }
-  function download(name, blob){
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob); a.download = name; a.click();
-    setTimeout(()=>URL.revokeObjectURL(a.href), 500);
-  }
 
-  // ---------- Zoom / Fit ----------
-  $('#centerFit').addEventListener('click', () => {
-    stage.scrollIntoView({behavior:'smooth', block:'center'});
-  });
-  $('#resetZoom').addEventListener('click', () => {
-    stage.style.transform = 'none';
+  // Checkerboard
+  toggleChecker.addEventListener('click', () => {
+    checkerOn = !checkerOn;
+    wrap.classList.toggle('checker', checkerOn);
   });
 
-  // ---------- Sanitize ----------
-  function sanitizeSvg(txt){
-    // strip scripts and event handlers
-    return txt
-      .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi,'')
-      .replace(/\son[a-z]+\s*=\s*(['"]).*?\1/gi,'');
-  }
+  // Outline
+  toggleOutline.addEventListener('click', () => {
+    outlineMode = !outlineMode;
+    scheduleRender();
+  });
 
-  // ---------- Toast ----------
-  const toastEl = $('#toast');
-  function toast(msg){
-    toastEl.textContent = msg; toastEl.classList.add('show');
-    setTimeout(()=>toastEl.classList.remove('show'), 1400);
-  }
+  // Reset
+  resetViewBtn.addEventListener('click', () => {
+    if(currentSvgEl){
+      view = computeViewForFit(currentSvgEl);
+      scheduleRender();
+    }
+  });
 
-  // Init
-  applyProfile(state.profiles[0].values);
+  // Pan/zoom (both tabs)
+  function stageEl(){ return activeTab==='inline' ? inlineStage : canvas; }
+  function pointerToLocal(ev){
+    const r = wrap.getBoundingClientRect();
+    return { x: ev.clientX - r.left, y: ev.clientY - r.top };
+  }
+  wrap.addEventListener('pointerdown', (ev) => {
+    isPanning = true;
+    wrap.setPointerCapture(ev.pointerId);
+    lastPt = pointerToLocal(ev);
+  });
+  wrap.addEventListener('pointermove', (ev) => {
+    if(!isPanning) return;
+    const pt = pointerToLocal(ev);
+    const dx = pt.x - lastPt.x;
+    const dy = pt.y - lastPt.y;
+    lastPt = pt;
+    view.x += dx;
+    view.y += dy;
+    if(activeTab==='inline'){
+      // update transform live
+      const inner = inlineStage.firstElementChild?.firstElementChild;
+      if(inner){
+        inner.style.transform = `translate(${view.x}px,${view.y}px) scale(${view.k})`;
+      }
+      updateMeta();
+    } else {
+      scheduleRender();
+    }
+  });
+  window.addEventListener('pointerup', () => { isPanning = false; });
+
+  wrap.addEventListener('wheel', (ev) => {
+    ev.preventDefault();
+    const delta = -ev.deltaY;
+    const factor = (ev.shiftKey ? 0.001 : 0.0025) * delta;
+    const k = clamp(view.k * (1 + factor), 0.05, 20);
+
+    // Zoom towards cursor
+    const r = wrap.getBoundingClientRect();
+    const cx = ev.clientX - r.left;
+    const cy = ev.clientY - r.top;
+    const scale = k / view.k;
+    view.x = cx - scale * (cx - view.x);
+    view.y = cy - scale * (cy - view.y);
+    view.k = k;
+
+    if(activeTab==='inline'){
+      const inner = inlineStage.firstElementChild?.firstElementChild;
+      if(inner){
+        inner.style.transform = `translate(${view.x}px,${view.y}px) scale(${view.k})`;
+      }
+      updateMeta();
+    } else {
+      scheduleRender();
+    }
+  }, { passive:false });
+
+  // Textarea actions
+  btnPreview.addEventListener('click', () => scheduleRender());
+  btnLoadDemo.addEventListener('click', () => {
+    svgInput.value = new XMLSerializer().serializeToString(buildSvg());
+    scheduleRender();
+  });
+
+  // Initial render
+  scheduleRender();
+
+  // Resize observer for responsive redraw
+  const ro = new ResizeObserver(debounce(() => scheduleRender(), 80));
+  ro.observe(wrap);
 })();
 </script>
 </body>
