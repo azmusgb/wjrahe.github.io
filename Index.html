@@ -47,7 +47,6 @@
     padding-bottom:max(16px,env(safe-area-inset-bottom));
   }
 
-  /* Safe areas & toolbar height */
   header{
     position:sticky; top:0; z-index:50; height:calc(var(--header) + env(safe-area-inset-top));
     padding: max(0px, env(safe-area-inset-top)) 16px 0 16px;
@@ -104,23 +103,19 @@
 
   .stage{
     position:relative;
-    /* fallback */
-    height:64vh;
-    /* mobile-safe: small viewport height prevents toolbar jumps */
-    height:64svh;
-    min-height:420px; border:1px solid var(--line); border-radius:14px; overflow:hidden;
+    height:64svh; min-height:420px; border:1px solid var(--line); border-radius:14px; overflow:hidden;
     background:
       linear-gradient( to bottom right, #ffffff08, #0000 ),
       conic-gradient(from 0deg at 50% 50%, #0000 0 90deg, #0002 0 180deg, #0000 0) 0 0/28px 28px,
       color-mix(in oklab,var(--panel) 96%, black 4%);
-    touch-action:none;
+    touch-action:none; user-select:none;
   }
   #inner{position:absolute; top:50%; left:50%; transform-origin:0 0; will-change:transform}
 
-  /* Mini preview: hidden on phones to avoid “two SVGs” vibe */
-  .badgePreview{display:grid; gap:8px; justify-items:center; border:1px dashed var(--line); border-radius:12px; padding:12px}
+  /* Optional mini preview (off by default; toggled via checkbox) */
+  .badgePreview{display:none; gap:8px; justify-items:center; border:1px dashed var(--line); border-radius:12px; padding:12px}
+  .badgePreview.on{display:grid}
   #svgBadge{width:280px; height:280px}
-  @media (max-width: 900px){ .badgePreview{ display:none; } }
 
   dialog{border:1px solid var(--line); background:var(--panel); color:var(--ink); border-radius:16px; padding:0; max-width:92vw; width:560px; box-shadow:var(--shadow)}
   dialog::backdrop{background:rgba(0,0,0,.5); backdrop-filter: blur(4px)}
@@ -156,6 +151,9 @@
         <option>320</option><option>512</option><option selected>640</option><option>768</option><option>1024</option>
       </select>
     </label>
+    <label class="chip" title="Show mini preview (avoids double-svg by default)">
+      <input id="miniToggle" type="checkbox" style="accent-color:var(--accent)"> Mini Preview
+    </label>
     <button id="themeToggle" class="chip" type="button" aria-pressed="false" title="Toggle theme">
       <span class="material-icons" aria-hidden="true">dark_mode</span><span id="themeLabel">Dark</span>
     </button>
@@ -180,7 +178,11 @@
       <button id="clearBtn" class="chip" type="button"><span class="material-icons" aria-hidden="true">backspace</span>Clear</button>
     </div>
 
-    
+    <!-- Optional mini-preview mount -->
+    <div id="miniHost" class="badgePreview" aria-hidden="true">
+      <strong class="subtle">Mini Preview</strong>
+      <div id="svgBadge" aria-label="Mini preview" role="img"></div>
+    </div>
   </aside>
 
   <section class="card" aria-label="Builder">
@@ -315,6 +317,7 @@
   </div>
   <div class="modal-body">
     <textarea id="jsonArea" class="card" style="min-height:180px; font:13px/1.55 var(--mono)" placeholder='Paste JSON here or edit and click "Apply"'></textarea>
+    <div class="subtle" style="margin-top:8px">Schema: {"form": {...current builder values...}, "presets": [...]}</div>
   </div>
   <div class="modal-actions">
     <button id="applyJson" class="btn primary" type="button"><span class="material-icons">check</span>Apply</button>
@@ -342,12 +345,13 @@ const NS='http://www.w3.org/2000/svg';
 const LS_FORM='medallion:form:overhaul';
 const LS_THEME='medallion:theme:light';
 const LS_PRESETS='medallion:presets:v2';
+const LS_MINI='medallion:mini:on';
 const safeLS={ get:k=>{try{return localStorage.getItem(k)}catch{return null}}, set:(k,v)=>{try{localStorage.setItem(k,v)}catch{}} };
 function toast(msg,err=false){ const el=byId('toast'); if(!el) return; el.classList.toggle('error',!!err); byId('toastMsg').textContent=msg; el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),2200); }
 
 /* ===== Theme ===== */
 (function initTheme(){ const stored=safeLS.get(LS_THEME); if(stored==='1') document.body.classList.add('theme-light'); paintTheme(); })();
-function paintTheme(){ const light=document.body.classList.contains('theme-light'); byId('themeToggle').setAttribute('aria-pressed',String(light)); byId('themeToggle').querySelector('.material-icons').textContent=light?'light_mode':'dark_mode'; byId('themeLabel').textContent=light?'Light':'Dark'; }
+function paintTheme(){ const light=document.body.classList.contains('theme-light'); const t=byId('themeToggle'); if(!t) return; t.setAttribute('aria-pressed',String(light)); t.querySelector('.material-icons').textContent=light?'light_mode':'dark_mode'; byId('themeLabel').textContent=light?'Light':'Dark'; }
 byId('themeToggle').addEventListener('click',()=>{ const l=document.body.classList.toggle('theme-light'); safeLS.set(LS_THEME,l?'1':'0'); paintTheme(); });
 
 /* ===== Tabs ===== */
@@ -365,6 +369,7 @@ const DEFAULT_PRESETS=[
 ];
 function getPresets(){ const raw=safeLS.get(LS_PRESETS); if(!raw) return DEFAULT_PRESETS; try{const arr=JSON.parse(raw); return Array.isArray(arr)&&arr.length?arr:DEFAULT_PRESETS}catch{return DEFAULT_PRESETS} }
 function setPresets(arr){ safeLS.set(LS_PRESETS, JSON.stringify(arr)); renderProfiles(); }
+
 const profilesHost=byId('profiles');
 function renderProfiles(){
   profilesHost.innerHTML='';
@@ -395,7 +400,49 @@ byId('addPresetBtn').addEventListener('click', ()=>{
   setPresets(arr); toast('Preset saved');
 });
 
-/* ===== Form IO (mute guard) ===== */
+/* ===== Import / Export JSON (wired) ===== */
+const jsonModal=byId('jsonModal'), jsonArea=byId('jsonArea');
+byId('exportJsonBtn').addEventListener('click', ()=>{
+  const payload={ form: readForm(), presets: getPresets() };
+  jsonArea.value = JSON.stringify(payload,null,2);
+  jsonModal.showModal();
+});
+byId('importJsonBtn').addEventListener('click', ()=>{ jsonArea.value=''; jsonModal.showModal(); });
+byId('applyJson').addEventListener('click', ()=>{
+  try{
+    const obj=JSON.parse(jsonArea.value||'{}');
+    if(obj.form) fillForm(obj.form,true);
+    if(Array.isArray(obj.presets)) setPresets(obj.presets);
+    jsonModal.close(); toast('JSON applied');
+  }catch{ toast('Invalid JSON',true); }
+});
+byId('copyJson').addEventListener('click', ()=>{ navigator.clipboard?.writeText(jsonArea.value||'').then(()=>toast('Copied')); });
+byId('closeJson').addEventListener('click', ()=>jsonModal.close());
+
+/* ===== Mini preview toggle (prevents accidental double-SVG) ===== */
+const miniToggle=byId('miniToggle'), miniHost=byId('miniHost');
+(function initMini(){ const on = safeLS.get(LS_MINI)==='1'; miniToggle.checked=on; miniHost.classList.toggle('on',on); miniHost.setAttribute('aria-hidden', String(!on)); })();
+miniToggle.addEventListener('change', ()=>{
+  const on=miniToggle.checked; miniHost.classList.toggle('on',on); miniHost.setAttribute('aria-hidden', String(!on)); safeLS.set(LS_MINI, on?'1':'0');
+  // re-render mirror if turning on
+  if(on){ const svg=byId('inner')?.querySelector('svg'); if(svg) renderBadge(svg); }
+});
+
+/* ===== Randomizer ===== */
+byId('randBtn').addEventListener('click', ()=>{
+  const base = structuredClone(DEFAULT_PRESETS[Math.floor(Math.random()*DEFAULT_PRESETS.length)].form);
+  const picks = (arr)=>arr[Math.floor(Math.random()*arr.length)];
+  base.rim_finish = picks(['metallic silver','brushed silver','polished steel','gold','bronze']);
+  base.plate_color = picks(['black','navy','crimson','gray','white']);
+  base.text_colors = picks(['white with black outline','gold','silver','cyan','red']);
+  base.main_symbol = picks(['Death Star','Jedi crest']);
+  base.sabers_desc = picks(['two crossed sabers glow','three angled beams glow','single vertical saber glow']);
+  base.flip_arc = picks(['auto','normal','flipped']);
+  fillForm(base,true);
+  toast('Randomized');
+});
+
+/* ===== Form IO (autosave) ===== */
 let MUTE=false;
 const FIELDS=["text_top","rim_finish","plate_color","text_colors","state_shape","outline_color","main_symbol","symbol_color","badge_elements","secondary_symbol","aurebesh_style","sabers_desc","style_keywords","flip_arc"];
 function readForm(){
@@ -448,7 +495,6 @@ let view={x:0,y:0,k:1,min:.06,max:10,w:640,h:640,rot:0};
 new ResizeObserver(()=>{ const r=stage.getBoundingClientRect(); hudSize.textContent=`${Math.round(r.width)}×${Math.round(r.height)}px`; renderPreview(); }).observe(stage);
 sizeSelect.addEventListener('change',()=>{ view.w=view.h=Number(sizeSelect.value||640); generate(); setTimeout(fit,0); });
 
-/* Scoped element factory (no default to #inner) */
 function makeFactory(root){
   return function M(name, attrs={}, parent){
     const el=document.createElementNS(NS,name);
@@ -461,7 +507,6 @@ function makeFactory(root){
     return el;
   };
 }
-
 function colorPick(key, table, fallback){ key=(key||'').toLowerCase(); for(const [k,v] of table){ if(k && key.includes(k)) return v; } return fallback; }
 
 function buildMedallionSvg(v){
@@ -497,7 +542,7 @@ function buildMedallionSvg(v){
     const wantsOutline=(v.text_colors||'').toLowerCase().includes('outline') || plateFill==='#121316';
     const t=M('text',{'font-size':Math.max(26,D*0.047),'font-weight':900,fill:textFill,'text-anchor':'middle','letter-spacing':'.8'});
     if(wantsOutline){ t.setAttribute('stroke','#000'); t.setAttribute('stroke-width',Math.max(1.6,D*0.003)); t.setAttribute('paint-order','stroke'); }
-    const useRev = (v.flip_arc==='flipped') || (v.flip_arc==='auto' && view.rot%360>=180);
+    const useRev = (v.flip_arc==='flipped') || (v.flip_arc==='auto' && (view.rot%360+360)%360>=180);
     const tp=M('textPath',{href:useRev?'#topArcRev':'#topArc',startOffset:'50%',method:'align',spacing:'auto'},t);
     tp.textContent=(v.text_top.length>42 ? v.text_top.slice(0,41)+'…' : v.text_top).toUpperCase();
     svg.appendChild(t);
@@ -578,10 +623,10 @@ byId('fillView').addEventListener('click',fillView);
 byId('resetView').addEventListener('click',resetView);
 byId('rotateView').addEventListener('click',rotateView);
 
-/* ===== Gestures ===== */
+/* ===== Gestures (improved centric zoom) ===== */
 let pointers=new Map(), lastCenter=null, lastDist=null;
-stage.addEventListener('pointerdown',e=>{ stage.setPointerCapture(e.pointerId); pointers.set(e.pointerId,{x:e.clientX,y:e.clientY}); }, {passive:true});
-stage.addEventListener('pointerup',e=>{ try{stage.releasePointerCapture(e.pointerId)}catch{} pointers.delete(e.pointerId); if(pointers.size<2){ lastCenter=lastDist=null } }, {passive:true});
+stage.addEventListener('pointerdown',e=>{ stage.setPointerCapture?.(e.pointerId); pointers.set(e.pointerId,{x:e.clientX,y:e.clientY}); }, {passive:true});
+stage.addEventListener('pointerup',e=>{ try{stage.releasePointerCapture?.(e.pointerId)}catch{} pointers.delete(e.pointerId); if(pointers.size<2){ lastCenter=lastDist=null } }, {passive:true});
 stage.addEventListener('pointercancel',e=>{ pointers.delete(e.pointerId); if(pointers.size<2){ lastCenter=lastDist=null } }, {passive:true});
 stage.addEventListener('pointermove',e=>{
   if(!pointers.has(e.pointerId)) return;
@@ -612,13 +657,13 @@ stage.addEventListener('wheel',e=>{
 },{passive:false});
 stage.addEventListener('dblclick',()=>fit(),{passive:true});
 
-/* ===== Badge mirror ===== */
+/* ===== Badge mirror (opt-in) ===== */
 function renderBadge(svg){
-  const badge=byId('svgBadge'); if(!badge) return;
-  badge.innerHTML='';
+  const host=byId('svgBadge'); if(!host || !miniToggle.checked) return;
+  host.innerHTML='';
   const clone=svg.cloneNode(true);
   clone.setAttribute('viewBox','0 0 300 300'); clone.setAttribute('width','300'); clone.setAttribute('height','300');
-  badge.appendChild(clone);
+  host.appendChild(clone);
 }
 
 /* ===== Export ===== */
