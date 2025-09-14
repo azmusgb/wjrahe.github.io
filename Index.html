@@ -6,7 +6,7 @@
 <meta name="color-scheme" content="dark light" />
 <meta name="theme-color" content="#0b0d13" media="(prefers-color-scheme: dark)">
 <meta name="theme-color" content="#f6f8fc" media="(prefers-color-scheme: light)">
-<title>Medallion Forge — v6.1 (Scoped SVG + Single Init)</title>
+<title>Medallion Forge — Overhaul (mobile-safe, single-init)</title>
 
 <link href="https://fonts.cdnfonts.com/css/aurebesh" rel="stylesheet" />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -33,10 +33,12 @@
     --accent:#2563eb; --accent2:#22d3ee; --glow:rgba(37,99,235,.22);
     --line:#e7eaf0; --ok:#16a34a; --warn:#d97706; --bad:#dc2626;
   }
+
   *{box-sizing:border-box}
   html,body{height:100%}
   body{
-    margin:0; color:var(--ink); background:
+    margin:0; color:var(--ink);
+    background:
       radial-gradient(1200px 800px at 10% -10%, #1a1f2e 0%, #0000 60%),
       radial-gradient(1200px 800px at 110% 10%, #132032 0%, #0000 55%),
       var(--bg);
@@ -44,15 +46,20 @@
     -webkit-text-size-adjust:100%;
     padding-bottom:max(16px,env(safe-area-inset-bottom));
   }
+
+  /* Safe areas & toolbar height */
   header{
-    position:sticky; top:0; z-index:50; height:var(--header);
+    position:sticky; top:0; z-index:50; height:calc(var(--header) + env(safe-area-inset-top));
+    padding: max(0px, env(safe-area-inset-top)) 16px 0 16px;
     border-bottom:1px solid var(--line); backdrop-filter: blur(6px);
     background:linear-gradient(90deg, color-mix(in oklab,var(--panel) 92%, black 8%), color-mix(in oklab,var(--panel) 96%, black 4%));
-    display:flex; align-items:center; justify-content:space-between; gap:12px; padding:0 16px;
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
   }
+
   .brand{display:flex;gap:12px;align-items:center}
   .logo{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,var(--accent),var(--accent2)); box-shadow:0 0 18px var(--glow); color:#fff; font-weight:900}
   .pill{padding:4px 10px;border-radius:999px;background:linear-gradient(90deg,var(--accent),var(--accent2));color:#fff;font-size:11px;font-weight:700;letter-spacing:.4px}
+
   .chip,.btn{
     border:1px solid var(--line); background:var(--panel); color:var(--ink);
     border-radius:10px; padding:10px 14px; display:inline-flex; align-items:center; gap:6px;
@@ -78,8 +85,6 @@
   .profile:hover{border-color:var(--accent); box-shadow:0 0 0 3px var(--glow)}
   .thumb{width:48px;height:48px;border-radius:12px;display:grid;place-items:center;background:radial-gradient(120% 100% at 25% 20%,var(--accent) 0%,var(--accent2) 100%); color:#fff; font-weight:800}
   .tag{font-size:10px; padding:3px 8px; border-radius:999px; background:color-mix(in oklab, var(--accent) 20%, transparent); color:var(--accent)}
-  .searchbar{display:flex; gap:8px; margin-bottom:10px}
-  .searchbar input{flex:1}
 
   .grid{display:grid; gap:12px; grid-template-columns:1fr 1fr}
   @media (max-width:640px){ .grid{grid-template-columns:1fr} }
@@ -90,8 +95,6 @@
     background:color-mix(in oklab, var(--bg) 92%, black 8%); color:var(--ink); outline:none; transition:.2s; font:14px var(--sans);
   }
   input:focus,select:focus,textarea:focus{border-color:var(--accent); box-shadow:0 0 0 3px var(--glow); background:var(--panel)}
-  .colorrow{display:grid; grid-template-columns:1fr auto; gap:8px; align-items:center}
-  .swatch{width:42px;height:42px;border-radius:10px;border:1px solid var(--line)}
 
   .tabs{display:flex; gap:8px; border-bottom:1px solid var(--line); padding-bottom:8px; margin-bottom:12px}
   .tab{padding:10px 14px; background:transparent; border:1px solid transparent; border-radius:10px; color:var(--muted); font-weight:600; cursor:pointer}
@@ -99,16 +102,25 @@
   .tab[aria-selected="true"]{background:var(--glow); border-color:var(--accent); color:var(--accent)}
   .tabpanel[hidden]{display:none}
 
-  .stage{position:relative; height:64vh; min-height:420px; border:1px solid var(--line); border-radius:14px; overflow:hidden;
+  .stage{
+    position:relative;
+    /* fallback */
+    height:64vh;
+    /* mobile-safe: small viewport height prevents toolbar jumps */
+    height:64svh;
+    min-height:420px; border:1px solid var(--line); border-radius:14px; overflow:hidden;
     background:
       linear-gradient( to bottom right, #ffffff08, #0000 ),
       conic-gradient(from 0deg at 50% 50%, #0000 0 90deg, #0002 0 180deg, #0000 0) 0 0/28px 28px,
-      color-mix(in oklab,var(--panel) 96%, black 4%); touch-action:none;
+      color-mix(in oklab,var(--panel) 96%, black 4%);
+    touch-action:none;
   }
   #inner{position:absolute; top:50%; left:50%; transform-origin:0 0; will-change:transform}
 
+  /* Mini preview: hidden on phones to avoid “two SVGs” vibe */
   .badgePreview{display:grid; gap:8px; justify-items:center; border:1px dashed var(--line); border-radius:12px; padding:12px}
   #svgBadge{width:280px; height:280px}
+  @media (max-width: 900px){ .badgePreview{ display:none; } }
 
   dialog{border:1px solid var(--line); background:var(--panel); color:var(--ink); border-radius:16px; padding:0; max-width:92vw; width:560px; box-shadow:var(--shadow)}
   dialog::backdrop{background:rgba(0,0,0,.5); backdrop-filter: blur(4px)}
@@ -121,7 +133,7 @@
   .toast.show{transform:translateY(0); opacity:1}
   .toast.error{border-left-color:var(--bad)}
 
-  @media (max-width:480px){ header{height:56px} .logo{width:32px;height:32px} .card{padding:16px} }
+  @media (max-width:480px){ header{height:calc(56px + env(safe-area-inset-top))} .logo{width:32px;height:32px} .card{padding:16px} .chip,.btn{padding:8px 10px;min-height:36px} }
   @media (prefers-reduced-motion: reduce){ *{transition:none!important; animation:none!important} }
 </style>
 </head>
@@ -132,7 +144,7 @@
     <div>
       <div style="display:flex;gap:8px;align-items:center">
         <strong style="font-size:18px">Medallion Forge</strong>
-        <span class="pill">v6.1</span>
+        <span class="pill">Overhaul</span>
       </div>
       <div class="subtle">Profiles • Builder • Live SVG • Export</div>
     </div>
@@ -154,8 +166,8 @@
   <aside class="aside card">
     <h2><span class="material-icons" aria-hidden="true" style="font-size:18px">view_carousel</span> Profiles</h2>
 
-    <div class="searchbar">
-      <input id="profileSearch" placeholder="Search presets…" aria-label="Search presets">
+    <div class="toolbar" style="margin-bottom:10px">
+      <input id="profileSearch" placeholder="Search presets…" aria-label="Search presets" style="flex:1;min-width:0">
       <button id="addPresetBtn" class="chip" type="button" title="Save as preset"><span class="material-icons" aria-hidden="true">bookmark_add</span>Save</button>
     </div>
 
@@ -191,28 +203,19 @@
           <div class="subtle">Curved text along the top arc.</div>
         </div>
 
-        <div class="row colorrow">
-          <div>
-            <label for="rim_finish"><span class="material-icons">settings</span>Rim Finish</label>
-            <input id="rim_finish" placeholder="metallic silver">
-          </div>
-          <div class="swatch" id="sw_rim" title="Rim color preview"></div>
+        <div class="row">
+          <label for="rim_finish"><span class="material-icons">settings</span>Rim Finish</label>
+          <input id="rim_finish" placeholder="metallic silver">
         </div>
 
-        <div class="row colorrow">
-          <div>
-            <label for="plate_color"><span class="material-icons">palette</span>Plate Color</label>
-            <input id="plate_color" placeholder="black">
-          </div>
-          <input id="plate_hex" type="color" value="#121316" title="Plate hex">
+        <div class="row">
+          <label for="plate_color"><span class="material-icons">palette</span>Plate Color</label>
+          <input id="plate_color" placeholder="black">
         </div>
 
-        <div class="row colorrow">
-          <div>
-            <label for="text_colors"><span class="material-icons">format_color_text</span>Text Fill / Outline</label>
-            <input id="text_colors" placeholder="white with black outline">
-          </div>
-          <input id="text_hex" type="color" value="#ffffff" title="Text hex">
+        <div class="row">
+          <label for="text_colors"><span class="material-icons">format_color_text</span>Text Fill / Outline</label>
+          <input id="text_colors" placeholder="white with black outline">
         </div>
 
         <div class="row">
@@ -220,12 +223,9 @@
           <input id="state_shape" placeholder="state of Florida">
         </div>
 
-        <div class="row colorrow">
-          <div>
-            <label for="outline_color"><span class="material-icons">border_color</span>Outline Color</label>
-            <input id="outline_color" placeholder="white">
-          </div>
-          <input id="outline_hex" type="color" value="#ffffff" title="Outline hex">
+        <div class="row">
+          <label for="outline_color"><span class="material-icons">border_color</span>Outline Color</label>
+          <input id="outline_color" placeholder="white">
         </div>
 
         <div class="row">
@@ -246,12 +246,9 @@
           <input id="main_symbol" placeholder="Death Star">
         </div>
 
-        <div class="row colorrow">
-          <div>
-            <label for="symbol_color"><span class="material-icons">color_lens</span>Symbol Color</label>
-            <input id="symbol_color" placeholder="red with etched lines">
-          </div>
-          <input id="symbol_hex" type="color" value="#e43b44" title="Symbol hex">
+        <div class="row">
+          <label for="symbol_color"><span class="material-icons">color_lens</span>Symbol Color</label>
+          <input id="symbol_color" placeholder="red with etched lines">
         </div>
 
         <div class="row">
@@ -281,11 +278,6 @@
         <div class="row">
           <label for="style_keywords"><span class="material-icons">style</span>Style Keywords</label>
           <input id="style_keywords" placeholder="cinematic, heraldic, symmetrical">
-        </div>
-        <div class="row">
-          <label for="arc_radius"><span class="material-icons">trip_origin</span>Top Arc Radius</label>
-          <input id="arc_radius" type="range" min="55" max="88" step="1" value="78">
-          <div class="subtle">Fine-tune the text arc (percent of radius)</div>
         </div>
         <div class="row">
           <label for="out"><span class="material-icons">notes</span>Generated Prompt</label>
@@ -336,13 +328,21 @@
 <div id="toast" class="toast" role="status" aria-live="polite"><span class="material-icons" aria-hidden="true">check_circle</span><span id="toastMsg">Done</span></div>
 
 <script>
+/* ===========================================================
+   Idempotent boot guard (prevents double script execution)
+   =========================================================== */
+if (window.__MEDALLION_BOOTED__) {
+  console.debug('Medallion Forge: already booted; skipping duplicate init.');
+} else {
+  window.__MEDALLION_BOOTED__ = true;
+
 /* ===== Utilities ===== */
 const $=s=>document.querySelector(s);
 const $$=s=>Array.from(document.querySelectorAll(s));
 const byId=id=>document.getElementById(id);
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const NS='http://www.w3.org/2000/svg';
-const LS_FORM='medallion:form:v6.1';
+const LS_FORM='medallion:form:overhaul';
 const LS_THEME='medallion:theme:light';
 const LS_PRESETS='medallion:presets:v2';
 const safeLS={ get:k=>{try{return localStorage.getItem(k)}catch{return null}}, set:(k,v)=>{try{localStorage.setItem(k,v)}catch{}} };
@@ -360,7 +360,7 @@ function setTab(t){ const id=t.dataset.tab; tabs.forEach(btn=>{const a=btn===t; 
 tabs.forEach((t,i)=>{ t.addEventListener('click',()=>setTab(t)); t.addEventListener('keydown',e=>{ if(e.key==='ArrowRight') setTab(tabs[(i+1)%tabs.length]); if(e.key==='ArrowLeft') setTab(tabs[(i-1+tabs.length)%tabs.length]); if(e.key==='Home') setTab(tabs[0]); if(e.key==='End') setTab(tabs.at(-1)); }, {passive:true}); });
 setTab(tabs[0]);
 
-/* ===== Presets & Profiles ===== */
+/* ===== Presets ===== */
 const DEFAULT_PRESETS=[
   {id:'fl_army',name:'Florida + Army',note:'Aurebesh rim • Crossed sabers',thumb:'FL',form:{text_top:"SAINT CLOUD JEDI",rim_finish:"metallic silver",plate_color:"black",text_colors:"white with black outline",state_shape:"state of Florida",outline_color:"white",main_symbol:"Death Star",symbol_color:"red with etched lines",badge_elements:"concentric rings",secondary_symbol:"Army star emblem",aurebesh_style:"glowing Aurebesh along rim",sabers_desc:"two crossed sabers glow",style_keywords:"cinematic, heraldic, symmetrical",flip_arc:"auto"}},
   {id:'det_wings',name:'Detroit + Wings',note:'Sports fusion • 3 beams',thumb:'DET',form:{text_top:"DETROIT JEDI",rim_finish:"polished steel",plate_color:"black",text_colors:"white",state_shape:"medallion field",outline_color:"red/black",main_symbol:"Death Star",symbol_color:"red etched",badge_elements:"concentric rings",secondary_symbol:"",aurebesh_style:"glowing inscriptions",sabers_desc:"three angled beams glow",style_keywords:"sports fusion, symmetrical",flip_arc:"auto"}},
@@ -398,8 +398,8 @@ byId('addPresetBtn').addEventListener('click', ()=>{
   setPresets(arr); toast('Preset saved');
 });
 
-/* ===== Form IO (with mute guard) ===== */
-let MUTE=false;   // prevents generate() on programmatic updates
+/* ===== Form IO (mute guard) ===== */
+let MUTE=false;
 const FIELDS=["text_top","rim_finish","plate_color","text_colors","state_shape","outline_color","main_symbol","symbol_color","badge_elements","secondary_symbol","aurebesh_style","sabers_desc","style_keywords","flip_arc"];
 function readForm(){
   const v={}; FIELDS.forEach(id=>v[id]=(byId(id)?.value||'').trim());
@@ -416,31 +416,19 @@ function readForm(){
   v.sabers_desc||="two crossed sabers glow";
   v.style_keywords||="cinematic, heraldic, symmetrical";
   v.flip_arc||="auto";
-  v.arc_radius = Number(byId('arc_radius').value||78);
-  v._hex_plate = byId('plate_hex').value;
-  v._hex_text = byId('text_hex').value;
-  v._hex_outline = byId('outline_hex').value;
-  v._hex_symbol = byId('symbol_hex').value;
   return v;
 }
 function fillForm(data, andGenerate=false){
   MUTE=true;
-  FIELDS.concat(['arc_radius']).forEach(k=>{ const el=byId(k); if(el && data[k]!=null){ el.value=data[k]; }});
-  if(data._hex_plate) byId('plate_hex').value=data._hex_plate;
-  if(data._hex_text) byId('text_hex').value=data._hex_text;
-  if(data._hex_outline) byId('outline_hex').value=data._hex_outline;
-  if(data._hex_symbol) byId('symbol_hex').value=data._hex_symbol;
+  FIELDS.forEach(k=>{ const el=byId(k); if(el && data[k]!=null){ el.value=data[k]; }});
   MUTE=false;
   if(andGenerate) generate();
 }
 let saveT;
 function autosave(){ clearTimeout(saveT); saveT=setTimeout(()=>safeLS.set(LS_FORM, JSON.stringify(readForm())),200); }
-[...FIELDS,'arc_radius'].forEach(id=>{
+FIELDS.forEach(id=>{
   const el=byId(id); if(!el) return;
   ['input','change'].forEach(ev=>el.addEventListener(ev,()=>{ if(MUTE) return; generate(); autosave(); }, {passive:true}));
-});
-['plate_hex','text_hex','outline_hex','symbol_hex'].forEach(id=>{
-  byId(id).addEventListener('input', ()=>{ if(MUTE) return; generate(); autosave(); }, {passive:true});
 });
 byId('clearBtn').addEventListener('click', ()=>{ localStorage.removeItem(LS_FORM); fillForm({}, true); toast('Cleared'); });
 
@@ -457,16 +445,13 @@ function buildPrompt(v){
   ].join("\n");
 }
 
-/* ===== Color helpers ===== */
-function colorPick(key, table, fallback){ key=(key||'').toLowerCase(); for(const [k,v] of table){ if(k && key.includes(k)) return v; } return fallback; }
-
 /* ===== Stage & SVG ===== */
 const stage=byId('stage'), inner=byId('inner'), hudZoom=byId('hudZoom'), hudSize=byId('hudSize'), meta=byId('meta'), sizeSelect=byId('sizeSelect');
 let view={x:0,y:0,k:1,min:.06,max:10,w:640,h:640,rot:0};
 new ResizeObserver(()=>{ const r=stage.getBoundingClientRect(); hudSize.textContent=`${Math.round(r.width)}×${Math.round(r.height)}px`; renderPreview(); }).observe(stage);
 sizeSelect.addEventListener('change',()=>{ view.w=view.h=Number(sizeSelect.value||640); generate(); setTimeout(fit,0); });
 
-/* Scoped element factory — NO default to #inner */
+/* Scoped element factory (no default to #inner) */
 function makeFactory(root){
   return function M(name, attrs={}, parent){
     const el=document.createElementNS(NS,name);
@@ -480,6 +465,8 @@ function makeFactory(root){
   };
 }
 
+function colorPick(key, table, fallback){ key=(key||'').toLowerCase(); for(const [k,v] of table){ if(k && key.includes(k)) return v; } return fallback; }
+
 function buildMedallionSvg(v){
   const D=view.w, R=D/2;
   const svg=document.createElementNS(NS,'svg');
@@ -488,21 +475,18 @@ function buildMedallionSvg(v){
 
   const M = makeFactory(svg);
 
-  // Palette
-  const plateFill = v._hex_plate || colorPick(v.plate_color,[['black','#121316'],['navy','#0b2346'],['crimson','#5c0b12'],['gray','#2a2f3a'],['white','#f3f6f9']], '#121316');
+  const plateFill = colorPick(v.plate_color,[['black','#121316'],['navy','#0b2346'],['crimson','#5c0b12'],['gray','#2a2f3a'],['white','#f3f6f9']], '#121316');
   const rimColor   = colorPick(v.rim_finish,[['gold','#ffd54a'],['silver','#c0c7ce'],['steel','#b0b7c3'],['bronze','#c18b52'],['obsidian','#000']], '#a9bdd1');
-  const textFill   = v._hex_text || colorPick(v.text_colors,[['white','#fff'],['gold','#ffd54a'],['silver','#c0c7ce'],['cyan','#6ee7ff'],['red','#e43b44'],['black','#000']], '#fff');
-  const symColor   = v._hex_symbol || colorPick(v.symbol_color,[['red','#e43b44'],['silver','#c0c7ce'],['gold','#ffd54a'],['white','#fff'],['blue','#3b6ee4'],['cyan','#6ee7ff']], '#6ee7ff');
-  const outlineCol = v._hex_outline || colorPick(v.outline_color,[['white','#ffffff'],['gold','#ffd54a'],['silver','#c0c7ce'],['red','#e43b44'],['blue','#3b6ee4']], '#ffffff');
+  const textFill   = colorPick(v.text_colors,[['white','#fff'],['gold','#ffd54a'],['silver','#c0c7ce'],['cyan','#6ee7ff'],['red','#e43b44'],['black','#000']], '#fff');
+  const symColor   = colorPick(v.symbol_color,[['red','#e43b44'],['silver','#c0c7ce'],['gold','#ffd54a'],['white','#fff'],['blue','#3b6ee4'],['cyan','#6ee7ff']], '#6ee7ff');
+  const outlineCol = colorPick(v.outline_color,[['white','#ffffff'],['gold','#ffd54a'],['silver','#c0c7ce'],['red','#e43b44'],['blue','#3b6ee4']], '#ffffff');
 
-  // Defs & arcs
   const defs=M('defs');
   M('style',{},defs).textContent=`.ns{vector-effect:non-scaling-stroke;shape-rendering:crispEdges}.round{stroke-linecap:round;stroke-linejoin:round}`;
-  const sweepA=R*(Number(v.arc_radius||78)/100), y=R-sweepA;
+  const sweepA=R*0.78, y=R-sweepA;
   M('path',{id:'topArc',d:`M ${R- sweepA} ${y} A ${sweepA} ${sweepA} 0 0 1 ${R+ sweepA} ${y}`},defs);
   M('path',{id:'topArcRev',d:`M ${R+ sweepA} ${y} A ${sweepA} ${sweepA} 0 0 0 ${R- sweepA} ${y}`},defs);
 
-  // Rings
   const gBase=M('g');
   M('circle',{cx:R,cy:R,r:R*0.94,fill:plateFill,stroke:rimColor,'stroke-width':Math.max(8,D*0.015),class:'ns'},gBase);
   M('circle',{cx:R,cy:R,r:R*0.985,fill:'none',stroke:rimColor,'stroke-width':Math.max(2,D*0.004),class:'ns'},gBase);
@@ -512,7 +496,6 @@ function buildMedallionSvg(v){
     [0.76,0.64,0.54].forEach((p,i)=>M('circle',{cx:R,cy:R,r:R*p,fill:'none',stroke: i===1 ? '#7fbbe0' : rimColor,'stroke-width':Math.max(1,D*0.0026),'stroke-dasharray': i===1?'6 6':null,class:'ns'},gBase));
   }
 
-  // Arc text
   if((v.text_top||'').trim()){
     const wantsOutline=(v.text_colors||'').toLowerCase().includes('outline') || plateFill==='#121316';
     const t=M('text',{'font-size':Math.max(26,D*0.047),'font-weight':900,fill:textFill,'text-anchor':'middle','letter-spacing':'.8'});
@@ -523,7 +506,6 @@ function buildMedallionSvg(v){
     svg.appendChild(t);
   }
 
-  // Central outline
   if((v.state_shape||'').toLowerCase().includes('florida')){
     const path=`M ${R-90} ${R+30} C ${R-40} ${R-10}, ${R+10} ${R-6}, ${R+64} ${R+18}
                 C ${R+90} ${R+32}, ${R+96} ${R+56}, ${R+122} ${R+80}
@@ -535,7 +517,6 @@ function buildMedallionSvg(v){
     M('circle',{cx:R,cy:R,r:R*0.34,fill:'none',stroke:outlineCol,'stroke-width':Math.max(3,D*0.005),'class':'ns'});
   }
 
-  // Main symbol
   const g=M('g');
   const ms=(v.main_symbol||'').toLowerCase();
   if(ms.includes('death')){
@@ -563,7 +544,6 @@ function buildMedallionSvg(v){
     M('polygon',{points:starPts(R+0.4*D,R-0.25*D,0.075*D,0.04*D,5),fill:'none',stroke:'#d4af37','stroke-width':Math.max(3,D*0.0046),class:'ns'});
   }
 
-  // Sabers
   const saber=(x1,y1,x2,y2)=>{
     M('line',{x1,y1,x2,y2,stroke:'#9feaff','stroke-opacity':.22,'stroke-width':Math.max(12,D*0.02),class:'ns round'});
     M('line',{x1,y1,x2,y2,stroke:'#79e4ff','stroke-opacity':.38,'stroke-width':Math.max(7,D*0.011),class:'ns round'});
@@ -574,12 +554,10 @@ function buildMedallionSvg(v){
   else if(s.includes('three')||/\b3\b/.test(s)){ saber(R-0.31*D,R+0.37*D,R+0.31*D,R+0.37*D); saber(R-0.22*D,R+0.40*D,R+0.12*D,R+0.12*D); saber(R+0.22*D,R+0.40*D,R-0.12*D,R+0.12*D); }
   else{ saber(R,R-0.12*D,R,R+0.40*D); }
 
-  // Aurebesh ring
   const aure=(v.aurebesh_style||'').toLowerCase();
   if(aure.includes('glow')||aure.includes('aurebesh')||aure.includes('rune')||aure.includes('inscription')){
     M('circle',{cx:R,cy:R,r:R*0.68,fill:'none',stroke:'#6ee7ff','stroke-width':Math.max(2,D*0.003),'stroke-dasharray':'6 6','stroke-opacity':.75,class:'ns'});
   }
-
   return svg;
 }
 
@@ -679,19 +657,10 @@ byId('downloadBtn').addEventListener('click',()=>{
   const blob=new Blob([byId('out').value||''],{type:'text/plain'}); const u=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=u; a.download='medallion_prompt.txt'; a.click(); revokeLater(u); toast('TXT downloaded');
 });
 
-/* ===== JSON modal ===== */
-const jsonModal=byId('jsonModal');
-byId('exportJsonBtn').addEventListener('click',()=>{ byId('jsonArea').value=JSON.stringify(readForm(),null,2); jsonModal.showModal(); });
-byId('importJsonBtn').addEventListener('click',()=>{ byId('jsonArea').value=''; jsonModal.showModal(); });
-byId('closeJson').addEventListener('click',()=>jsonModal.close());
-byId('copyJson').addEventListener('click',()=>navigator.clipboard?.writeText(byId('jsonArea').value||'').then(()=>toast('JSON copied')));
-byId('applyJson').addEventListener('click',()=>{ try{ const obj=JSON.parse(byId('jsonArea').value||'{}'); fillForm(obj,true); jsonModal.close(); toast('JSON applied'); }catch{ toast('Invalid JSON',true); }});
-
 /* ===== Generate ===== */
 function updateOutputs(v){
   const svg=buildMedallionSvg(v);
   mount(svg); renderPreview(); renderBadge(svg);
-  byId('sw_rim').style.background = colorPick(v.rim_finish,[['gold','#ffd54a'],['silver','#c0c7ce'],['steel','#b0b7c3'],['bronze','#c18b52'],['obsidian','#000']], '#a9bdd1');
 }
 function generate(){
   const v=readForm();
@@ -710,10 +679,10 @@ addEventListener('keydown',e=>{
   const saved=safeLS.get(LS_FORM);
   if(saved){ try{ fillForm(JSON.parse(saved), false); }catch{ fillForm(DEFAULT_PRESETS[0].form, false); } }
   else { fillForm(DEFAULT_PRESETS[0].form, false); }
-  // single, explicit render
   generate();
   setTimeout(()=>fit(), 80);
 })();
+} // end idempotent guard
 </script>
 </body>
 </html>
