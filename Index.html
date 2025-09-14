@@ -1,604 +1,636 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<meta name="color-scheme" content="dark light" />
-<title>Medallion Prompt Builder — Ultimate+</title>
-
-<!-- Fonts (swap to avoid FOIT on mobile) -->
-<link href="https://fonts.cdnfonts.com/css/aurebesh" rel="stylesheet" />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons&display=swap" rel="stylesheet" />
-
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Medallion Forge — Badge Builder</title>
 <style>
   :root{
-    --bg:#0b0d13; --panel:#151923; --ink:#e8ecf1; --muted:#9aa3af;
-    --accent:#6ee7ff; --accent-2:#6476ff; --accent-glow:rgba(110,231,255,.35);
-    --line:#252b39; --success:#4ade80; --warning:#fbbf24; --danger:#f87171;
-    --mono:"JetBrains Mono","Fira Code",ui-monospace,Menlo,Consolas,monospace;
-    --sans:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;
-    --aurebesh:'Aurebesh', var(--sans); --radius:16px; --shadow:0 12px 32px rgba(0,0,0,.28);
+    --bg:#0f1115; --panel:#151923; --ink:#e8ecf1; --muted:#a0a8b8; --line:#252b39;
+    --accent:#6ee7ff; --accent-2:#7c8cff; --danger:#ff5c5c; --ok:#4ade80;
+    --mono: ui-monospace,Menlo,Consolas,monospace;
+    --sans: Inter, system-ui, Segoe UI, Roboto, Arial, sans-serif;
   }
   @media (prefers-color-scheme: light){
-    :root{ --bg:#f5f7fb; --panel:#fff; --ink:#0f172a; --muted:#64748b;
-      --accent:#2563eb; --accent-2:#22d3ee; --accent-glow:rgba(37,99,235,.25); --line:#e5e7eb; --success:#16a34a; --warning:#d97706; --danger:#dc2626;}
+    :root{ --bg:#f6f7fb; --panel:#ffffff; --ink:#0e1218; --muted:#5b6472; --line:#e6e8ef; --accent:#0ea5e9; --accent-2:#6366f1; }
   }
-  .light-theme{
-    --bg:#f5f7fb; --panel:#fff; --ink:#0f172a; --muted:#64748b;
-    --accent:#2563eb; --accent-2:#22d3ee; --accent-glow:rgba(37,99,235,.25); --line:#e5e7eb; --success:#16a34a; --warning:#d97706; --danger:#dc2626;
-  }
-
   *{box-sizing:border-box}
   html,body{height:100%}
-  body{
-    margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 var(--sans);
-    -webkit-text-size-adjust:100%;
-    overflow-x:hidden;
+  body{margin:0;background:linear-gradient(180deg, var(--bg) 0%, #0b0d13 100%);color:var(--ink);font:14px/1.5 var(--sans)}
+  a{color:var(--accent)}
+  .wrap{
+    display:grid; gap:16px; padding:16px; max-width:1200px; margin:0 auto;
+    grid-template-columns: 380px 1fr;
   }
-
-  header{
-    position:sticky;top:0;z-index:9;padding:14px 18px;border-bottom:1px solid var(--line);
-    background:color-mix(in oklab, var(--bg) 92%, black 8%);backdrop-filter:blur(6px);
-    display:flex;align-items:center;justify-content:space-between
+  @media (max-width: 960px){
+    .wrap{grid-template-columns:1fr}
   }
-  .brand{display:flex;align-items:center;gap:10px}
-  .logo{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;
-    background:linear-gradient(135deg,var(--accent) 0%,var(--accent-2) 100%);box-shadow:0 0 18px var(--accent-glow)}
-  .pill{padding:3px 8px;border-radius:999px;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;font-size:11px;font-weight:700}
-  .theme-toggle{border:1px solid var(--line);color:var(--muted);background:var(--panel);border-radius:10px;padding:6px 10px;display:flex;gap:6px;align-items:center;cursor:pointer}
-  .theme-toggle:hover{border-color:var(--accent);color:var(--accent)}
-  .kbd{font:11px var(--mono);border:1px solid var(--line);border-radius:6px;padding:2px 6px}
-
-  /* App layout: Profiles | Builder | Output */
-  .app{
-    max-width:1400px;margin:22px auto;padding:0 16px;display:grid;gap:18px;
-    grid-template-columns:280px 1fr 1fr;align-items:start
+  header{grid-column:1/-1; display:flex; gap:12px; align-items:center; justify-content:space-between}
+  .brand{display:flex; gap:10px; align-items:center}
+  .badge{width:28px; height:28px; border-radius:50%; background:radial-gradient(circle at 30% 30%, var(--accent), var(--accent-2)); box-shadow:0 0 0 2px #0004, inset 0 0 16px #0006}
+  h1{margin:0;font-size:18px;letter-spacing:.3px}
+  .panel{
+    background:linear-gradient(180deg, var(--panel), color-mix(in srgb, var(--panel) 92%, black));
+    border:1px solid var(--line); border-radius:12px; padding:14px;
+    box-shadow: 0 2px 12px #0004;
   }
-  @media (max-width:1200px){ .app{grid-template-columns:1fr 1fr} .aside{grid-column:1/-1;order:-1} }
-  @media (max-width:800px){ .app{grid-template-columns:1fr} .aside{order:-1} }
-
-  .card{background:color-mix(in oklab, var(--panel) 98%, black 2%);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px}
-  .card h2{font-size:14px;margin:0 0 10px 0;letter-spacing:.2px;display:flex;align-items:center;gap:6px;color:color-mix(in oklab,var(--ink) 85%, var(--muted) 15%)}
-  .subtle{color:var(--muted);font-size:12px}
-
-  .profiles{display:grid;gap:10px}
-  .profile{
-    display:grid;grid-template-columns:56px 1fr;gap:10px;align-items:center;
-    border:1px solid var(--line);border-radius:12px;padding:10px;background:var(--panel);cursor:pointer;transition:.2s;
+  .controls{display:grid; gap:12px; align-content:start; position:relative}
+  .section{border:1px dashed var(--line); border-radius:10px; padding:12px}
+  .section h3{margin:0 0 8px 0; font-size:13px; letter-spacing:.2px; color:var(--muted)}
+  .row{display:grid; grid-template-columns: 1fr 1fr; gap:8px}
+  .row-3{display:grid; grid-template-columns: 1fr 1fr 1fr; gap:8px}
+  .field{display:flex; flex-direction:column; gap:6px}
+  label{font-size:12px; color:var(--muted)}
+  input[type="text"], input[type="number"], select, textarea{
+    background:#0b0e14; color:var(--ink); border:1px solid var(--line); border-radius:8px; padding:10px 10px; outline:none;
   }
-  .profile:hover{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
-  .thumb{width:56px;height:56px;border-radius:10px;background:radial-gradient(100% 100% at 25% 20%, var(--accent) 0%, var(--accent-2) 100%);display:grid;place-items:center;color:#fff;font-weight:800}
-  .tag{display:inline-block;padding:2px 8px;border-radius:999px;background:color-mix(in oklab,var(--accent) 25%, transparent);color:var(--accent);font-size:10px;font-weight:700}
-
-  .tabs{display:flex;gap:8px;border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:12px}
-  .tab{padding:8px 12px;border-radius:8px;border:1px solid transparent;background:transparent;color:var(--muted);cursor:pointer}
-  .tab[aria-selected="true"]{background:var(--accent-glow);border-color:var(--accent);color:var(--accent)}
-  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  @media (max-width:600px){ .grid{grid-template-columns:1fr} }
-
-  .row{display:grid;gap:6px}
-  label{font-size:12px;font-weight:700;color:color-mix(in oklab, var(--ink) 85%, var(--muted) 15%)}
-  input,select,textarea{
-    width:100%;padding:11px 12px;border-radius:10px;border:1px solid var(--line);
-    background:color-mix(in oklab,var(--bg) 92%, black 8%);color:var(--ink);outline:none
+  input[type="color"]{height:36px; padding:0; border-radius:8px; border:1px solid var(--line); background:#0b0e14}
+  input[type="checkbox"]{transform:translateY(2px)}
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    padding:10px 12px; border-radius:10px; border:1px solid var(--line);
+    background:#0b0e14; color:var(--ink); cursor:pointer; user-select:none;
   }
-  input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
-  textarea{min-height:200px;font:12.5px/1.55 var(--mono);resize:vertical}
-  .btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
-  .btn,.chip{
-    padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--panel);
-    color:var(--ink);cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:.15s;font-weight:600;min-height:40px
+  .btn.primary{background:linear-gradient(180deg, var(--accent), var(--accent-2)); color:white; border-color:transparent}
+  .btn.ghost{background:transparent}
+  .btn:active{transform:translateY(1px)}
+  .stack{display:flex; gap:8px; flex-wrap:wrap}
+  .profiles{display:grid; grid-template-columns:repeat(3,1fr); gap:8px}
+  @media (max-width:960px){ .profiles{grid-template-columns:repeat(2,1fr)} }
+  @media (max-width:520px){ .profiles{grid-template-columns:1fr} }
+  .card{
+    padding:10px; border:1px solid var(--line); border-radius:10px; cursor:pointer; position:relative; overflow:hidden;
+    background:linear-gradient(180deg,#0b0e14,#0c111a);
   }
-  .btn:hover,.chip:hover{border-color:var(--accent);color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
-  .primary{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;border:none}
-
-  .out-wrap{display:grid;gap:12px}
-  .monobox{
-    font:12.5px/1.55 var(--mono);white-space:pre-wrap;background:color-mix(in oklab,var(--bg) 92%, black 8%);
-    border:1px dashed color-mix(in oklab,var(--line) 90%, black 10%);border-radius:12px;padding:14px;min-height:120px
+  .card:hover{outline:1px solid color-mix(in srgb, var(--accent) 60%, transparent)}
+  .card h4{margin:0 0 4px 0; font-size:13px}
+  .card p{margin:0; font-size:12px; color:var(--muted)}
+  .previewWrap{position:relative}
+  .previewBar{display:flex; gap:8px; justify-content:space-between; align-items:center; margin-bottom:10px}
+  #svgStage{
+    width:100%; aspect-ratio:1/1; display:block; border-radius:12px; background:#0b0e14;
+    border:1px solid var(--line); box-shadow: inset 0 0 40px #0007;
   }
-  .preview{display:grid;gap:12px;justify-items:center;border:1px solid var(--line);border-radius:14px;padding:14px;background:color-mix(in oklab,var(--panel) 96%, black 4%)}
-  #svgPreview{
-    width:320px;height:320px;border-radius:50%;background:radial-gradient(ellipse at center, rgba(0,0,0,.0) 55%, rgba(0,0,0,.35) 100%);
-    box-shadow:0 0 28px rgba(110,231,255,.18);transition:transform .3s;will-change:transform;touch-action:manipulation;
+  .hint{font-size:12px; color:var(--muted)}
+  .toolbar{display:flex; gap:8px; flex-wrap:wrap}
+  .kvs{display:grid; grid-template-columns:1fr auto; gap:8px; align-items:center}
+  .toast{
+    position:fixed; left:50%; bottom:18px; transform:translateX(-50%); padding:10px 14px;
+    background:#0b0e14; color:var(--ink); border:1px solid var(--line); border-radius:999px; box-shadow:0 6px 30px #0008;
+    opacity:0; pointer-events:none; transition:.25s ease; font-size:13px;
   }
-  .preview-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-  .zoom-btn{width:40px;height:40px;border-radius:50%;display:grid;place-items:center}
-
-  .toast{position:fixed;bottom:20px;right:20px;z-index:50;transform:translateY(80px);opacity:0;background:var(--panel);
-    border:1px solid var(--line);border-left:4px solid var(--success);border-radius:10px;padding:12px 14px;box-shadow:var(--shadow);
-    display:flex;gap:8px;align-items:center;transition:.35s cubic-bezier(.2,.8,.2,1)}
-  .toast.show{transform:translateY(0);opacity:1}
-  .toast.error{border-left-color:var(--danger)}
-
-  @keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
-  .spinning{animation:spin 18s linear infinite}
-  @media (prefers-reduced-motion: reduce){
-    .spinning{animation:none !important}
-    #svgPreview{transition:none}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(-6px)}
+  /* Tight mobile spacing */
+  @media (max-width:420px){
+    .row, .row-3{grid-template-columns:1fr}
+    .previewBar{flex-direction:column; align-items:stretch}
   }
-
-  /* Phone-first spacing */
-  @media (max-width: 480px) {
-    header { padding: 12px 12px; }
-    .card { padding: 12px; border-radius: 14px; }
-    .preview { padding: 12px; }
-    #svgPreview { max-width: 100%; height: auto; }
-    .monobox { font-size: 12px; line-height: 1.45; }
-  }
-
-  /* Simple modal for import/export JSON */
-  dialog::backdrop{ background:rgba(0,0,0,.35) }
-  .modal-head{display:flex;gap:8px;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);padding:10px}
-  .modal-body{padding:10px}
-  .modal-actions{display:flex;gap:8px;justify-content:flex-end;padding:10px;border-top:1px solid var(--line)}
 </style>
 </head>
 <body>
-<header>
-  <div class="brand">
-    <div class="logo" aria-hidden="true">⚔️</div>
-    <div>
-      <div style="display:flex;align-items:center;gap:8px">
-        <strong>Medallion Prompt Builder</strong> <span class="pill">Ultimate+</span>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="badge" aria-hidden="true"></div>
+        <h1>Medallion Forge — Imperial Badge Builder</h1>
       </div>
-      <div class="subtle">Profiles • Builder • Live SVG • Exports</div>
-    </div>
-  </div>
-  <button id="themeToggle" class="theme-toggle" type="button" aria-pressed="false">
-    <span class="material-icons" aria-hidden="true">dark_mode</span><span id="themeLabel">Dark</span>
-  </button>
-</header>
-
-<main class="app">
-  <!-- LEFT: Profiles -->
-  <aside class="aside card">
-    <h2><span class="material-icons" style="font-size:18px" aria-hidden="true">view_carousel</span> Profiles</h2>
-    <div class="profiles" role="list">
-      <button class="profile" data-profile="fl_army" role="listitem" type="button" aria-label="Load profile Florida plus Army">
-        <div class="thumb">FL</div><div><strong>Florida + Army</strong><div class="subtle">Aurebesh rim • Crossed sabers</div><span class="tag">Preset</span></div>
-      </button>
-      <button class="profile" data-profile="det_wings" role="listitem" type="button" aria-label="Load profile Detroit Wings">
-        <div class="thumb">DET</div><div><strong>Detroit + Wings</strong><div class="subtle">Sports fusion • 3 beams</div><span class="tag">Preset</span></div>
-      </button>
-      <button class="profile" data-profile="jedi_generic" role="listitem" type="button" aria-label="Load profile Galactic Jedi">
-        <div class="thumb">JEDI</div><div><strong>Galactic Jedi</strong><div class="subtle">Navy plate • Vertical glow</div><span class="tag">Preset</span></div>
-      </button>
-    </div>
-    <div style="margin-top:12px" class="btns">
-      <button id="saveBtn" class="chip" type="button"><span class="material-icons" aria-hidden="true">bookmark_add</span>Save Current</button>
-      <button id="loadBtn" class="chip" type="button"><span class="material-icons" aria-hidden="true">folder_open</span>Load Saved</button>
-      <button id="randBtn" class="chip" type="button"><span class="material-icons" aria-hidden="true">casino</span>Randomize</button>
-      <button id="exportJsonBtn" class="chip" type="button"><span class="material-icons" aria-hidden="true">ios_share</span>Export JSON</button>
-      <button id="importJsonBtn" class="chip" type="button"><span class="material-icons" aria-hidden="true">download</span>Import JSON</button>
-    </div>
-  </aside>
-
-  <!-- MIDDLE: Builder -->
-  <section class="card" aria-label="Builder">
-    <h2><span class="material-icons" style="font-size:18px" aria-hidden="true">tune</span> Builder</h2>
-    <div class="tabs" role="tablist" aria-label="Sections">
-      <button class="tab" id="tab-basic" role="tab" aria-controls="panel-basic" aria-selected="true" data-tab="basic">Basic</button>
-      <button class="tab" id="tab-symbols" role="tab" aria-controls="panel-symbols" aria-selected="false" data-tab="symbols" tabindex="-1">Symbols</button>
-      <button class="tab" id="tab-advanced" role="tab" aria-controls="panel-advanced" aria-selected="false" data-tab="advanced" tabindex="-1">Advanced</button>
-    </div>
-
-    <div id="panel-basic" class="tab-panel" role="tabpanel" aria-labelledby="tab-basic">
-      <div class="grid">
-        <div class="row"><label for="text_top">Top Text</label><input id="text_top" placeholder="SAINT CLOUD JEDI" autocomplete="off"></div>
-        <div class="row"><label for="rim_finish">Rim Finish</label><input id="rim_finish" placeholder="metallic silver" autocomplete="off"></div>
-        <div class="row"><label for="plate_color">Plate Color</label><input id="plate_color" placeholder="black" autocomplete="off"></div>
-        <div class="row"><label for="text_colors">Text Fill / Outline</label><input id="text_colors" placeholder="white with black outline" autocomplete="off"></div>
-        <div class="row"><label for="state_shape">Main Outline</label><input id="state_shape" placeholder="state of Florida" autocomplete="off"></div>
-        <div class="row"><label for="outline_color">Outline Color</label><input id="outline_color" placeholder="white" autocomplete="off"></div>
+      <div class="stack">
+        <button class="btn" id="toggleTheme" title="Toggle theme">Theme</button>
+        <button class="btn ghost" id="resetAll">Reset</button>
       </div>
-    </div>
+    </header>
 
-    <div id="panel-symbols" class="tab-panel" role="tabpanel" aria-labelledby="tab-symbols" hidden>
-      <div class="grid">
-        <div class="row"><label for="main_symbol">Main Symbol</label><input id="main_symbol" placeholder="Death Star" autocomplete="off"></div>
-        <div class="row"><label for="symbol_color">Symbol Color</label><input id="symbol_color" placeholder="red with etched lines" autocomplete="off"></div>
-        <div class="row"><label for="badge_elements">Badge Elements</label><input id="badge_elements" placeholder="concentric rings" autocomplete="off"></div>
-        <div class="row"><label for="secondary_symbol">Secondary Symbol</label><input id="secondary_symbol" placeholder="Army star (optional)" autocomplete="off"></div>
-        <div class="row"><label for="aurebesh_style">Aurebesh Style</label><input id="aurebesh_style" placeholder="glowing Aurebesh along rim" autocomplete="off"></div>
-        <div class="row"><label for="sabers_desc">Lightsabers</label><input id="sabers_desc" placeholder="two crossed sabers glow" autocomplete="off"></div>
+    <!-- LEFT: Controls -->
+    <aside class="panel controls" aria-label="Controls">
+      <div class="section">
+        <h3>Profile presets</h3>
+        <div class="profiles" id="profiles"></div>
       </div>
-    </div>
 
-    <div id="panel-advanced" class="tab-panel" role="tabpanel" aria-labelledby="tab-advanced" hidden>
-      <div class="row"><label for="style_keywords">Style Keywords</label><input id="style_keywords" placeholder="cinematic, heraldic, symmetrical" autocomplete="off"></div>
-      <div class="btns" role="group" aria-label="Actions">
-        <button id="gen" class="btn primary" type="button"><span class="material-icons" aria-hidden="true">bolt</span>Generate</button>
-        <button id="copyBtn" class="btn" type="button"><span class="material-icons" aria-hidden="true">content_copy</span>Copy Text</button>
-        <button id="downloadBtn" class="btn" type="button"><span class="material-icons" aria-hidden="true">save</span>Download TXT</button>
-        <button id="downloadSvgBtn" class="btn" type="button"><span class="material-icons" aria-hidden="true">image</span>Export SVG</button>
-        <button id="downloadPngBtn" class="btn" type="button"><span class="material-icons" aria-hidden="true">photo</span>Export PNG</button>
-      </div>
-      <div class="subtle" style="margin-top:8px">Shortcuts: <span class="kbd">Ctrl/⌘ + Enter</span> generate • <span class="kbd">Ctrl/⌘ + C</span> copy</div>
-    </div>
-  </section>
-
-  <!-- RIGHT: Output -->
-  <section class="card" aria-label="Output">
-    <h2><span class="material-icons" style="font-size:18px" aria-hidden="true">visibility</span> Output</h2>
-    <div class="out-wrap">
-      <div class="row"><label for="out">Generated Prompt</label><textarea id="out" spellcheck="false" aria-describedby="preview"></textarea></div>
-      <div class="preview" aria-live="polite">
-        <svg id="svgPreview" viewBox="0 0 300 300" role="img" aria-label="Medallion preview"></svg>
-        <div class="preview-controls">
-          <button id="zoomOut" class="chip zoom-btn" type="button" aria-label="Zoom out"><span class="material-icons" aria-hidden="true">remove</span></button>
-          <span id="zoomLevel" class="subtle" aria-live="polite">100%</span>
-          <button id="zoomIn" class="chip zoom-btn" type="button" aria-label="Zoom in"><span class="material-icons" aria-hidden="true">add</span></button>
-          <button id="rotateBtn" class="chip" type="button"><span class="material-icons" aria-hidden="true">rotate_90_degrees_ccw</span>Rotate</button>
-          <button id="toggleSpin" class="chip" type="button" aria-pressed="false"><span class="material-icons" aria-hidden="true">rotate_right</span>Auto-Rotate</button>
-          <button id="resetView" class="chip" type="button"><span class="material-icons" aria-hidden="true">restart_alt</span>Reset</button>
+      <div class="section">
+        <h3>Text & Rings</h3>
+        <div class="row">
+          <div class="field">
+            <label for="titleText">Top text</label>
+            <input id="titleText" type="text" placeholder="SAINT CLOUD JEDI" value="SAINT CLOUD JEDI">
+          </div>
+          <div class="field">
+            <label for="titleFontSize">Font size (px)</label>
+            <input id="titleFontSize" type="number" min="10" max="120" value="26">
+          </div>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label for="subtitleText">Aurebesh rim (optional)</label>
+            <input id="subtitleText" type="text" placeholder="AUREBESH · IMPERIAL · INSIGNIA">
+          </div>
+          <div class="field">
+            <label for="subtitleSize">Aurebesh size (px)</label>
+            <input id="subtitleSize" type="number" min="8" max="40" value="12">
+          </div>
+        </div>
+        <div class="row-3">
+          <div class="field"><label>Rim color</label><input id="rimColor" type="color" value="#ffffff"></div>
+          <div class="field"><label>Plate color</label><input id="plateColor" type="color" value="#0b0e14"></div>
+          <div class="field"><label>Ink color</label><input id="inkColor" type="color" value="#ffffff"></div>
+        </div>
+        <div class="row">
+          <div class="field kvs">
+            <label for="diameter">Diameter (px)</label>
+            <input id="diameter" type="number" min="200" max="1400" value="640">
+          </div>
+          <div class="field kvs">
+            <label><input id="showBail" type="checkbox" checked> Bail loop</label>
+          </div>
         </div>
       </div>
-      <div class="row"><label>Text Preview</label><div id="preview" class="monobox"></div></div>
-    </div>
-  </section>
-</main>
 
-<!-- Import/Export JSON Modal -->
-<dialog id="jsonModal" aria-labelledby="jsonTitle" aria-modal="true">
-  <div class="modal-head">
-    <strong id="jsonTitle">Import / Export JSON</strong>
-    <button id="closeJson" class="chip" type="button"><span class="material-icons" aria-hidden="true">close</span>Close</button>
-  </div>
-  <div class="modal-body">
-    <textarea id="jsonArea" class="monobox" style="min-height:180px" placeholder='Paste JSON here or edit and click "Apply"'></textarea>
-  </div>
-  <div class="modal-actions">
-    <button id="applyJson" class="btn primary" type="button"><span class="material-icons" aria-hidden="true">check</span>Apply</button>
-    <button id="copyJson" class="btn" type="button"><span class="material-icons" aria-hidden="true">content_copy</span>Copy</button>
-  </div>
-</dialog>
+      <div class="section">
+        <h3>Center motif</h3>
+        <div class="row">
+          <div class="field">
+            <label for="motif">Preset</label>
+            <select id="motif">
+              <option value="deathstar">Death Star + Florida (simplified)</option>
+              <option value="deathstar_basic">Death Star only</option>
+              <option value="custom">Custom SVG upload</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="motifScale">Motif scale (%)</label>
+            <input id="motifScale" type="number" min="20" max="120" value="72">
+          </div>
+        </div>
+        <div class="row-3">
+          <div class="field"><label>Death Star color</label><input id="dsColor" type="color" value="#ff2a2a"></div>
+          <div class="field"><label>Dish/lines</label><input id="dsStroke" type="color" value="#111111"></div>
+          <div class="field"><label>Florida outline</label><input id="flColor" type="color" value="#ffffff"></div>
+        </div>
+        <div class="row">
+          <div class="field kvs">
+            <label><input id="showArmyStar" type="checkbox" checked> US Army star overlay (gold)</label>
+          </div>
+          <div class="field">
+            <label for="customSvg">Custom center SVG (if chosen)</label>
+            <input id="customSvg" type="file" accept=".svg">
+          </div>
+        </div>
+      </div>
 
-<div id="toast" class="toast" role="status" aria-live="polite"><span class="material-icons" aria-hidden="true">check_circle</span><span id="toastMsg">Done</span></div>
+      <div class="section">
+        <h3>Lightsabers</h3>
+        <div class="row">
+          <div class="field">
+            <label for="saberCount">Count</label>
+            <select id="saberCount">
+              <option>0</option><option>1</option><option>2</option><option selected>3</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="saberGlow">Glow strength</label>
+            <input id="saberGlow" type="number" min="0" max="16" value="6">
+          </div>
+        </div>
+        <div class="row-3">
+          <div class="field"><label>Primary core</label><input id="sCore" type="color" value="#ffffff"></div>
+          <div class="field"><label>Primary aura</label><input id="sAura" type="color" value="#ff2a2a"></div>
+          <div class="field"><label>Secondary aura</label><input id="sAura2" type="color" value="#ffebeb"></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h3>Export</h3>
+        <div class="toolbar">
+          <button class="btn" id="copySvg">Copy SVG</button>
+          <button class="btn" id="downloadSvg">Download SVG</button>
+          <button class="btn" id="downloadPng">Download PNG</button>
+        </div>
+        <p class="hint">PNG export rasterizes the current preview at device pixel ratio for crisp output.</p>
+      </div>
+    </aside>
+
+    <!-- RIGHT: Preview -->
+    <main class="panel previewWrap" aria-label="Preview">
+      <div class="previewBar">
+        <div class="stack">
+          <button class="btn" id="centerFit">Center / Fit</button>
+          <button class="btn" id="resetZoom">Reset Zoom</button>
+        </div>
+        <div class="hint" id="meta">640×640 • live</div>
+      </div>
+      <div id="svgStage"></div>
+    </main>
+  </div>
+
+  <div class="toast" id="toast">Copied!</div>
 
 <script>
-/* ===== Utilities ===== */
-const $ = id => document.getElementById(id);
-const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
-const on = (el, ev, fn, opt) => el && el.addEventListener(ev, fn, opt||{passive:true});
-const sleep = ms => new Promise(r => setTimeout(r, ms));
-const LSKEY_FORM = 'medallion:form:v2';
-const LSKEY_THEME = 'medallion:theme:light';
-function toast(msg, isError=false){ const el=$('toast'); el.classList.toggle('error',!!isError); $('toastMsg').textContent=msg; el.classList.add('show'); setTimeout(()=>el.classList.remove('show'), 2200); }
+(() => {
+  // ---------- Helpers ----------
+  const $ = sel => document.querySelector(sel);
+  const $$ = sel => Array.from(document.querySelectorAll(sel));
+  const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
+  const toRad = (deg) => deg * Math.PI / 180;
 
-/* ===== Theme (persist) ===== */
-(function initTheme(){
-  const stored = localStorage.getItem(LSKEY_THEME);
-  if (stored === '1') document.body.classList.add('light-theme');
-  const light = document.body.classList.contains('light-theme');
-  $('themeToggle').setAttribute('aria-pressed', String(light));
-  $('themeToggle').querySelector('.material-icons').textContent = light ? 'light_mode' : 'dark_mode';
-  $('themeLabel').textContent = light ? 'Light' : 'Dark';
-})();
-on($('themeToggle'),'click',()=>{
-  const light=document.body.classList.toggle('light-theme');
-  localStorage.setItem(LSKEY_THEME, light ? '1' : '0');
-  $('themeToggle').setAttribute('aria-pressed', String(light));
-  $('themeToggle').querySelector('.material-icons').textContent=light?'light_mode':'dark_mode';
-  $('themeLabel').textContent=light?'Light':'Dark';
-});
-
-/* ===== Tabs (ARIA) ===== */
-const tabs=[...document.querySelectorAll('.tab')];
-const panels={basic:$('panel-basic'),symbols:$('panel-symbols'),advanced:$('panel-advanced')};
-function setTab(btn){const id=btn.dataset.tab; tabs.forEach(t=>{const a=t===btn; t.setAttribute('aria-selected',String(a)); t.tabIndex=a?0:-1;}); Object.entries(panels).forEach(([k,p])=>p.hidden=(k!==id)); btn.focus();}
-tabs.forEach(t=>{on(t,'click',()=>setTab(t)); on(t,'keydown',e=>{const i=tabs.indexOf(t); if(e.key==='ArrowRight')setTab(tabs[(i+1)%tabs.length]); if(e.key==='ArrowLeft')setTab(tabs[(i-1+tabs.length)%tabs.length]); if(e.key==='Home')setTab(tabs[0]); if(e.key==='End')setTab(tabs[tabs.length-1]);});});
-setTab(tabs[0]);
-
-/* ===== Presets ===== */
-const presets={
-  fl_army:{text_top:"SAINT CLOUD JEDI",rim_finish:"metallic silver",plate_color:"black",text_colors:"white with black outline",state_shape:"state of Florida",outline_color:"white",main_symbol:"Death Star",symbol_color:"red with etched lines",badge_elements:"concentric rings",secondary_symbol:"Army star emblem",aurebesh_style:"glowing Aurebesh along rim",sabers_desc:"two crossed sabers glow",style_keywords:"cinematic, heraldic, symmetrical"},
-  det_wings:{text_top:"DETROIT JEDI",rim_finish:"polished steel",plate_color:"black",text_colors:"white",state_shape:"medallion field",outline_color:"red/black",main_symbol:"Death Star",symbol_color:"red etched",badge_elements:"concentric rings",secondary_symbol:"",aurebesh_style:"glowing inscriptions",sabers_desc:"three angled beams glow",style_keywords:"sports fusion, symmetrical"},
-  jedi_generic:{text_top:"GALACTIC JEDI ORDER",rim_finish:"brushed silver",plate_color:"navy",text_colors:"silver outline",state_shape:"medallion field",outline_color:"white",main_symbol:"Jedi crest",symbol_color:"silver",badge_elements:"imperial ticks",secondary_symbol:"",aurebesh_style:"cyan glow runes",sabers_desc:"single vertical saber glow",style_keywords:"heraldic, luminous"}
-};
-document.querySelectorAll('.profile').forEach(card=>on(card,'click',()=>{const p=presets[card.dataset.profile]; if(p){fillForm(p,true); toast('Profile loaded');}}));
-
-/* ===== Form IO ===== */
-const FIELDS = ["text_top","rim_finish","plate_color","text_colors","state_shape","outline_color","main_symbol","symbol_color","badge_elements","secondary_symbol","aurebesh_style","sabers_desc","style_keywords"];
-
-function readForm(){
-  const g=id=>(($(id)||{}).value||'').trim();
-  return {
-    text_top: g('text_top')||"SAINT CLOUD JEDI",
-    rim_finish: g('rim_finish')||"metallic silver",
-    plate_color: g('plate_color')||"black",
-    text_colors: g('text_colors')||"white with black outline",
-    state_shape: g('state_shape')||"state of Florida",
-    outline_color: g('outline_color')||"white",
-    main_symbol: g('main_symbol')||"Death Star",
-    symbol_color: g('symbol_color')||"red with etched lines",
-    badge_elements: g('badge_elements')||"concentric rings",
-    secondary_symbol: g('secondary_symbol')||"",
-    aurebesh_style: g('aurebesh_style')||"glowing Aurebesh along rim",
-    sabers_desc: g('sabers_desc')||"two crossed sabers glow",
-    style_keywords: g('style_keywords')||"cinematic, heraldic, symmetrical"
-  };
-}
-function fillForm(data, andGenerate=false){
-  FIELDS.forEach(k=>{ const el=$(k); if(el && data[k]!==undefined) el.value=data[k]; });
-  if (andGenerate) generate();
-}
-
-/* Autosave debounce */
-let saveT;
-function autosave(){
-  clearTimeout(saveT);
-  saveT = setTimeout(()=>{ try{ localStorage.setItem(LSKEY_FORM, JSON.stringify(readForm())); }catch{} }, 250);
-}
-
-/* Restore autosave on boot (if present) */
-(function restoreAuto(){
-  try{ const raw = localStorage.getItem(LSKEY_FORM); if(raw){ const obj = JSON.parse(raw); fillForm(obj,true); } }catch{}
-})();
-
-/* ===== Prompt Builder ===== */
-function buildPrompt(v){
-  return [
-    "Cinematic-style medallion pendant design.",
-    "• Shape & Base: Round pendant, "+v.rim_finish+", plate in "+v.plate_color+".",
-    "• Text: Raised lettering “"+v.text_top+"” in "+v.text_colors+".",
-    "• Central Motif: "+v.state_shape+" in "+v.outline_color+" with "+v.main_symbol+" ("+v.symbol_color+"). Elements: "+v.badge_elements+(v.secondary_symbol?(". Secondary: "+v.secondary_symbol):"")+".",
-    "• Aurebesh: "+v.aurebesh_style+".",
-    "• Lightsabers: "+v.sabers_desc+".",
-    "• Style: "+v.style_keywords+"."
-  ].join("\n");
-}
-
-/* ===== SVG Preview ===== */
-let zoom=1, rotation=0, spinning=false;
-
-/* Color resolver with sensible fallbacks */
-function colorPick(key, table, fallback){ 
-  key=(key||'').toLowerCase();
-  for(const [k,v] of table) if(k && key.includes(k)) return v; 
-  return fallback; 
-}
-
-function updateSvg(v){
-  const svg = $('svgPreview');
-  if (!svg) return;
-  svg.innerHTML = '';
-
-  // ---------- helpers ----------
-  const NS = 'http://www.w3.org/2000/svg';
-  const make = (name, attrs = {}, parent = svg) => {
-    const el = document.createElementNS(NS, name);
-    for (const [k, val] of Object.entries(attrs)) if (val != null) el.setAttribute(k, String(val));
-    parent.appendChild(el);
-    return el;
-  };
-  const colorPick = (key, table, fallback) => {
-    key = (key || '').toLowerCase();
-    for (const [k, v2] of table) if (k && key.includes(k)) return v2;
-    return fallback;
+  const state = {
+    customCenterSvgText: null,
+    profiles: [
+      {
+        id:'imperial_badge',
+        name:'Imperial Badge',
+        note:'Cinematic badge, Aurebesh rim, 3 sabers',
+        values:{
+          titleText:'SAINT CLOUD JEDI',
+          titleFontSize:26,
+          subtitleText:'AUREBESH · IMPERIAL · INSIGNIA',
+          subtitleSize:12,
+          rimColor:'#ffffff', plateColor:'#0b0e14', inkColor:'#ffffff',
+          diameter:640, showBail:true,
+          motif:'deathstar', motifScale:72,
+          dsColor:'#ff2a2a', dsStroke:'#111111', flColor:'#ffffff', showArmyStar:true,
+          saberCount:'3', saberGlow:6, sCore:'#ffffff', sAura:'#ff2a2a', sAura2:'#ffebeb',
+        }
+      },
+      {
+        id:'detroit_jedi',
+        name:'Detroit Jedi',
+        note:'Red theme, bold sabers',
+        values:{
+          titleText:'DETROIT JEDI',
+          titleFontSize:28,
+          subtitleText:'',
+          subtitleSize:12,
+          rimColor:'#ffffff', plateColor:'#0b0e14', inkColor:'#ffffff',
+          diameter:720, showBail:true,
+          motif:'deathstar_basic', motifScale:70,
+          dsColor:'#ff2a2a', dsStroke:'#0e1117', flColor:'#ffffff', showArmyStar:false,
+          saberCount:'3', saberGlow:10, sCore:'#ffffff', sAura:'#ff2a2a', sAura2:'#ffd2d2',
+        }
+      },
+      {
+        id:'army_florida',
+        name:'Army · Florida',
+        note:'Gold star overlay',
+        values:{
+          titleText:'SAINT CLOUD JEDI',
+          titleFontSize:24,
+          subtitleText:'SERVICE · HONOR · DUTY',
+          subtitleSize:12,
+          rimColor:'#ffffff', plateColor:'#0b0e14', inkColor:'#ffffff',
+          diameter:640, showBail:true,
+          motif:'deathstar', motifScale:68,
+          dsColor:'#e52424', dsStroke:'#111111', flColor:'#ffffff', showArmyStar:true,
+          saberCount:'2', saberGlow:6, sCore:'#ffffff', sAura:'#ffcc00', sAura2:'#ffe9a6',
+        }
+      }
+    ]
   };
 
-  // ---------- palette ----------
-  const plateFill = colorPick(v.plate_color, [['black','#121316'],['navy','#0b2346'],['crimson','#5c0b12'],['gray','#2a2f3a'],['white','#f3f6f9'],['forest','#0f2c1b']], '#121316');
-  const rimColor  = colorPick(v.rim_finish , [['gold','#ffd54a'],['silver','#c0c7ce'],['steel','#b0b7c3'],['bronze','#c18b52'],['obsidian','#000']], '#9ad6ff');
-  const textFill  = colorPick(v.text_colors,[['white','#fff'],['gold','#ffd54a'],['silver','#c0c7ce'],['cyan','#6ee7ff'],['red','#e43b44'],['black','#000']], '#fff');
-  const symColor  = colorPick(v.symbol_color,[['red','#e43b44'],['silver','#c0c7ce'],['gold','#ffd54a'],['white','#fff'],['blue','#3b6ee4'],['cyan','#6ee7ff']], '#6ee7ff');
+  // Build profile cards
+  const profileHost = $('#profiles');
+  state.profiles.forEach(p => {
+    const el = document.createElement('div');
+    el.className = 'card';
+    el.innerHTML = `<h4>${p.name}</h4><p>${p.note}</p>`;
+    el.addEventListener('click', () => applyProfile(p.values));
+    profileHost.appendChild(el);
+  });
 
-  // Keep strokes crisp even when the SVG is CSS-scaled/rotated.
-  svg.setAttribute('shape-rendering','geometricPrecision');
+  // Map form controls
+  const C = {
+    titleText: $('#titleText'),
+    titleFontSize: $('#titleFontSize'),
+    subtitleText: $('#subtitleText'),
+    subtitleSize: $('#subtitleSize'),
+    rimColor: $('#rimColor'),
+    plateColor: $('#plateColor'),
+    inkColor: $('#inkColor'),
+    diameter: $('#diameter'),
+    showBail: $('#showBail'),
+    motif: $('#motif'),
+    motifScale: $('#motifScale'),
+    dsColor: $('#dsColor'),
+    dsStroke: $('#dsStroke'),
+    flColor: $('#flColor'),
+    showArmyStar: $('#showArmyStar'),
+    customSvg: $('#customSvg'),
+    saberCount: $('#saberCount'),
+    saberGlow: $('#saberGlow'),
+    sCore: $('#sCore'),
+    sAura: $('#sAura'),
+    sAura2: $('#sAura2'),
+  };
 
-  // ---------- defs ----------
-  const defs = make('defs');
-  // non-scaling stroke + crisp joins as a CSS class (applies to lines, rings, ticks)
-  const style = make('style', {}, defs);
-  style.textContent = `
-    .ns { vector-effect: non-scaling-stroke; shape-rendering: crispEdges; }
-    .round { stroke-linecap: round; stroke-linejoin: round; }
-  `;
+  Object.values(C).forEach(inp => inp.addEventListener('input', scheduleRender));
+  C.customSvg.addEventListener('change', async (e) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    if (f.type !== 'image/svg+xml') { toast('Please upload an .svg file'); return; }
+    const txt = await f.text();
+    state.customCenterSvgText = sanitizeSvg(txt);
+    render();
+  });
 
-  const rimGrad = make('linearGradient', { id:'rimGrad', x1:'0%', y1:'0%', x2:'100%', y2:'100%' }, defs);
-  rimGrad.innerHTML = `<stop offset="0%" stop-color="${rimColor}"/><stop offset="100%" stop-color="${rimColor}" stop-opacity=".82"/>`;
+  // Theme + reset
+  $('#toggleTheme').addEventListener('click', () => {
+    const dark = document.documentElement.dataset.theme !== 'light';
+    if (dark) document.documentElement.dataset.theme = 'light';
+    else document.documentElement.dataset.theme = 'dark';
+  });
+  $('#resetAll').addEventListener('click', () => { applyProfile(state.profiles[0].values); });
 
-  const saberCore = make('linearGradient', { id:'saberCore', x1:'0%', y1:'0%', x2:'100%', y2:'0%' }, defs);
-  saberCore.innerHTML = `<stop offset="0%" stop-color="#fff"/><stop offset="50%" stop-color="#c7f3ff"/><stop offset="100%" stop-color="#6ee7ff"/>`;
+  // ---------- SVG Generator ----------
+  function buildSvg(opts){
+    const D = +opts.diameter;
+    const R = D/2;
+    const rim = opts.rimColor, plate = opts.plateColor, ink = opts.inkColor;
+    const title = (opts.titleText||'').toUpperCase();
+    const tSize = +opts.titleFontSize;
+    const sub = (opts.subtitleText||'');
+    const subSize = +opts.subtitleSize;
+    const showBail = !!opts.showBail;
 
-  // arc for text (no textLength — Safari can stretch glyphs)
-  make('path', { id:'topArc', d:'M 36 120 A 114 114 0 0 1 264 120' }, defs);
+    // Build root SVG
+    const svgns = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(svgns,'svg');
+    svg.setAttribute('xmlns', svgns);
+    svg.setAttribute('viewBox', `0 0 ${D} ${D}`);
+    svg.setAttribute('width', D);
+    svg.setAttribute('height', D);
 
-  // ---------- base plate ----------
-  make('circle', { cx:150, cy:150, r:120, fill:plateFill, stroke:rimColor, 'stroke-width':6, class:'ns' });
+    // Defs: filters & paths
+    const defs = el('defs');
+    // Glow filter for sabers
+    const glow = el('filter', {id:'glow', x:'-50%', y:'-50%', width:'200%', height:'200%'});
+    glow.append(
+      el('feGaussianBlur', {in:'SourceGraphic', stdDeviation: opts.saberGlow||6, result:'blur'}),
+      el('feMerge', {}).appendChild(el('feMergeNode', {in:'blur'}))
+    );
+    defs.appendChild(glow);
 
-  // decorative rims (full-pixel radii; non-scaling)
-  make('circle', { cx:150, cy:150, r:136, fill:'none', stroke:'url(#rimGrad)', 'stroke-width':3, opacity:.92, class:'ns' });
-  make('circle', { cx:150, cy:150, r:132, fill:'none', stroke:'#fff', 'stroke-opacity':.08, 'stroke-width':2, class:'ns' });
+    // Text paths for arcs
+    const arcTopId = 'arcTop';
+    const arcTop = describeArc(R, R, R*0.72, 200, -20); // top arc
+    defs.appendChild(el('path', {id:arcTopId, d:arcTop}));
+    if (sub){
+      const arcSubId = 'arcSub';
+      const arcSub = describeArc(R, R, R*0.86, 210, -30);
+      defs.appendChild(el('path', {id:arcSubId, d:arcSub}));
+    }
+    svg.appendChild(defs);
 
-  // inner tick ring
-  const ticks = make('g', { stroke:'#8fd6ff', 'stroke-width':1, fill:'none', class:'ns' });
-  for (let i = 0; i < 48; i++) {
-    const a = (i * 7.5) * Math.PI / 180;
-    const r1 = 106, r2 = i % 2 ? 109 : 111;
-    const x1 = 150 + r1 * Math.cos(a), y1 = 150 + r1 * Math.sin(a);
-    const x2 = 150 + r2 * Math.cos(a), y2 = 150 + r2 * Math.sin(a);
-    make('line', { x1:x1, y1:y1, x2:x2, y2:y2 }, ticks);
+    // Background plate + rim
+    // Rim
+    svg.appendChild(el('circle', {cx:R, cy:R, r:R*0.98, fill:rim}));
+    // Inner plate
+    svg.appendChild(el('circle', {cx:R, cy:R, r:R*0.9, fill:plate}));
+
+    // Bail loop (top)
+    if (showBail){
+      svg.appendChild(el('rect', {x:R-18, y:8, width:36, height:24, rx:6, fill:rim}));
+      svg.appendChild(el('circle', {cx:R, cy:20, r:8, fill:plate}));
+    }
+
+    // Title along top arc
+    if (title){
+      const txt = el('text', {fill:ink, 'font-size':tSize, 'font-family':'Arial, Helvetica, sans-serif', 'letter-spacing':1.5, 'text-anchor':'middle'});
+      const textPath = el('textPath', {'href':'#'+arcTopId, startOffset:'50%'});
+      textPath.textContent = title;
+      txt.appendChild(textPath);
+      svg.appendChild(txt);
+    }
+    // Aurebesh rim (render as normal characters unless user pastes Aurebesh glyphs)
+    if (sub){
+      const st = el('text', {fill:ink, 'font-size':subSize, 'font-family':'Arial, Helvetica, sans-serif', 'letter-spacing':2, 'text-anchor':'middle', opacity:.8});
+      const tp = el('textPath', {'href':'#arcSub', startOffset:'50%'});
+      tp.textContent = sub;
+      st.appendChild(tp); svg.appendChild(st);
+    }
+
+    // Center motif group
+    const g = el('g', {transform:`translate(${R},${R}) scale(${(+opts.motifScale||70)/100})`});
+    // death star (basic)
+    if (opts.motif === 'deathstar' || opts.motif === 'deathstar_basic'){
+      g.appendChild(deathStar(opts));
+      if (opts.motif === 'deathstar'){
+        g.appendChild(floridaOutline(opts)); // simplified silhouette
+      }
+    } else if (opts.motif === 'custom'){
+      const svgtxt = state.customCenterSvgText;
+      if (svgtxt){
+        const frag = stringToFragment(svgtxt);
+        // normalize center
+        const box = el('rect', {x:-150,y:-150,width:300,height:300,fill:'none',stroke:'none'});
+        g.appendChild(box);
+        g.appendChild(frag);
+      }
+    }
+
+    if (opts.showArmyStar) g.appendChild(armyStar());
+
+    // Lightsabers
+    const sabers = parseInt(opts.saberCount||0,10);
+    if (sabers>0){
+      const saberGroup = el('g', {'filter':'url(#glow)'});
+      const angles = sabers===1 ? [0] : sabers===2 ? [-22, 22] : [-28, 0, 28];
+      angles.forEach((ang,i) => {
+        saberGroup.appendChild(lightsaber(ang, i, opts));
+      });
+      svg.appendChild(saberGroup);
+    }
+
+    svg.appendChild(g);
+    return svg;
+
+    // ---- element helpers ----
+    function el(name, attrs={}){
+      const node = document.createElementNS(svgns, name);
+      for (const [k,v] of Object.entries(attrs)) node.setAttribute(k, v);
+      return node;
+    }
+    function stringToFragment(s){
+      // very simple parser for safe inline
+      const tmp = document.createElement('div'); tmp.innerHTML = s;
+      const svg = tmp.querySelector('svg'); return svg ? svg : tmp.firstElementChild;
+    }
+    function deathStar(o){
+      const s = el('g', {transform:'translate(0,10)'});
+      const base = el('circle', {cx:0, cy:0, r:120, fill:o.dsColor, stroke:o.dsStroke, 'stroke-width':4});
+      s.appendChild(base);
+      // panel rings
+      [80, 40, -10].forEach((y,idx) => {
+        s.appendChild(el('ellipse', {cx:0, cy:y*0.7, rx:120 - idx*10, ry:14, fill:'none', stroke:o.dsStroke, 'stroke-width':3, opacity:.9}));
+      });
+      // trench
+      s.appendChild(el('rect', {x:-120, y:-8, width:240, height:16, fill:o.dsStroke, opacity:.9}));
+      // dish
+      s.appendChild(el('circle', {cx:36, cy:-36, r:28, fill:'#00000020', stroke:o.dsStroke, 'stroke-width':3}));
+      s.appendChild(el('circle', {cx:36, cy:-36, r:12, fill:'#00000010', stroke:o.dsStroke, 'stroke-width':2}));
+      return s;
+    }
+    function floridaOutline(o){
+      // Simplified path (stylized silhouette)
+      const path = "M -110,-90 C -80,-120, -30,-110, 10,-90 C 40,-70, 60,-20, 80,10 C 45,5, 35,-5, 18,-8 C 2,-10, -5,5, -18,8 C -38,12, -64,2, -92,-8 Z";
+      const g = el('g', {opacity:.9});
+      g.appendChild(el('path', {d:path, fill:'none', stroke:o.flColor, 'stroke-width':5}));
+      return g;
+    }
+    function armyStar(){
+      const g = el('g', {transform:'translate(0,-6) scale(0.7)'});
+      const poly = starPoints(0,0,80,38,5);
+      g.appendChild(el('polygon', {points:poly, fill:'none', stroke:'#d4af37', 'stroke-width':6}));
+      return g;
+    }
+    function starPoints(cx, cy, outerR, innerR, points){
+      let str = '';
+      const step = Math.PI / points;
+      for (let i=0;i<2*points;i++){
+        const r = (i%2===0) ? outerR : innerR;
+        const a = i * step - Math.PI/2;
+        const x = cx + r * Math.cos(a), y = cy + r * Math.sin(a);
+        str += `${x},${y} `;
+      }
+      return str.trim();
+    }
+    function lightsaber(angleDeg, idx, o){
+      const g = el('g', {transform:`translate(${D*0.22}, ${D*0.78}) rotate(${angleDeg})`});
+      // hilt
+      g.appendChild(el('rect', {x:-16, y:-10, width:32, height:20, rx:3, fill:'#9aa3af'}));
+      g.appendChild(el('rect', {x:16, y:-8, width:16, height:16, rx:3, fill:'#606874'}));
+      // blade (core + aura stroke)
+      const bladeLen = D*0.55;
+      const blade = el('rect', {x:32, y:-4, width:bladeLen, height:8, rx:4, fill:o.sCore, stroke:o.sAura, 'stroke-width':6});
+      g.appendChild(blade);
+      return g;
+    }
+    // describe circular arc (SVG path)
+    function describeArc(cx, cy, r, startAngle, endAngle){
+      const start = polarToCartesian(cx,cy,r,endAngle);
+      const end   = polarToCartesian(cx,cy,r,startAngle);
+      const large = endAngle - startAngle <= 180 ? 0 : 1;
+      return ["M", start.x, start.y, "A", r, r, 0, large, 0, end.x, end.y].join(" ");
+    }
+    function polarToCartesian(cx,cy,r,angle){
+      const a = toRad(angle);
+      return {x: cx + r*Math.cos(a), y: cy + r*Math.sin(a)};
+    }
   }
 
-  // optional badge rings
-  if ((v.badge_elements||'').toLowerCase().includes('ring')){
-    [90,72,54].forEach((r,i)=>{
-      make('circle',{ cx:150, cy:150, r:r, fill:'none', stroke: i===1 ? '#7fbbe0' : rimColor, 'stroke-width':1, 'stroke-dasharray': i===1 ? '6 6' : null, class:'ns' });
+  // ---------- Render Loop ----------
+  const stage = $('#svgStage');
+  function read(){
+    return {
+      titleText: C.titleText.value,
+      titleFontSize: +C.titleFontSize.value,
+      subtitleText: C.subtitleText.value,
+      subtitleSize: +C.subtitleSize.value,
+      rimColor: C.rimColor.value,
+      plateColor: C.plateColor.value,
+      inkColor: C.inkColor.value,
+      diameter: +C.diameter.value,
+      showBail: C.showBail.checked,
+      motif: C.motif.value,
+      motifScale: +C.motifScale.value,
+      dsColor: C.dsColor.value,
+      dsStroke: C.dsStroke.value,
+      flColor: C.flColor.value,
+      showArmyStar: C.showArmyStar.checked,
+      saberCount: C.saberCount.value,
+      saberGlow: +C.saberGlow.value,
+      sCore: C.sCore.value,
+      sAura: C.sAura.value,
+      sAura2: C.sAura2.value
+    };
+  }
+  function render(){
+    const v = read();
+    const svg = buildSvg(v);
+    stage.innerHTML = '';
+    stage.appendChild(svg);
+    $('#meta').textContent = `${v.diameter}×${v.diameter} • live`;
+    lastSvg = svg;
+  }
+  let raf = 0;
+  function scheduleRender(){ cancelAnimationFrame(raf); raf = requestAnimationFrame(render); }
+
+  function applyProfile(val){
+    Object.entries(val).forEach(([k,v])=>{
+      if (typeof C[k] === 'undefined') return;
+      if (C[k].type === 'checkbox') C[k].checked = !!v;
+      else C[k].value = v;
     });
+    render();
+    toast('Profile loaded');
   }
 
-  // ---------- main symbol ----------
-  const g = make('g');
-
-  const ms = (v.main_symbol||'').toLowerCase();
-  if (ms.includes('death')) {
-    // Death Star
-    make('circle', { cx:150, cy:150, r:58, fill:symColor, stroke:'#222', 'stroke-width':1.4, class:'ns' }, g);
-    // equatorial trench
-    make('line', { x1:96, y1:150, x2:204, y2:150, stroke: plateFill==='#121316' ? '#0a0a0a' : '#111', 'stroke-width':6, class:'ns' }, g);
-    // dish
-    make('circle', { cx:178, cy:130, r:12, fill: plateFill==='#121316' ? '#0a0a0a' : '#111', stroke:'#3b3f48', 'stroke-width':1, class:'ns' }, g);
-    // radial panels
-    for (let i = 0; i < 10; i++) {
-      const a = (i * 18) * Math.PI/180, r1=34, r2=58;
-      const x1 = 150 + r1*Math.cos(a), y1 = 150 + r1*Math.sin(a);
-      const x2 = 150 + r2*Math.cos(a), y2 = 150 + r2*Math.sin(a);
-      make('line', { x1:x1, y1:y1, x2:x2, y2:y2, stroke:'#27303d', 'stroke-width':1, class:'ns' }, g);
-    }
-    // lower arc
-    make('path', { d:'M 115 180 A 45 45 0 0 0 185 180', stroke:'#27303d', 'stroke-width':1, fill:'none', class:'ns' }, g);
-  } else if (ms.includes('jedi')) {
-    make('path', { d:'M150 108 L168 96 L168 140 L182 154 L168 168 L168 210 L150 194 L132 210 L132 168 L118 154 L132 140 L132 96 Z', fill:symColor }, g);
-  } else if (ms.includes('imperial') || ms.includes('cog')) {
-    make('circle', { cx:150, cy:150, r:46, fill:symColor, stroke:'#222', 'stroke-width':1.2, class:'ns' }, g);
-    for (let i=0;i<8;i++){
-      const a = i*45*Math.PI/180, r1=46, r2=58;
-      const x1 = 150 + r1*Math.cos(a), y1 = 150 + r1*Math.sin(a);
-      const x2 = 150 + r2*Math.cos(a), y2 = 150 + r2*Math.sin(a);
-      make('line', { x1:x1, y1:y1, x2:x2, y2:y2, stroke: symColor, 'stroke-width': 6, class:'ns' }, g);
-    }
-  } else {
-    make('path', { d:'M150,102 L164,136 L201,139 L172,162 L180,197 L150,179 L120,197 L128,162 L99,139 L136,136 Z', fill:symColor }, g);
+  // ---------- Export ----------
+  let lastSvg = null;
+  $('#copySvg').addEventListener('click', async () => {
+    if (!lastSvg) return;
+    const xml = toXml(lastSvg);
+    try { await navigator.clipboard.writeText(xml); toast('SVG copied'); }
+    catch { toast('Copy failed'); }
+  });
+  $('#downloadSvg').addEventListener('click', () => {
+    if (!lastSvg) return;
+    const xml = toXml(lastSvg);
+    download('medallion.svg', new Blob([xml], {type:'image/svg+xml'}));
+  });
+  $('#downloadPng').addEventListener('click', async () => {
+    if (!lastSvg) return;
+    const xml = toXml(lastSvg);
+    const url = URL.createObjectURL(new Blob([xml], {type:'image/svg+xml'}));
+    const img = new Image();
+    const scale = Math.min(Math.max(window.devicePixelRatio||1, 1), 3);
+    img.onload = () => {
+      const w = lastSvg.viewBox.baseVal.width, h = lastSvg.viewBox.baseVal.height;
+      const canvas = document.createElement('canvas'); canvas.width = w*scale; canvas.height = h*scale;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      canvas.toBlob(blob => download('medallion.png', blob), 'image/png');
+      URL.revokeObjectURL(url);
+    };
+    img.src = url;
+  });
+  function toXml(svgEl){
+    // clone to ensure inline styles/attributes are preserved
+    const clone = svgEl.cloneNode(true);
+    // ensure xmlns
+    clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+    return `<?xml version="1.0" encoding="UTF-8"?>\n` + clone.outerHTML;
+  }
+  function download(name, blob){
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = name; a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href), 500);
   }
 
-  // secondary emblem
-  if ((v.secondary_symbol||'').trim()){
-    make('circle', { cx:210, cy:105, r:9, fill:symColor, stroke:'#203040', 'stroke-width':0.75, class:'ns' });
+  // ---------- Zoom / Fit ----------
+  $('#centerFit').addEventListener('click', () => {
+    stage.scrollIntoView({behavior:'smooth', block:'center'});
+  });
+  $('#resetZoom').addEventListener('click', () => {
+    stage.style.transform = 'none';
+  });
+
+  // ---------- Sanitize ----------
+  function sanitizeSvg(txt){
+    // strip scripts and event handlers
+    return txt
+      .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi,'')
+      .replace(/\son[a-z]+\s*=\s*(['"]).*?\1/gi,'');
   }
 
-  // ---------- sabers (layered, no filters) ----------
-  const saber = (x1,y1,x2,y2)=>{
-    make('line', { x1, y1, x2, y2, stroke:'#9feaff', 'stroke-opacity':0.22, 'stroke-width':10, class:'ns round' });
-    make('line', { x1, y1, x2, y2, stroke:'#79e4ff', 'stroke-opacity':0.35, 'stroke-width':6,  class:'ns round' });
-    make('line', { x1, y1, x2, y2, stroke:'url(#saberCore)', 'stroke-width':3, class:'ns round' });
-  };
-  const s = (v.sabers_desc||'').toLowerCase();
-  if (s.includes('cross') || /\bx\b/.test(s)) { saber(105,105,195,195); saber(195,105,105,195); }
-  else if (s.includes('three') || /\b3\b/.test(s)) { saber(95,210,205,210); saber(115,225,185,165); saber(185,225,115,165); }
-  else if (s.includes('circle')) { for (let i=0;i<6;i++){ const a=i*60*Math.PI/180; saber(150+40*Math.cos(a),150+40*Math.sin(a),150+80*Math.cos(a),150+80*Math.sin(a)); } }
-  else { saber(150,118,150,226); }
-
-  // ---------- aurebesh ring ----------
-  const aure = (v.aurebesh_style||'').toLowerCase();
-  if (aure.includes('glow') || aure.includes('aurebesh') || aure.includes('rune') || aure.includes('inscription')){
-    make('circle', { cx:150, cy:150, r:108, fill:'none', stroke:'#6ee7ff', 'stroke-width':1, 'stroke-dasharray':'6 6', 'stroke-opacity':.75, class:'ns' });
-    const dots = make('g', { fill:'#6ee7ff' });
-    for (let i=0;i<16;i++){
-      const a=i*22.5*Math.PI/180, x=150+96*Math.cos(a), y=150+96*Math.sin(a);
-      make('circle', { cx:x, cy:y, r:2 }, dots);
-    }
+  // ---------- Toast ----------
+  const toastEl = $('#toast');
+  function toast(msg){
+    toastEl.textContent = msg; toastEl.classList.add('show');
+    setTimeout(()=>toastEl.classList.remove('show'), 1400);
   }
 
-  // ---------- arc text (no textLength; safer on iOS) ----------
-  if ((v.text_top||'').trim()){
-    const wantsOutline = (v.text_colors||'').toLowerCase().includes('outline') || plateFill==='#121316';
-    const text = make('text', { 'font-size':15, 'font-weight':800, fill:textFill, 'letter-spacing':'.6', 'text-anchor':'middle' });
-    if (wantsOutline){ text.setAttribute('stroke','#000'); text.setAttribute('stroke-width','1.1'); text.setAttribute('paint-order','stroke'); }
-    const tp = make('textPath', { href:'#topArc', startOffset:'50%', method:'align', spacing:'auto' }, text);
-    const raw = v.text_top.length>28 ? v.text_top.slice(0,27)+'…' : v.text_top;
-    tp.textContent = raw.toUpperCase();
-  }
-}
-/* ===== Controls / Generate ===== */
-function generate(){ const v=readForm(); $('out').value=buildPrompt(v); $('preview').textContent=$('out').value; updateSvg(v); autosave(); }
-['input','change'].forEach(ev=>{ document.querySelectorAll('input,select,textarea').forEach(el=>el.addEventListener(ev, generate, {passive:true})); });
-on($('gen'),'click',generate);
-
-/* Save / Load / Randomize (local preset) */
-on($('saveBtn'),'click',()=>{localStorage.setItem('medallionPreset', JSON.stringify(readForm())); toast('Preset saved');});
-on($('loadBtn'),'click',()=>{const data=localStorage.getItem('medallionPreset'); if(!data) return toast('No saved preset',true); try{fillForm(JSON.parse(data),true); toast('Preset loaded');}catch{toast('Load failed',true)};});
-on($('randBtn'),'click',()=>{const s=a=>a[Math.floor(Math.random()*a.length)]; fillForm({
-  text_top:s(["STELLAR JEDI","IMPERIAL ORDER","REBEL ALLIANCE","SITH EMPIRE","CORELLIAN KNIGHTS"]),
-  rim_finish:s(["metallic silver","polished gold","brushed steel","obsidian black","antique bronze"]),
-  plate_color:s(["black","navy","crimson","deep gray","forest green","white"]),
-  text_colors:s(["white with black outline","gold fill","glowing cyan","silver embossed","red on black"]),
-  state_shape:s(["medallion field","state of Florida","planet outline","Imperial cog","Rebel crest"]),
-  outline_color:s(["white","silver","gold trim","red glow","blue neon"]),
-  main_symbol:s(["Death Star","Jedi crest","Imperial cog","Lightsaber","Millennium Falcon"]),
-  symbol_color:s(["red with etched lines","etched silver","glowing white","gold leaf","blue crystal"]),
-  badge_elements:s(["concentric rings","spokes","binary stars","orbital lines","insignia ticks"]),
-  secondary_symbol:s(["Army star emblem","","Jedi logo","droid outline","TIE silhouette"]),
-  aurebesh_style:s(["glowing Aurebesh along rim","cyan inscriptions","luminous white runes","golden lettering","etched symbols"]),
-  sabers_desc:s(["two crossed sabers glow","three angled beams glow","four sabers in X","single vertical saber glow","circle of sabers glow"]),
-  style_keywords:s(["cinematic","formal","balanced symmetry","ancient relic","futuristic tech"])
-}, true); toast('Randomized');});
-
-/* Import / Export JSON (modal) */
-const jsonModal = $('jsonModal');
-on($('exportJsonBtn'),'click',()=>{ $('jsonArea').value = JSON.stringify(readForm(), null, 2); jsonModal.showModal(); });
-on($('importJsonBtn'),'click',()=>{ $('jsonArea').value=''; jsonModal.showModal(); });
-on($('closeJson'),'click',()=>jsonModal.close());
-on($('copyJson'),'click',()=>{ navigator.clipboard?.writeText($('jsonArea').value||'').then(()=>toast('JSON copied')); });
-on($('applyJson'),'click',()=>{ try{ const obj=JSON.parse($('jsonArea').value||'{}'); fillForm(obj,true); jsonModal.close(); toast('JSON applied'); }catch{ toast('Invalid JSON', true); }});
-
-/* Copy / Export (TXT, SVG, PNG) */
-on($('copyBtn'),'click',()=>navigator.clipboard?.writeText($('out').value||'').then(()=>toast('Copied')));
-on($('downloadBtn'),'click',()=>{const blob=new Blob([$('out').value||''],{type:'text/plain'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='medallion_prompt.txt'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),500); toast('TXT downloaded');});
-on($('downloadSvgBtn'),'click',()=>{const svg=$('svgPreview'); if(!svg||!svg.outerHTML) return toast('Nothing to export',true); 
-  // bake current rotation into exported SVG
-  const rot = rotation%360;
-  const cloned = svg.cloneNode(true);
-  if(rot){
-    const g=document.createElementNS('http://www.w3.org/2000/svg','g');
-    while(cloned.firstChild){ g.appendChild(cloned.firstChild); }
-    g.setAttribute('transform',`rotate(${rot} 150 150)`);
-    cloned.appendChild(g);
-  }
-  const xml=`<?xml version="1.0" encoding="UTF-8"?>\n`+cloned.outerHTML; 
-  const blob=new Blob([xml],{type:'image/svg+xml'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='medallion_preview.svg'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),500); toast('SVG downloaded');});
-on($('downloadPngBtn'),'click',()=>{const svg=$('svgPreview'); if(!svg) return;
-  const rot = rotation%360;
-  const clone = svg.cloneNode(true);
-  const g=document.createElementNS('http://www.w3.org/2000/svg','g');
-  while(clone.firstChild){ g.appendChild(clone.firstChild); }
-  if(rot){ g.setAttribute('transform',`rotate(${rot} 150 150)`); }
-  clone.appendChild(g);
-  const xml=`<?xml version="1.0" encoding="UTF-8"?>\n`+clone.outerHTML;
-
-  const scale=2; // retina crisp
-  const box=svg.viewBox.baseVal||{width:300,height:300};
-  const canvas=document.createElement('canvas'); canvas.width=box.width*scale; canvas.height=box.height*scale;
-  const ctx=canvas.getContext('2d');
-  const url=URL.createObjectURL(new Blob([xml],{type:'image/svg+xml'}));
-  const img=new Image(); img.onload=()=>{ ctx.setTransform(scale,0,0,scale,0,0); ctx.drawImage(img,0,0); URL.revokeObjectURL(url);
-    canvas.toBlob(b=>{ if(!b){toast('PNG failed',true);return;}
-      const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='medallion_preview.png';
-      document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),500);
-      toast('PNG downloaded');
-    },'image/png');
-  };
-  img.crossOrigin='anonymous'; img.src=url;
-});
-
-/* View controls */
-function applyView(){ $('svgPreview').style.transform=`scale(${zoom}) rotate(${rotation}deg)`; $('zoomLevel').textContent=`${Math.round(zoom*100)}%`; $('toggleSpin').setAttribute('aria-pressed', String(spinning)); }
-on($('zoomIn'),'click',()=>{zoom=clamp(Math.round((zoom+0.1)*10)/10,0.6,1.8); applyView();});
-on($('zoomOut'),'click',()=>{zoom=clamp(Math.round((zoom-0.1)*10)/10,0.6,1.8); applyView();});
-on($('rotateBtn'),'click',()=>{rotation=(rotation+45)%360; applyView();});
-on($('toggleSpin'),'click',e=>{spinning=!spinning; $('svgPreview').classList.toggle('spinning',spinning); e.currentTarget.querySelector('.material-icons').textContent=spinning?'pause':'rotate_right'; applyView();});
-on($('resetView'),'click',()=>{zoom=1; rotation=0; spinning=false; $('svgPreview').classList.remove('spinning'); applyView();});
-
-/* Shortcuts */
-addEventListener('keydown',e=>{ 
-  if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){ e.preventDefault(); generate(); }
-  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='c' && document.activeElement.id==='out'){ e.preventDefault(); navigator.clipboard?.writeText($('out').value||'').then(()=>toast('Copied')); }
-},{passive:true});
-
-/* Boot helpers */
-function ensureFirstGenerate(){
-  // ensure something is drawn even if restoreAuto found nothing
-  if(!$('out').value.trim()){ fillForm(presets.fl_army,true); }
-}
-
-/* Boot */
-(function boot(){ 
-  // wire form listeners for autosave
-  FIELDS.forEach(id=>{ const el=$(id); if(el){ el.addEventListener('input', autosave, {passive:true}); el.addEventListener('change', autosave, {passive:true}); } });
-  ensureFirstGenerate();
-  applyView();
+  // Init
+  applyProfile(state.profiles[0].values);
 })();
 </script>
 </body>
