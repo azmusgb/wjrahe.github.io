@@ -1,667 +1,73 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<meta name="color-scheme" content="dark light" />
-<meta name="theme-color" content="#0d1117" media="(prefers-color-scheme: dark)">
-<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
-<title>Medallion Forge — Enhanced Edition</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round&display=swap" rel="stylesheet" />
-
-<style>
-  /* ========== Enhanced Design Tokens ========== */
-  :root{
-    --bg: #0a0e14; --surface:#111827; --elevated:#1f2937; --ink:#f1f5f9; --muted:#94a3b8; --subtle:#64748b;
-    --border:#334155; --accent:#6366f1; --accent-2:#8b5cf6; --accent-glow: #6366f133;
-    --success:#10b981; --warning:#f59e0b; --danger:#ef4444;
-    --glass: rgba(255,255,255,.05); --glass-border: rgba(255,255,255,.1);
-    --r:16px; --r-lg:24px; --shadow:0 20px 25px -5px rgba(0,0,0,.4), 0 10px 10px -5px rgba(0,0,0,.2);
-    --shadow-lg:0 25px 50px -12px rgba(0,0,0,.6);
-    --sans:'Inter',system-ui,sans-serif;
-    --transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
-    --bounce: cubic-bezier(0.68,-0.55,0.265,1.55);
-  }
-  @media (prefers-color-scheme: light){
-    :root{
-      --bg:#fafafa; --surface:#ffffff; --elevated:#f8fafc; --ink:#0f172a; --muted:#64748b; --subtle:#94a3b8;
-      --border:#e2e8f0; --glass: rgba(0,0,0,.03); --glass-border: rgba(0,0,0,.08);
-    }
-  }
-  .theme-light{
-    --bg:#fafafa; --surface:#ffffff; --elevated:#f8fafc; --ink:#0f172a; --muted:#64748b; --subtle:#94a3b8;
-    --border:#e2e8f0; --glass: rgba(0,0,0,.03); --glass-border: rgba(0,0,0,.08);
-  }
-
-  /* ========== Base & Layout ========== */
-  *{box-sizing:border-box; margin:0; padding:0}
-  html{font-size:16px; scroll-behavior:smooth}
-  body{
-    min-height:100vh; font:400 14px/1.6 var(--sans); color:var(--ink); background:var(--bg);
-    -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; overflow-x:hidden;
-  }
-  .app{max-width:1400px; margin:0 auto; padding:20px; min-height:calc(100vh - 80px)}
-  .grid{display:grid; gap:20px; grid-template-columns: 320px 1fr 400px}
-  @media (max-width:1200px){ .grid{grid-template-columns: 280px 1fr 350px; gap:16px} }
-  @media (max-width:1000px){ .grid{grid-template-columns:1fr; gap:16px} .app{padding:16px} }
-
-  .card{
-    background: var(--surface); border:1px solid var(--border); border-radius:var(--r-lg); 
-    box-shadow:var(--shadow); padding:24px; position:relative; overflow:hidden;
-    backdrop-filter: blur(20px); transition:var(--transition);
-  }
-  .card::before{
-    content:''; position:absolute; top:0; left:0; right:0; height:1px;
-    background:linear-gradient(90deg, transparent, var(--glass-border), transparent);
-  }
-  .card:hover{ box-shadow:var(--shadow-lg); transform:translateY(-2px) }
-
-  /* ========== Typography ========== */
-  h1{font-size:24px; font-weight:800; margin-bottom:16px; background:linear-gradient(135deg,var(--accent),var(--accent-2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text}
-  h2{font-size:16px; font-weight:700; color:var(--muted); margin:20px 0 12px; text-transform:uppercase; letter-spacing:0.5px}
-  h2:first-of-type{margin-top:0}
-
-  /* ========== Enhanced Header ========== */
-  header{
-    position:sticky; top:0; z-index:100; backdrop-filter:blur(20px);
-    background: var(--glass); border-bottom:1px solid var(--glass-border);
-  }
-  .header-inner{
-    max-width:1400px; margin:0 auto; padding:16px 20px; display:flex; align-items:center; justify-content:space-between;
-  }
-  .brand{display:flex; gap:12px; align-items:center}
-  .logo{
-    width:32px; height:32px; border-radius:12px; position:relative; overflow:hidden;
-    background:linear-gradient(135deg,var(--accent),var(--accent-2)); display:grid; place-items:center;
-  }
-  .logo::before{
-    content:'⚡'; color:white; font-size:16px; font-weight:900; text-shadow:0 2px 4px rgba(0,0,0,.3);
-  }
-  .brand-text strong{font-size:18px; font-weight:800}
-  .brand-text .subtitle{font-size:12px; color:var(--muted); margin-top:2px}
-
-  /* ========== Enhanced Controls ========== */
-  .toolbar{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
-  .chip,.btn{
-    min-height:40px; padding:10px 14px; border-radius:12px; display:inline-flex; align-items:center; gap:8px; 
-    border:1px solid var(--border); background:var(--elevated); color:var(--ink); cursor:pointer; 
-    font-weight:500; transition:var(--transition); position:relative; overflow:hidden;
-  }
-  .chip::before,.btn::before{
-    content:''; position:absolute; inset:0; background:var(--accent-glow); opacity:0; transition:var(--transition);
-  }
-  .chip:hover::before,.btn:hover::before{opacity:1}
-  .chip:hover,.btn:hover{border-color:var(--accent); transform:translateY(-1px)}
-  .chip:active,.btn:active{transform:scale(0.98)}
-
-  .btn.primary{
-    background:linear-gradient(135deg,var(--accent),var(--accent-2)); border:none; color:white; font-weight:600;
-    box-shadow:0 8px 25px -8px var(--accent); position:relative; overflow:hidden;
-  }
-  .btn.primary::before{background:linear-gradient(135deg,rgba(255,255,255,.2),transparent)}
-  .btn.primary:hover{transform:translateY(-2px); box-shadow:0 12px 35px -10px var(--accent)}
-
-  .material-icons-round{font-size:20px; user-select:none}
-
-  /* ========== Enhanced Forms ========== */
-  .form-grid{display:grid; gap:16px; grid-template-columns:1fr 1fr}
-  @media (max-width:1000px){ .form-grid{grid-template-columns:1fr} }
-  .form-group{position:relative}
-  .form-group.full{grid-column:1/-1}
-
-  label{
-    font-size:13px; font-weight:600; color:var(--muted); margin-bottom:6px; display:block; 
-    text-transform:uppercase; letter-spacing:0.5px;
-  }
-  input,select,textarea{
-    width:100%; min-height:44px; padding:12px 16px; border-radius:12px; font-family:inherit;
-    border:1px solid var(--border); background:var(--elevated); color:var(--ink); 
-    transition:var(--transition); font-size:14px; font-weight:400;
-  }
-  input:focus,select:focus,textarea:focus{
-    outline:none; border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-glow);
-    background:var(--surface);
-  }
-  textarea{resize:vertical; font-family:ui-monospace,SF Mono,Monaco,Consolas,monospace; line-height:1.5}
-
-  /* ========== Enhanced Swatches ========== */
-  .swatch-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(80px,1fr)); gap:8px; margin-top:8px}
-  .swatch{
-    padding:8px 12px; border-radius:10px; border:1px solid var(--border); background:var(--elevated);
-    font-size:12px; font-weight:500; cursor:pointer; transition:var(--transition); text-align:center;
-    position:relative; overflow:hidden;
-  }
-  .swatch::before{
-    content:''; position:absolute; inset:0; background:var(--accent-glow); opacity:0; transition:var(--transition);
-  }
-  .swatch:hover::before{opacity:1}
-  .swatch[aria-pressed="true"]{border-color:var(--accent); color:var(--accent); font-weight:600}
-  .swatch[aria-pressed="true"]::before{opacity:.5}
-
-  /* ========== Enhanced Tabs ========== */
-  .tabs{
-    display:flex; gap:4px; background:var(--elevated); padding:4px; border-radius:12px; margin-bottom:20px;
-    position:relative; overflow:hidden;
-  }
-  .tabs::before{
-    content:''; position:absolute; inset:4px; border-radius:8px; 
-    background:linear-gradient(135deg,var(--accent),var(--accent-2)); 
-    transition:var(--transition); opacity:0; z-index:0;
-  }
-  .tab{
-    flex:1; padding:10px 16px; border-radius:8px; color:var(--muted); cursor:pointer; 
-    transition:var(--transition); position:relative; z-index:1; text-align:center; font-weight:500;
-    background:transparent; border:none; font-family:inherit;
-  }
-  .tab[aria-selected="true"]{
-    color:white; background:linear-gradient(135deg,var(--accent),var(--accent-2)); font-weight:600;
-    box-shadow:0 4px 12px -4px var(--accent);
-  }
-  .tabpanel[hidden]{display:none}
-
-  /* ========== Enhanced Preview Stage ========== */
-  .stage-container{position:relative}
-  .stage{
-    height:70vh; min-height:400px; border:1px solid var(--border); border-radius:var(--r-lg); 
-    overflow:hidden; background:var(--elevated); position:relative; cursor:grab;
-    background-image: radial-gradient(circle at 1px 1px, var(--border) 1px, transparent 0);
-    background-size: 20px 20px; background-position: -10px -10px;
-  }
-  .stage:active{cursor:grabbing}
-  .stage.light{background:white; background-image: radial-gradient(circle at 1px 1px, #e5e7eb 1px, transparent 0)}
-  #inner{position:absolute; top:50%; left:50%; transform-origin:0 0; transition:transform .1s ease-out}
-
-  .hud{
-    display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px; padding:12px; 
-    background:var(--glass); border:1px solid var(--glass-border); border-radius:12px; backdrop-filter:blur(10px);
-  }
-  .hud .chip{background:var(--glass); backdrop-filter:blur(10px); border-color:var(--glass-border)}
-
-  /* ========== Enhanced Profiles ========== */
-  .search-wrapper{position:relative; margin-bottom:16px}
-  .search-wrapper .material-icons-round{
-    position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--muted); pointer-events:none;
-  }
-  .search-wrapper input{padding-left:44px}
-
-  .profiles{display:grid; gap:12px; max-height:60vh; overflow-y:auto; scrollbar-width:thin}
-  .profile{
-    display:grid; grid-template-columns:48px 1fr auto; gap:12px; align-items:center; 
-    padding:12px; border:1px solid var(--border); border-radius:12px; background:var(--elevated);
-    cursor:pointer; transition:var(--transition); position:relative; overflow:hidden;
-  }
-  .profile::before{
-    content:''; position:absolute; inset:0; background:var(--accent-glow); opacity:0; transition:var(--transition);
-  }
-  .profile:hover::before{opacity:1}
-  .profile:hover{border-color:var(--accent); transform:translateY(-1px)}
-
-  .profile-thumb{
-    width:48px; height:48px; border-radius:12px; background:linear-gradient(135deg,var(--accent),var(--accent-2));
-    display:grid; place-items:center; color:white; font-weight:800; font-size:13px;
-    position:relative; overflow:hidden;
-  }
-  .profile-thumb::before{
-    content:''; position:absolute; inset:0; background:linear-gradient(135deg,rgba(255,255,255,.2),transparent .5);
-  }
-
-  .profile-info .name{font-weight:600; font-size:14px; margin-bottom:2px}
-  .profile-info .note{color:var(--muted); font-size:12px}
-
-  .profile-actions{display:flex; gap:6px}
-  .profile-actions .chip{min-height:32px; padding:6px 10px; font-size:11px}
-
-  /* ========== Animations ========== */
-  @keyframes slideInUp{
-    from{opacity:0; transform:translateY(20px)}
-    to{opacity:1; transform:translateY(0)}
-  }
-  @keyframes pulse{
-    0%,100%{opacity:1}
-    50%{opacity:.5}
-  }
-  @keyframes bounce{
-    0%,100%{transform:translateY(0)}
-    50%{transform:translateY(-4px)}
-  }
-  .slide-in{animation:slideInUp .3s var(--bounce) forwards}
-  .pulse{animation:pulse 1.5s infinite}
-  .bounce{animation:bounce .5s var(--bounce)}
-
-  /* ========== Modal & Toast Enhancements ========== */
-  dialog{
-    border:1px solid var(--border); border-radius:var(--r-lg); padding:0; 
-    background:var(--surface); color:var(--ink); width:min(600px,90vw);
-    backdrop-filter:blur(20px); box-shadow:var(--shadow-lg);
-  }
-  dialog::backdrop{background:rgba(0,0,0,.6); backdrop-filter:blur(4px)}
-  .modal-head{
-    padding:20px 24px; border-bottom:1px solid var(--border); font-weight:700; font-size:18px;
-    background:linear-gradient(135deg,var(--accent),var(--accent-2)); color:white; margin:-1px -1px 0;
-    border-radius:var(--r-lg) var(--r-lg) 0 0;
-  }
-  .modal-body{padding:24px}
-  .modal-actions{padding:20px 24px; border-top:1px solid var(--border); display:flex; gap:12px; justify-content:flex-end}
-
-  .toast{
-    position:fixed; top:24px; right:24px; background:var(--surface); border:1px solid var(--border);
-    padding:16px 20px; border-radius:12px; box-shadow:var(--shadow-lg); 
-    backdrop-filter:blur(20px); opacity:0; transform:translateY(-20px) scale(.95); 
-    transition:var(--transition); z-index:1000; max-width:400px;
-  }
-  .toast.show{opacity:1; transform:translateY(0) scale(1)}
-  .toast.success{border-left:4px solid var(--success)}
-  .toast.error{border-left:4px solid var(--danger)}
-  .toast.warning{border-left:4px solid var(--warning)}
-
-  /* ========== Responsive Enhancements ========== */
-  @media (max-width:1000px){
-    .stage{height:50vh; min-height:300px}
-    .profiles{max-height:40vh}
-    .hud{padding:8px; gap:6px}
-    .hud .chip{min-height:36px; padding:8px 10px; font-size:12px}
-  }
-
-  /* ========== Loading States ========== */
-  .loading{position:relative; pointer-events:none}
-  .loading::after{
-    content:''; position:absolute; inset:0; background:var(--glass); border-radius:inherit;
-    display:flex; align-items:center; justify-content:center; backdrop-filter:blur(2px);
-    animation:pulse 1.5s infinite;
-  }
-
-  /* ========== Accessibility ========== */
-  .sr-only{position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden}
-  @media (prefers-reduced-motion:reduce){
-    *,*::before,*::after{animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important}
-  }
-  
-  /* ========== Scrollbar Styling ========== */
-  ::-webkit-scrollbar{width:8px; height:8px}
-  ::-webkit-scrollbar-track{background:var(--elevated); border-radius:4px}
-  ::-webkit-scrollbar-thumb{background:var(--border); border-radius:4px; border:2px solid var(--elevated)}
-  ::-webkit-scrollbar-thumb:hover{background:var(--muted)}
-</style>
-</head>
-<body>
-<header>
-  <div class="header-inner">
-    <div class="brand">
-      <div class="logo" aria-hidden="true"></div>
-      <div class="brand-text">
-        <strong>Medallion Forge</strong>
-        <div class="subtitle">Enhanced Edition</div>
-      </div>
-    </div>
-    <div class="toolbar" role="group" aria-label="Global controls">
-      <label class="chip">
-        <span class="material-icons-round" aria-hidden="true">aspect_ratio</span>
-        <select id="sizeSelect" aria-label="Canvas size">
-          <option value="320">320px</option><option value="512">512px</option><option value="640" selected>640px</option><option value="768">768px</option><option value="1024">1024px</option><option value="1536">1536px</option>
-        </select>
-      </label>
-      <button id="themeToggle" class="chip" type="button" aria-pressed="false" title="Toggle theme">
-        <span class="material-icons-round" aria-hidden="true">dark_mode</span><span id="themeLabel">Dark</span>
-      </button>
-      <button id="fullscreenBtn" class="chip" type="button" title="Toggle fullscreen preview">
-        <span class="material-icons-round" aria-hidden="true">fullscreen</span>
-      </button>
-    </div>
-  </div>
-</header>
-
-<div class="app">
-  <div class="grid">
-    <!-- Enhanced Presets Panel -->
-    <div class="card slide-in">
-      <h1>Preset Library</h1>
-      <div class="search-wrapper">
-        <span class="material-icons-round">search</span>
-        <input id="profileSearch" placeholder="Search presets..." aria-label="Search presets">
-      </div>
-      <div id="profiles" class="profiles"></div>
-      <div class="toolbar" style="margin-top:16px; justify-content:space-between">
-        <div style="display:flex; gap:8px">
-          <button id="addPresetBtn" class="chip" type="button" title="Save current configuration">
-            <span class="material-icons-round">bookmark_add</span>Save
-          </button>
-          <button id="randBtn" class="chip" type="button" title="Generate random configuration">
-            <span class="material-icons-round">casino</span>Random
-          </button>
-        </div>
-        <div style="display:flex; gap:8px">
-          <button id="exportJsonBtn" class="chip" type="button" title="Export all data">
-            <span class="material-icons-round">upload</span>Export
-          </button>
-          <button id="importJsonBtn" class="chip" type="button" title="Import data">
-            <span class="material-icons-round">download</span>Import
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Enhanced Builder Panel -->
-    <div class="card slide-in" style="animation-delay:.1s">
-      <h1>Configuration Studio</h1>
-      <div class="tabs" role="tablist">
-        <button class="tab" data-tab="basic" aria-controls="panel-basic" aria-selected="true">Basics</button>
-        <button class="tab" data-tab="symbols" aria-controls="panel-symbols" aria-selected="false" tabindex="-1">Symbols</button>
-        <button class="tab" data-tab="advanced" aria-controls="panel-advanced" aria-selected="false" tabindex="-1">Advanced</button>
-        <button class="tab" data-tab="export" aria-controls="panel-export" aria-selected="false" tabindex="-1">Export</button>
-      </div>
-
-      <div id="panel-basic" class="tabpanel" role="tabpanel">
-        <h2>Text & Foundation</h2>
-        <div class="form-grid">
-          <div class="form-group">
-            <label for="text_top">Primary Text</label>
-            <input id="text_top" placeholder="GALACTIC JEDI ORDER" autocomplete="off">
-          </div>
-          <div class="form-group">
-            <label for="flip_arc">Text Orientation</label>
-            <select id="flip_arc">
-              <option value="auto" selected>Auto-detect</option>
-              <option value="normal">Standard</option>
-              <option value="flipped">Inverted</option>
-            </select>
-          </div>
-          <div class="form-group full">
-            <label for="rim_finish">Rim Material</label>
-            <input id="rim_finish" placeholder="polished steel with subtle etching">
-            <div class="swatch-grid" id="rim_swatches" role="group" aria-label="Rim material presets">
-              <button class="swatch" data-val="polished steel">Steel</button>
-              <button class="swatch" data-val="brushed silver">Silver</button>
-              <button class="swatch" data-val="antique gold">Gold</button>
-              <button class="swatch" data-val="weathered bronze">Bronze</button>
-              <button class="swatch" data-val="blackened iron">Iron</button>
-              <button class="swatch" data-val="copper patina">Copper</button>
-            </div>
-          </div>
-          <div class="form-group full">
-            <label for="plate_color">Base Plate</label>
-            <input id="plate_color" placeholder="deep obsidian with subtle texture">
-            <div class="swatch-grid" id="plate_swatches" role="group" aria-label="Plate color presets">
-              <button class="swatch" data-val="deep obsidian">Obsidian</button>
-              <button class="swatch" data-val="pearl white">Pearl</button>
-              <button class="swatch" data-val="midnight navy">Navy</button>
-              <button class="swatch" data-val="crimson red">Crimson</button>
-              <button class="swatch" data-val="forest green">Forest</button>
-              <button class="swatch" data-val="royal purple">Purple</button>
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="text_colors">Text Styling</label>
-            <input id="text_colors" placeholder="luminous white with shadow outline">
-          </div>
-          <div class="form-group">
-            <label for="outline_color">Border Accent</label>
-            <input id="outline_color" placeholder="electric blue glow">
-          </div>
-        </div>
-
-        <h2>Central Design</h2>
-        <div class="form-grid">
-          <div class="form-group full">
-            <label for="state_shape">Primary Outline</label>
-            <input id="state_shape" placeholder="ornate circular mandala pattern">
-          </div>
-        </div>
-      </div>
-
-      <div id="panel-symbols" class="tabpanel" role="tabpanel" hidden>
-        <h2>Symbolic Elements</h2>
-        <div class="form-grid">
-          <div class="form-group">
-            <label for="main_symbol">Central Icon</label>
-            <input id="main_symbol" placeholder="stylized phoenix rising">
-          </div>
-          <div class="form-group">
-            <label for="symbol_color">Icon Coloring</label>
-            <input id="symbol_color" placeholder="gradient gold to crimson">
-          </div>
-          <div class="form-group full">
-            <label for="badge_elements">Decorative Elements</label>
-            <input id="badge_elements" placeholder="intricate geometric patterns with Celtic knots">
-          </div>
-          <div class="form-group">
-            <label for="secondary_symbol">Secondary Motif</label>
-            <input id="secondary_symbol" placeholder="constellation of stars (optional)">
-          </div>
-          <div class="form-group">
-            <label for="aurebesh_style">Script/Runes</label>
-            <input id="aurebesh_style" placeholder="glowing runic inscriptions around border">
-          </div>
-          <div class="form-group full">
-            <label for="sabers_desc">Energy Elements</label>
-            <input id="sabers_desc" placeholder="twin energy beams with particle effects">
-          </div>
-        </div>
-      </div>
-
-      <div id="panel-advanced" class="tabpanel" role="tabpanel" hidden>
-        <h2>Advanced Styling</h2>
-        <div class="form-grid">
-          <div class="form-group full">
-            <label for="style_keywords">Visual Style</label>
-            <input id="style_keywords" placeholder="cinematic, photorealistic, dramatic lighting, high detail">
-          </div>
-          <div class="form-group">
-            <label for="lighting_mood">Lighting Mood</label>
-            <select id="lighting_mood">
-              <option value="dramatic">Dramatic</option>
-              <option value="soft" selected>Soft</option>
-              <option value="harsh">Harsh</option>
-              <option value="ethereal">Ethereal</option>
-              <option value="moody">Moody</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="material_finish">Surface Finish</label>
-            <select id="material_finish">
-              <option value="polished" selected>Polished</option>
-              <option value="matte">Matte</option>
-              <option value="brushed">Brushed</option>
-              <option value="hammered">Hammered</option>
-              <option value="engraved">Engraved</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="detail_level">Detail Level</label>
-            <input type="range" id="detail_level" min="1" max="10" value="7" style="width:100%">
-            <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--muted); margin-top:4px">
-              <span>Minimal</span><span>Moderate</span><span>Intricate</span>
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="age_patina">Age/Patina</label>
-            <input type="range" id="age_patina" min="0" max="10" value="2" style="width:100%">
-            <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--muted); margin-top:4px">
-              <span>New</span><span>Aged</span><span>Ancient</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div id="panel-export" class="tabpanel" role="tabpanel" hidden>
-        <h2>Generated Prompt</h2>
-        <div class="form-grid">
-          <div class="form-group full">
-            <textarea id="out" spellcheck="false" placeholder="Your detailed prompt will appear here..." style="min-height:200px; font-size:13px"></textarea>
-          </div>
-        </div>
-        <div class="toolbar" style="margin-top:16px; flex-wrap:wrap; gap:12px">
-          <button id="gen" class="btn primary bounce" type="button">
-            <span class="material-icons-round">auto_awesome</span>Generate Prompt
-          </button>
-          <button id="copyBtn" class="btn" type="button">
-            <span class="material-icons-round">content_copy</span>Copy Text
-          </button>
-          <button id="downloadBtn" class="btn" type="button">
-            <span class="material-icons-round">download</span>Save TXT
-          </button>
-          <button id="copySvgBtn" class="btn" type="button">
-            <span class="material-icons-round">code</span>Copy SVG
-          </button>
-          <button id="downloadSvgBtn" class="btn" type="button">
-            <span class="material-icons-round">image</span>Save SVG
-          </button>
-          <button id="downloadPngBtn" class="btn" type="button">
-            <span class="material-icons-round">photo</span>Export PNG
-          </button>
-          <button id="clearBtn" class="btn" type="button" title="Reset to defaults">
-            <span class="material-icons-round">refresh</span>Reset
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Enhanced Preview Panel -->
-    <div class="card slide-in" style="animation-delay:.2s">
-      <h1>Live Preview</h1>
-      <div class="hud">
-        <button class="chip" id="fit" type="button" title="Fit to view">
-          <span class="material-icons-round">fit_screen</span>Fit
-        </button>
-        <button class="chip" id="fillView" type="button" title="Fill viewport">
-          <span class="material-icons-round">fullscreen</span>Fill
-        </button>
-        <button class="chip" id="resetView" type="button" title="Reset view">
-          <span class="material-icons-round">center_focus_strong</span>Reset
-        </button>
-        <button class="chip" id="rotateView" type="button" title="Rotate 45°">
-          <span class="material-icons-round">rotate_right</span>Rotate
-        </button>
-        <span class="chip" id="hudZoom">100%</span>
-        <span class="chip" id="hudSize">—</span>
-        <button class="chip" id="animateBtn" type="button" title="Toggle animation">
-          <span class="material-icons-round">play_circle</span>Animate
-        </button>
-      </div>
-      <div class="stage-container">
-        <div class="stage" id="stage" aria-label="Interactive preview - pan, zoom, and rotate">
-          <div id="inner"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Enhanced Modals -->
-<dialog id="jsonModal" aria-labelledby="jsonTitle" aria-modal="true">
-  <div class="modal-head">
-    <strong id="jsonTitle">Import / Export Configuration</strong>
-  </div>
-  <div class="modal-body">
-    <p style="color:var(--muted); margin-bottom:16px; font-size:14px">
-      Export your current setup or import saved configurations. JSON format preserves all settings and presets.
-    </p>
-    <textarea id="jsonArea" style="width:100%; min-height:300px; font-family:ui-monospace,monospace; font-size:12px" placeholder="Paste JSON configuration here..."></textarea>
-  </div>
-  <div class="modal-actions">
-    <button id="applyJson" class="btn primary" type="button">
-      <span class="material-icons-round">check</span>Apply
-    </button>
-    <button id="copyJson" class="btn" type="button">
-      <span class="material-icons-round">content_copy</span>Copy
-    </button>
-    <button id="validateJson" class="btn" type="button">
-      <span class="material-icons-round">fact_check</span>Validate
-    </button>
-    <button id="closeJson" class="btn" type="button">Cancel</button>
-  </div>
-</dialog>
-
-<dialog id="fullscreenModal" aria-labelledby="fullscreenTitle" aria-modal="true" style="max-width:95vw; max-height:95vh">
-  <div class="modal-head">
-    <strong id="fullscreenTitle">Fullscreen Preview</strong>
-  </div>
-  <div class="modal-body" style="padding:12px">
-    <div id="fullscreenStage" style="width:80vh; height:80vh; border:1px solid var(--border); border-radius:12px; overflow:hidden; background:var(--elevated); position:relative">
-      <div id="fullscreenInner" style="position:absolute; top:50%; left:50%; transform-origin:0 0"></div>
-    </div>
-  </div>
-  <div class="modal-actions">
-    <button id="closeFullscreen" class="btn" type="button">Close</button>
-  </div>
-</dialog>
-
-<!-- Enhanced Toast System -->
-<div id="toastContainer" style="position:fixed; top:24px; right:24px; z-index:1000; display:flex; flex-direction:column; gap:8px; pointer-events:none"></div>
-
-<div id="live" class="sr-only" aria-live="polite">Ready</div>
-
 <script>
-/* ===== Enhanced Medallion Forge - Modern, Feature-Rich Implementation ===== */
+/* ===== Medallion Forge — Enhanced Edition (fixed helpers + Eruda bootstrap) ===== */
 (() => {
   'use strict';
-  
-  // Enhanced utilities
-  const $ = s => document.querySelector(s);
-  const $ = s => Array.from(document.querySelectorAll(s));
+
+  // --- helpers (fixed) -------------------------------------------------------
+  const $  = s => document.querySelector(s);                 // single
+  const $$ = s => Array.from(document.querySelectorAll(s));  // many
   const byId = id => document.getElementById(id);
   const NS = 'http://www.w3.org/2000/svg';
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
-  
-  // Storage keys
+
+  // Quietly init Eruda if it's present (prevents console spam)
+  if (window.eruda && typeof window.eruda.init === 'function') {
+    try { window.eruda.init(); } catch { /* no-op */ }
+  }
+
+  // --- storage ---------------------------------------------------------------
   const STORAGE_KEYS = {
     FORM: 'medallion:enhanced:form',
-    PRESETS: 'medallion:enhanced:presets', 
+    PRESETS: 'medallion:enhanced:presets',
     THEME: 'medallion:enhanced:theme',
     VIEW: 'medallion:enhanced:view'
   };
-  
-  // Safe localStorage wrapper
   const storage = {
     get: k => { try { return localStorage.getItem(k) } catch { return null } },
     set: (k, v) => { try { localStorage.setItem(k, v) } catch {} },
     del: k => { try { localStorage.removeItem(k) } catch {} }
   };
 
-  // Enhanced toast system
+  // --- toast -----------------------------------------------------------------
   const toastContainer = byId('toastContainer');
   let toastId = 0;
   const showToast = (message, type = 'success', duration = 3000) => {
-    const toast = document.createElement('div');
-    toast.className = `toast ${type} show`;
-    toast.id = `toast-${++toastId}`;
-    toast.innerHTML = `
-      <div style="display:flex; align-items:center; gap:10px">
-        <span class="material-icons-round">${type === 'success' ? 'check_circle' : type === 'error' ? 'error' : 'info'}</span>
+    const el = document.createElement('div');
+    el.className = `toast ${type} show`;
+    el.id = `toast-${++toastId}`;
+    el.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px">
+        <span class="material-icons-round">
+          ${type === 'success' ? 'check_circle' : type === 'error' ? 'error' : 'info'}
+        </span>
         <span>${message}</span>
-      </div>
-    `;
-    
-    toastContainer.appendChild(toast);
+      </div>`;
+    toastContainer.appendChild(el);
     byId('live').textContent = message;
-    
     setTimeout(() => {
-      toast.style.opacity = '0';
-      toast.style.transform = 'translateX(100%) scale(0.95)';
-      setTimeout(() => toast.remove(), 200);
+      el.style.opacity = '0';
+      el.style.transform = 'translateX(100%) scale(0.95)';
+      setTimeout(() => el.remove(), 200);
     }, duration);
   };
 
-  // Enhanced theme system
+  // --- theme -----------------------------------------------------------------
   function initTheme() {
     const stored = storage.get(STORAGE_KEYS.THEME);
     if (stored === 'light') document.body.classList.add('theme-light');
-    
+
     const updateTheme = () => {
       const isLight = document.body.classList.contains('theme-light');
       const toggle = byId('themeToggle');
       const icon = toggle.querySelector('.material-icons-round');
       const label = byId('themeLabel');
-      
       toggle.setAttribute('aria-pressed', String(isLight));
       icon.textContent = isLight ? 'light_mode' : 'dark_mode';
       label.textContent = isLight ? 'Light' : 'Dark';
       byId('stage').classList.toggle('light', isLight);
     };
-    
+
     updateTheme();
-    
     byId('themeToggle').addEventListener('click', () => {
       const isLight = document.body.classList.toggle('theme-light');
       storage.set(STORAGE_KEYS.THEME, isLight ? 'light' : 'dark');
@@ -670,76 +76,58 @@
     });
   }
 
-  // Enhanced tab system
+  // --- tabs (uses $$) --------------------------------------------------------
   function initTabs() {
-    const tabs = $('.tab');
+    const tabs = $$('.tab');
     const panels = {
       basic: byId('panel-basic'),
-      symbols: byId('panel-symbols'), 
+      symbols: byId('panel-symbols'),
       advanced: byId('panel-advanced'),
       export: byId('panel-export')
     };
-    
+
     const setTab = (activeTab) => {
       const targetId = activeTab.dataset.tab;
-      
       tabs.forEach(tab => {
-        const isActive = tab === activeTab;
-        tab.setAttribute('aria-selected', String(isActive));
-        tab.tabIndex = isActive ? 0 : -1;
+        const on = tab === activeTab;
+        tab.setAttribute('aria-selected', String(on));
+        tab.tabIndex = on ? 0 : -1;
       });
-      
-      Object.entries(panels).forEach(([id, panel]) => {
-        panel.hidden = id !== targetId;
-      });
-      
+      Object.entries(panels).forEach(([id, panel]) => { panel.hidden = id !== targetId; });
       activeTab.focus();
     };
-    
+
     tabs.forEach((tab, index) => {
       tab.addEventListener('click', () => setTab(tab));
       tab.addEventListener('keydown', e => {
-        switch(e.key) {
-          case 'ArrowRight':
-            e.preventDefault();
-            setTab(tabs[(index + 1) % tabs.length]);
-            break;
-          case 'ArrowLeft':
-            e.preventDefault();
-            setTab(tabs[(index - 1 + tabs.length) % tabs.length]);
-            break;
-          case 'Home':
-            e.preventDefault();
-            setTab(tabs[0]);
-            break;
-          case 'End':
-            e.preventDefault();
-            setTab(tabs[tabs.length - 1]);
-            break;
+        switch (e.key) {
+          case 'ArrowRight': e.preventDefault(); setTab(tabs[(index + 1) % tabs.length]); break;
+          case 'ArrowLeft':  e.preventDefault(); setTab(tabs[(index - 1 + tabs.length) % tabs.length]); break;
+          case 'Home':       e.preventDefault(); setTab(tabs[0]); break;
+          case 'End':        e.preventDefault(); setTab(tabs[tabs.length - 1]); break;
         }
       });
     });
-    
+
     setTab(tabs[0]);
   }
 
-  // Enhanced form management
+  // --- form ------------------------------------------------------------------
   const FORM_FIELDS = [
-    'text_top', 'rim_finish', 'plate_color', 'text_colors', 'state_shape', 'outline_color',
-    'main_symbol', 'symbol_color', 'badge_elements', 'secondary_symbol', 'aurebesh_style',
-    'sabers_desc', 'style_keywords', 'flip_arc', 'lighting_mood', 'material_finish',
-    'detail_level', 'age_patina'
+    'text_top','rim_finish','plate_color','text_colors','state_shape','outline_color',
+    'main_symbol','symbol_color','badge_elements','secondary_symbol','aurebesh_style',
+    'sabers_desc','style_keywords','flip_arc','lighting_mood','material_finish',
+    'detail_level','age_patina'
   ];
-  
   const getDefaultForm = () => ({
     text_top: "GALACTIC JEDI ORDER",
-    rim_finish: "polished steel with subtle etching", 
+    rim_finish: "polished steel with subtle etching",
     plate_color: "deep obsidian with subtle texture",
     text_colors: "luminous white with shadow outline",
     state_shape: "ornate circular mandala pattern",
     outline_color: "electric blue glow",
     main_symbol: "stylized phoenix rising",
-    symbol_color: "gradient gold to crimson", 
+    symbol_color: "gradient gold to crimson",
     badge_elements: "intricate geometric patterns with Celtic knots",
     secondary_symbol: "constellation of stars",
     aurebesh_style: "glowing runic inscriptions around border",
@@ -747,116 +135,60 @@
     style_keywords: "cinematic, photorealistic, dramatic lighting, high detail",
     flip_arc: "auto",
     lighting_mood: "soft",
-    material_finish: "polished", 
+    material_finish: "polished",
     detail_level: "7",
     age_patina: "2"
   });
-  
   let currentForm = (() => {
     const stored = storage.get(STORAGE_KEYS.FORM);
     if (!stored) return getDefaultForm();
-    try {
-      const parsed = JSON.parse(stored);
-      return { ...getDefaultForm(), ...parsed };
-    } catch {
-      return getDefaultForm();
-    }
+    try { return { ...getDefaultForm(), ...JSON.parse(stored) }; }
+    catch { return getDefaultForm(); }
   })();
-  
   const readForm = () => {
     const form = {};
-    FORM_FIELDS.forEach(field => {
-      const element = byId(field);
-      if (element) {
-        form[field] = element.value.trim();
-      }
-    });
+    FORM_FIELDS.forEach(id => { const el = byId(id); if (el) form[id] = el.value.trim(); });
     return form;
   };
-  
-  const writeForm = (formData) => {
-    FORM_FIELDS.forEach(field => {
-      const element = byId(field);
-      if (element && formData[field] != null) {
-        element.value = formData[field];
-      }
-    });
-    currentForm = formData;
+  const writeForm = (data) => {
+    FORM_FIELDS.forEach(id => { const el = byId(id); if (el && data[id] != null) el.value = data[id]; });
+    currentForm = data;
     storage.set(STORAGE_KEYS.FORM, JSON.stringify(currentForm));
   };
 
-  // Enhanced preset system
+  // --- presets ---------------------------------------------------------------
   const getDefaultPresets = () => [
-    {
-      id: 'jedi_classic',
-      name: 'Classic Jedi Order', 
-      note: 'Traditional design • Blue energy',
-      thumb: 'JEDI',
-      form: getDefaultForm()
-    },
-    {
-      id: 'sith_dark',
-      name: 'Dark Side Order',
-      note: 'Crimson accents • Gothic styling', 
-      thumb: 'SITH',
-      form: {
-        ...getDefaultForm(),
-        text_top: "SITH ETERNAL",
-        plate_color: "midnight black with red veins",
-        text_colors: "blood red with black outline",
-        outline_color: "crimson glow",
-        main_symbol: "dark star with spikes",
-        symbol_color: "deep crimson with shadow",
-        sabers_desc: "crossed red lightsabers with dark energy"
-      }
-    },
-    {
-      id: 'mandalorian',
-      name: 'Mandalorian Clan',
-      note: 'Beskar steel • Warrior heritage',
-      thumb: 'MAND',
-      form: {
-        ...getDefaultForm(),
-        text_top: "THIS IS THE WAY",
-        rim_finish: "beskar steel with battle worn edges",
-        plate_color: "gunmetal gray with scratches",
-        main_symbol: "mythosaur skull",
-        symbol_color: "metallic silver with wear marks",
-        badge_elements: "clan sigils and honor marks"
-      }
-    }
+    { id:'jedi_classic', name:'Classic Jedi Order', note:'Traditional design • Blue energy', thumb:'JEDI', form:getDefaultForm() },
+    { id:'sith_dark', name:'Dark Side Order', note:'Crimson accents • Gothic styling', thumb:'SITH',
+      form:{ ...getDefaultForm(),
+        text_top:"SITH ETERNAL", plate_color:"midnight black with red veins",
+        text_colors:"blood red with black outline", outline_color:"crimson glow",
+        main_symbol:"dark star with spikes", symbol_color:"deep crimson with shadow",
+        sabers_desc:"crossed red lightsabers with dark energy" } },
+    { id:'mandalorian', name:'Mandalorian Clan', note:'Beskar steel • Warrior heritage', thumb:'MAND',
+      form:{ ...getDefaultForm(),
+        text_top:"THIS IS THE WAY", rim_finish:"beskar steel with battle worn edges",
+        plate_color:"gunmetal gray with scratches", main_symbol:"mythosaur skull",
+        symbol_color:"metallic silver with wear marks", badge_elements:"clan sigils and honor marks" } }
   ];
-  
   const getPresets = () => {
     const stored = storage.get(STORAGE_KEYS.PRESETS);
     if (!stored) return getDefaultPresets();
     try {
       const parsed = JSON.parse(stored);
       return Array.isArray(parsed) && parsed.length ? parsed : getDefaultPresets();
-    } catch {
-      return getDefaultPresets();
-    }
+    } catch { return getDefaultPresets(); }
   };
-  
-  const setPresets = (presets) => {
-    storage.set(STORAGE_KEYS.PRESETS, JSON.stringify(presets));
-    renderPresets();
-  };
-  
+  const setPresets = (p) => { storage.set(STORAGE_KEYS.PRESETS, JSON.stringify(p)); renderPresets(); };
+
   function renderPresets() {
-    const container = byId('profiles');
-    const query = (byId('profileSearch').value || '').toLowerCase();
-    
-    container.innerHTML = '';
-    
-    const filteredPresets = getPresets().filter(preset => 
-      !query || 
-      preset.name.toLowerCase().includes(query) || 
-      preset.note.toLowerCase().includes(query) ||
-      preset.thumb.toLowerCase().includes(query)
+    const wrap = byId('profiles');
+    const q = (byId('profileSearch').value || '').toLowerCase();
+    wrap.innerHTML = '';
+    const list = getPresets().filter(p =>
+      !q || p.name.toLowerCase().includes(q) || p.note.toLowerCase().includes(q) || p.thumb.toLowerCase().includes(q)
     );
-    
-    filteredPresets.forEach(preset => {
+    list.forEach(preset => {
       const div = document.createElement('div');
       div.className = 'profile slide-in';
       div.innerHTML = `
@@ -872,987 +204,489 @@
           <button class="chip" data-action="delete" title="Delete preset">
             <span class="material-icons-round">delete</span>
           </button>
-        </div>
-      `;
-      
-      const applyBtn = div.querySelector('[data-action="apply"]');
-      const deleteBtn = div.querySelector('[data-action="delete"]');
-      
-      applyBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        writeForm(preset.form);
-        generatePreview();
-        showToast(`Applied "${preset.name}"`);
+        </div>`;
+      div.querySelector('[data-action="apply"]').addEventListener('click', (e) => {
+        e.stopPropagation(); writeForm(preset.form); generatePreview(); showToast(`Applied "${preset.name}"`);
       });
-      
-      deleteBtn.addEventListener('click', (e) => {
+      div.querySelector('[data-action="delete"]').addEventListener('click', (e) => {
         e.stopPropagation();
         const isDefault = getDefaultPresets().some(p => p.id === preset.id);
-        if (isDefault) {
-          showToast('Cannot delete default presets', 'error');
-          return;
-        }
-        
-        if (confirm(`Delete "${preset.name}"?`)) {
-          setPresets(getPresets().filter(p => p.id !== preset.id));
-          showToast('Preset deleted');
-        }
+        if (isDefault) return showToast('Cannot delete default presets','error');
+        if (confirm(`Delete "${preset.name}"?`)) { setPresets(getPresets().filter(p => p.id !== preset.id)); showToast('Preset deleted'); }
       });
-      
-      div.addEventListener('click', () => {
-        writeForm(preset.form);
-        generatePreview();
-        showToast(`Loaded "${preset.name}"`);
-      });
-      
-      container.appendChild(div);
+      div.addEventListener('click', () => { writeForm(preset.form); generatePreview(); showToast(`Loaded "${preset.name}"`); });
+      wrap.appendChild(div);
     });
   }
 
-  // Enhanced SVG generation
+  // --- svg generation --------------------------------------------------------
   function generateSvg(form) {
     const size = parseInt(byId('sizeSelect').value) || 640;
     const R = size / 2;
-    
+
     const svg = document.createElementNS(NS, 'svg');
     svg.setAttribute('viewBox', `0 0 ${size} ${size}`);
     svg.setAttribute('width', size);
     svg.setAttribute('height', size);
     svg.setAttribute('shape-rendering', 'geometricPrecision');
     svg.setAttribute('text-rendering', 'optimizeLegibility');
-    
+
     const defs = document.createElementNS(NS, 'defs');
     svg.appendChild(defs);
-    
-    // Enhanced color mapping
-    const getColor = (input, fallback = '#ffffff') => {
+
+    const getColor = (input = '', fallback = '#ffffff') => {
       const colors = {
-        'obsidian': '#0f1419', 'pearl': '#f8fafc', 'navy': '#1e293b', 'crimson': '#991b1b',
-        'forest': '#166534', 'purple': '#7c2d12', 'gold': '#d97706', 'silver': '#64748b',
-        'steel': '#475569', 'bronze': '#92400e', 'iron': '#374151', 'copper': '#ea580c'
+        obsidian:'#0f1419', pearl:'#f8fafc', navy:'#1e293b', crimson:'#991b1b',
+        forest:'#166534', purple:'#7c2d12', gold:'#d97706', silver:'#64748b',
+        steel:'#475569', bronze:'#92400e', iron:'#374151', copper:'#ea580c', white:'#ffffff', black:'#111827'
       };
-      
       const lower = input.toLowerCase();
-      for (const [key, color] of Object.entries(colors)) {
-        if (lower.includes(key)) return color;
-      }
+      for (const [k, c] of Object.entries(colors)) if (lower.includes(k)) return c;
       return fallback;
     };
-    
-    // Create gradients
+
+    // rim gradient
     const rimGradient = document.createElementNS(NS, 'radialGradient');
     rimGradient.setAttribute('id', 'rimGrad');
-    rimGradient.setAttribute('cx', '50%');
-    rimGradient.setAttribute('cy', '50%');
-    rimGradient.setAttribute('r', '60%');
-    
-    const rimColor = getColor(form.rim_finish, '#64748b');
-    const stops = [
-      { offset: '0%', color: 'rgba(255,255,255,0.3)' },
-      { offset: '40%', color: rimColor },
-      { offset: '100%', color: 'rgba(0,0,0,0.4)' }
-    ];
-    
-    stops.forEach(stop => {
-      const stopEl = document.createElementNS(NS, 'stop');
-      stopEl.setAttribute('offset', stop.offset);
-      stopEl.setAttribute('stop-color', stop.color);
-      rimGradient.appendChild(stopEl);
+    rimGradient.setAttribute('cx', '50%'); rimGradient.setAttribute('cy', '50%'); rimGradient.setAttribute('r', '60%');
+    [
+      { offset:'0%',   color:'rgba(255,255,255,0.3)' },
+      { offset:'40%',  color:getColor(form.rim_finish, '#64748b') },
+      { offset:'100%', color:'rgba(0,0,0,0.4)' }
+    ].forEach(s => {
+      const st = document.createElementNS(NS, 'stop');
+      st.setAttribute('offset', s.offset); st.setAttribute('stop-color', s.color); rimGradient.appendChild(st);
     });
     defs.appendChild(rimGradient);
-    
-    // Enhanced lighting based on mood
-    const lightingMood = form.lighting_mood || 'soft';
-    const lightIntensity = lightingMood === 'dramatic' ? 0.8 : lightingMood === 'soft' ? 0.3 : 0.5;
-    
-    // Base structure
-    const baseGroup = document.createElementNS(NS, 'g');
-    svg.appendChild(baseGroup);
-    
-    // Main plate
+
+    // base plate + rim stroke
     const plate = document.createElementNS(NS, 'circle');
-    plate.setAttribute('cx', R);
-    plate.setAttribute('cy', R); 
+    plate.setAttribute('cx', R); plate.setAttribute('cy', R);
     plate.setAttribute('r', R * 0.92);
     plate.setAttribute('fill', getColor(form.plate_color, '#0f1419'));
     plate.setAttribute('stroke', 'url(#rimGrad)');
     plate.setAttribute('stroke-width', Math.max(8, size * 0.02));
-    baseGroup.appendChild(plate);
-    
-    // Enhanced text path
+    svg.appendChild(plate);
+
+    // arced top text
     if (form.text_top.trim()) {
-      const textPath = document.createElementNS(NS, 'path');
       const sweepRadius = R * 0.75;
       const arcY = R - sweepRadius;
-      
-      const useFlipped = form.flip_arc === 'flipped' || 
-        (form.flip_arc === 'auto' && view.rotation % 360 >= 180);
-      
-      const pathD = useFlipped ?
-        `M ${R + sweepRadius} ${arcY} A ${sweepRadius} ${sweepRadius} 0 0 0 ${R - sweepRadius} ${arcY}` :
-        `M ${R - sweepRadius} ${arcY} A ${sweepRadius} ${sweepRadius} 0 0 1 ${R + sweepRadius} ${arcY}`;
-      
-      textPath.setAttribute('id', 'textArc');
-      textPath.setAttribute('d', pathD);
-      defs.appendChild(textPath);
-      
+      const useFlipped = form.flip_arc === 'flipped' || (form.flip_arc === 'auto' && (view.rotation % 360) >= 180);
+      const pathD = useFlipped
+        ? `M ${R + sweepRadius} ${arcY} A ${sweepRadius} ${sweepRadius} 0 0 0 ${R - sweepRadius} ${arcY}`
+        : `M ${R - sweepRadius} ${arcY} A ${sweepRadius} ${sweepRadius} 0 0 1 ${R + sweepRadius} ${arcY}`;
+      const textPath = document.createElementNS(NS, 'path');
+      textPath.setAttribute('id','textArc'); textPath.setAttribute('d', pathD); defs.appendChild(textPath);
+
       const text = document.createElementNS(NS, 'text');
       text.setAttribute('font-size', Math.max(20, size * 0.04));
       text.setAttribute('font-weight', '800');
       text.setAttribute('fill', getColor(form.text_colors, '#ffffff'));
       text.setAttribute('text-anchor', 'middle');
       text.setAttribute('letter-spacing', '1px');
-      
-      const textPathElement = document.createElementNS(NS, 'textPath');
-      textPathElement.setAttribute('href', '#textArc');
-      textPathElement.setAttribute('startOffset', '50%');
-      textPathElement.textContent = form.text_top.substring(0, 40).toUpperCase();
-      
-      text.appendChild(textPathElement);
+
+      const tp = document.createElementNS(NS, 'textPath');
+      tp.setAttribute('href', '#textArc'); tp.setAttribute('startOffset', '50%');
+      tp.textContent = form.text_top.substring(0, 40).toUpperCase();
+      text.appendChild(tp);
       svg.appendChild(text);
     }
-    
-    // Central symbol with enhanced styling
+
+    // central symbol
     const symbolGroup = document.createElementNS(NS, 'g');
     const symbolSize = R * 0.3;
-    
-    if (form.main_symbol.toLowerCase().includes('phoenix')) {
-      // Phoenix design
+    if ((form.main_symbol || '').toLowerCase().includes('phoenix')) {
       const phoenix = document.createElementNS(NS, 'path');
-      const phoenixPath = `
+      const p = `
         M ${R} ${R - symbolSize * 0.8}
         Q ${R + symbolSize * 0.4} ${R - symbolSize * 0.6} ${R + symbolSize * 0.6} ${R - symbolSize * 0.2}
         Q ${R + symbolSize * 0.8} ${R} ${R + symbolSize * 0.4} ${R + symbolSize * 0.4}
         Q ${R} ${R + symbolSize * 0.6} ${R - symbolSize * 0.4} ${R + symbolSize * 0.4}
         Q ${R - symbolSize * 0.8} ${R} ${R - symbolSize * 0.6} ${R - symbolSize * 0.2}
-        Q ${R - symbolSize * 0.4} ${R - symbolSize * 0.6} ${R} ${R - symbolSize * 0.8}
-      `;
-      phoenix.setAttribute('d', phoenixPath);
+        Q ${R - symbolSize * 0.4} ${R - symbolSize * 0.6} ${R} ${R - symbolSize * 0.8}`;
+      phoenix.setAttribute('d', p);
       phoenix.setAttribute('fill', getColor(form.symbol_color, '#d97706'));
       phoenix.setAttribute('stroke', 'rgba(255,255,255,0.3)');
       phoenix.setAttribute('stroke-width', 2);
       symbolGroup.appendChild(phoenix);
     } else {
-      // Default symbol
-      const symbol = document.createElementNS(NS, 'circle');
-      symbol.setAttribute('cx', R);
-      symbol.setAttribute('cy', R);
-      symbol.setAttribute('r', symbolSize);
-      symbol.setAttribute('fill', getColor(form.symbol_color, '#6366f1'));
-      symbol.setAttribute('stroke', getColor(form.outline_color, '#ffffff'));
-      symbol.setAttribute('stroke-width', 3);
-      symbolGroup.appendChild(symbol);
+      const dot = document.createElementNS(NS, 'circle');
+      dot.setAttribute('cx', R); dot.setAttribute('cy', R); dot.setAttribute('r', symbolSize);
+      dot.setAttribute('fill', getColor(form.symbol_color, '#6366f1'));
+      dot.setAttribute('stroke', getColor(form.outline_color, '#ffffff'));
+      dot.setAttribute('stroke-width', 3);
+      symbolGroup.appendChild(dot);
     }
-    
     svg.appendChild(symbolGroup);
-    
-    // Enhanced energy effects
-    if (form.sabers_desc.includes('twin') || form.sabers_desc.includes('crossed')) {
-      const saber1 = document.createElementNS(NS, 'line');
-      saber1.setAttribute('x1', R - R * 0.3);
-      saber1.setAttribute('y1', R - R * 0.3); 
-      saber1.setAttribute('x2', R + R * 0.3);
-      saber1.setAttribute('y2', R + R * 0.3);
-      saber1.setAttribute('stroke', '#00bfff');
-      saber1.setAttribute('stroke-width', 4);
-      saber1.setAttribute('stroke-linecap', 'round');
-      saber1.setAttribute('opacity', '0.8');
-      
-      const saber2 = document.createElementNS(NS, 'line');
-      saber2.setAttribute('x1', R + R * 0.3);
-      saber2.setAttribute('y1', R - R * 0.3);
-      saber2.setAttribute('x2', R - R * 0.3); 
-      saber2.setAttribute('y2', R + R * 0.3);
-      saber2.setAttribute('stroke', '#00bfff');
-      saber2.setAttribute('stroke-width', 4);
-      saber2.setAttribute('stroke-linecap', 'round');
-      saber2.setAttribute('opacity', '0.8');
-      
-      svg.appendChild(saber1);
-      svg.appendChild(saber2);
+
+    // crossed energy beams if requested
+    const desc = (form.sabers_desc || '').toLowerCase();
+    if (desc.includes('twin') || desc.includes('crossed')) {
+      const mk = (x1,y1,x2,y2) => {
+        const l = document.createElementNS(NS, 'line');
+        l.setAttribute('x1', x1); l.setAttribute('y1', y1);
+        l.setAttribute('x2', x2); l.setAttribute('y2', y2);
+        l.setAttribute('stroke', '#00bfff'); l.setAttribute('stroke-width', 4);
+        l.setAttribute('stroke-linecap', 'round'); l.setAttribute('opacity', '0.85');
+        return l;
+      };
+      svg.appendChild(mk(R - R*0.3, R - R*0.3, R + R*0.3, R + R*0.3));
+      svg.appendChild(mk(R + R*0.3, R - R*0.3, R - R*0.3, R + R*0.3));
     }
-    
+
     return svg;
   }
 
-  // Enhanced view management
-  let view = {
-    x: 0, y: 0, scale: 1, rotation: 0,
-    minScale: 0.1, maxScale: 5,
-    width: 640, height: 640
-  };
-  
-  function loadViewState() {
-    const stored = storage.get(STORAGE_KEYS.VIEW);
-    if (stored) {
-      try {
-        view = { ...view, ...JSON.parse(stored) };
-      } catch {}
-    }
-  }
-  
-  function saveViewState() {
-    storage.set(STORAGE_KEYS.VIEW, JSON.stringify(view));
-  }
-  
+  // --- view state ------------------------------------------------------------
+  let view = { x:0, y:0, scale:1, rotation:0, minScale:0.1, maxScale:5, width:640, height:640 };
+  function loadViewState(){ try{ const s = storage.get(STORAGE_KEYS.VIEW); if (s) view = { ...view, ...JSON.parse(s) }; } catch {} }
+  function saveViewState(){ storage.set(STORAGE_KEYS.VIEW, JSON.stringify(view)); }
   function updatePreview() {
-    const stage = byId('stage');
-    const inner = byId('inner');
-    const stageRect = stage.getBoundingClientRect();
-    
-    const transform = `
-      translate(${stageRect.width/2 + view.x}px, ${stageRect.height/2 + view.y}px) 
-      rotate(${view.rotation}deg) 
-      scale(${view.scale}) 
-      translate(${-view.width/2}px, ${-view.height/2}px)
-    `;
-    
-    inner.style.transform = transform;
-    
-    // Update HUD
+    const stage = byId('stage'); const inner = byId('inner'); const r = stage.getBoundingClientRect();
+    inner.style.transform =
+      `translate(${r.width/2 + view.x}px, ${r.height/2 + view.y}px)
+       rotate(${view.rotation}deg)
+       scale(${view.scale})
+       translate(${-view.width/2}px, ${-view.height/2}px)`;
     byId('hudZoom').textContent = `${Math.round(view.scale * 100)}%`;
-    byId('hudSize').textContent = `${Math.round(stageRect.width)}×${Math.round(stageRect.height)}px`;
-    
+    byId('hudSize').textContent = `${Math.round(r.width)}×${Math.round(r.height)}px`;
     saveViewState();
   }
 
-  // Enhanced preview generation
+  // --- preview & prompt ------------------------------------------------------
   function generatePreview() {
-    const formData = readForm();
-    const svg = generateSvg(formData);
-    
-    // Apply vector-effect for crisp scaling
+    const form = readForm();
+    const svg = generateSvg(form);
     svg.querySelectorAll('path, circle, line, polygon').forEach(el => {
-      if (!el.hasAttribute('vector-effect')) {
-        el.setAttribute('vector-effect', 'non-scaling-stroke');
-      }
+      if (!el.hasAttribute('vector-effect')) el.setAttribute('vector-effect', 'non-scaling-stroke');
     });
-    
-    const inner = byId('inner');
-    inner.innerHTML = '';
-    inner.appendChild(svg);
-    
-    updatePreview();
-    generatePrompt();
-    
-    // Update live region
+    const inner = byId('inner'); inner.innerHTML = ''; inner.appendChild(svg);
+    updatePreview(); generatePrompt();
     byId('live').textContent = 'Preview updated';
   }
-  
-  // Enhanced prompt generation
   function generatePrompt() {
-    const form = readForm();
-    const detailLevel = parseInt(form.detail_level) || 7;
-    const ageLevel = parseInt(form.age_patina) || 2;
-    
-    const detailTerms = detailLevel > 7 ? 'highly detailed, intricate craftsmanship' : 
-                      detailLevel > 4 ? 'moderate detail, quality craftsmanship' : 'clean, minimalist design';
-    
-    const ageTerms = ageLevel > 7 ? 'ancient, heavily weathered, archaeological artifact' :
-                    ageLevel > 4 ? 'aged, battle-worn, historical piece' : 'pristine, newly forged';
-    
-    const prompt = `
-Professional medallion design render, ${form.style_keywords}.
+    const f = readForm();
+    const detail = +f.detail_level || 7, age = +f.age_patina || 2;
+    const detailTerms = detail > 7 ? 'highly detailed, intricate craftsmanship'
+                      : detail > 4 ? 'moderate detail, quality craftsmanship'
+                      : 'clean, minimalist design';
+    const ageTerms = age > 7 ? 'ancient, heavily weathered, archaeological artifact'
+                    : age > 4 ? 'aged, battle-worn, historical piece'
+                    : 'pristine, newly forged';
+    const txt = `
+Professional medallion design render, ${f.style_keywords}.
 
 STRUCTURE & MATERIALS:
-• Base: Circular pendant, ${form.rim_finish} rim with ${form.plate_color} central plate
-• Surface: ${form.material_finish} finish, ${ageTerms}  
-• Text: Raised inscription "${form.text_top}" in ${form.text_colors}
-• Border: ${form.outline_color} accent lighting
+• Base: Circular pendant, ${f.rim_finish} rim with ${f.plate_color} central plate
+• Surface: ${f.material_finish} finish, ${ageTerms}
+• Text: Raised inscription "${f.text_top}" in ${f.text_colors}
+• Border: ${f.outline_color} accent lighting
 
 CENTRAL DESIGN:
-• Primary: ${form.state_shape} featuring ${form.main_symbol} (${form.symbol_color})
-• Details: ${form.badge_elements}
-• Secondary: ${form.secondary_symbol}
-• Script: ${form.aurebesh_style}
+• Primary: ${f.state_shape} featuring ${f.main_symbol} (${f.symbol_color})
+• Details: ${f.badge_elements}
+• Secondary: ${f.secondary_symbol}
+• Script: ${f.aurebesh_style}
 
 EFFECTS & LIGHTING:
-• Energy: ${form.sabers_desc}
-• Mood: ${form.lighting_mood} lighting with ${detailTerms}
+• Energy: ${f.sabers_desc}
+• Mood: ${f.lighting_mood} lighting with ${detailTerms}
 • Quality: Photorealistic rendering, studio lighting, premium materials
 
-Technical: 4K resolution, physically accurate materials, professional product photography style.
-    `.trim();
-    
-    byId('out').value = prompt;
+Technical: 4K resolution, physically accurate materials, professional product photography style.`.trim();
+    byId('out').value = txt;
   }
 
-  // Enhanced interaction handlers
+  // --- interactions ----------------------------------------------------------
   function initInteractions() {
     const stage = byId('stage');
-    const inner = byId('inner');
-    
-    // Mouse/touch tracking
-    let pointers = new Map();
-    let isDragging = false;
-    let lastCenter = null;
-    let lastDistance = null;
-    
-    // Pointer events
-    stage.addEventListener('pointerdown', (e) => {
-      stage.setPointerCapture?.(e.pointerId);
-      pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
-      isDragging = true;
-    });
-    
-    ['pointerup', 'pointercancel'].forEach(event => {
-      stage.addEventListener(event, (e) => {
-        stage.releasePointerCapture?.(e.pointerId);
-        pointers.delete(e.pointerId);
-        if (pointers.size === 0) {
-          isDragging = false;
-          lastCenter = lastDistance = null;
-        }
-      });
-    });
-    
-    stage.addEventListener('pointermove', (e) => {
+    let pointers = new Map(), lastCenter = null, lastDist = null;
+
+    stage.addEventListener('pointerdown', e => { stage.setPointerCapture?.(e.pointerId); pointers.set(e.pointerId, {x:e.clientX,y:e.clientY}); });
+    ['pointerup','pointercancel'].forEach(ev => stage.addEventListener(ev, e => {
+      stage.releasePointerCapture?.(e.pointerId); pointers.delete(e.pointerId);
+      if (pointers.size === 0) { lastCenter = lastDist = null; }
+    }));
+    stage.addEventListener('pointermove', e => {
       if (!pointers.has(e.pointerId)) return;
-      
-      pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
-      const points = [...pointers.values()];
-      
-      if (points.length === 1) {
-        // Single finger/mouse - pan
-        const point = points[0];
-        if (lastCenter) {
-          view.x += point.x - lastCenter.x;
-          view.y += point.y - lastCenter.y;
+      pointers.set(e.pointerId, {x:e.clientX,y:e.clientY});
+      const pts = [...pointers.values()];
+      if (pts.length === 1) {
+        const p = pts[0];
+        if (lastCenter) { view.x += p.x - lastCenter.x; view.y += p.y - lastCenter.y; updatePreview(); }
+        lastCenter = {...p};
+      } else if (pts.length === 2) {
+        const c = { x:(pts[0].x+pts[1].x)/2, y:(pts[0].y+pts[1].y)/2 };
+        const d = Math.hypot(pts[0].x-pts[1].x, pts[0].y-pts[1].y);
+        if (lastCenter && lastDist) {
+          view.x += c.x - lastCenter.x; view.y += c.y - lastCenter.y;
+          const newScale = clamp(view.scale * (d/lastDist), view.minScale, view.maxScale);
+          const rect = stage.getBoundingClientRect();
+          const zx = c.x - rect.left - rect.width/2 - view.x;
+          const zy = c.y - rect.top  - rect.height/2 - view.y;
+          const ratio = newScale / view.scale;
+          view.x -= zx * (ratio - 1); view.y -= zy * (ratio - 1); view.scale = newScale;
           updatePreview();
         }
-        lastCenter = { ...point };
-      } else if (points.length === 2) {
-        // Two fingers - pan and zoom
-        const center = {
-          x: (points[0].x + points[1].x) / 2,
-          y: (points[0].y + points[1].y) / 2
-        };
-        const distance = Math.hypot(points[0].x - points[1].x, points[0].y - points[1].y);
-        
-        if (lastCenter && lastDistance) {
-          // Pan
-          view.x += center.x - lastCenter.x;
-          view.y += center.y - lastCenter.y;
-          
-          // Zoom
-          const scaleFactor = distance / lastDistance;
-          const newScale = clamp(view.scale * scaleFactor, view.minScale, view.maxScale);
-          
-          // Zoom towards gesture center
-          const stageRect = stage.getBoundingClientRect();
-          const zoomPointX = center.x - stageRect.left - stageRect.width / 2 - view.x;
-          const zoomPointY = center.y - stageRect.top - stageRect.height / 2 - view.y;
-          
-          const scaleRatio = newScale / view.scale;
-          view.x -= zoomPointX * (scaleRatio - 1);
-          view.y -= zoomPointY * (scaleRatio - 1);
-          view.scale = newScale;
-          
-          updatePreview();
-        }
-        
-        lastCenter = center;
-        lastDistance = distance;
+        lastCenter = c; lastDist = d;
       }
     });
-    
-    // Wheel zoom
-    stage.addEventListener('wheel', (e) => {
+    stage.addEventListener('wheel', e => {
       e.preventDefault();
-      
       const delta = -e.deltaY * (e.ctrlKey || e.metaKey ? 0.003 : 0.002);
       const newScale = clamp(view.scale * (1 + delta), view.minScale, view.maxScale);
-      
-      // Zoom towards mouse position
-      const stageRect = stage.getBoundingClientRect();
-      const zoomPointX = e.clientX - stageRect.left - stageRect.width / 2 - view.x;
-      const zoomPointY = e.clientY - stageRect.top - stageRect.height / 2 - view.y;
-      
-      const scaleRatio = newScale / view.scale;
-      view.x -= zoomPointX * (scaleRatio - 1);
-      view.y -= zoomPointY * (scaleRatio - 1);
-      view.scale = newScale;
-      
+      const rect = stage.getBoundingClientRect();
+      const zx = e.clientX - rect.left - rect.width/2 - view.x;
+      const zy = e.clientY - rect.top  - rect.height/2 - view.y;
+      const ratio = newScale / view.scale;
+      view.x -= zx * (ratio - 1); view.y -= zy * (ratio - 1); view.scale = newScale;
       updatePreview();
-    }, { passive: false });
-    
-    // Double-click to fit
+    }, { passive:false });
+
     stage.addEventListener('dblclick', fitToView);
-    
-    // View controls
     byId('fit').addEventListener('click', fitToView);
     byId('fillView').addEventListener('click', fillToView);
     byId('resetView').addEventListener('click', resetView);
     byId('rotateView').addEventListener('click', rotateView);
-    
-    // Size selector
-    byId('sizeSelect').addEventListener('change', (e) => {
-      const newSize = parseInt(e.target.value) || 640;
-      view.width = view.height = newSize;
+
+    byId('sizeSelect').addEventListener('change', e => {
+      const n = parseInt(e.target.value) || 640;
+      view.width = view.height = n;
       generatePreview();
       setTimeout(fitToView, 50);
     });
   }
-  
   function fitToView() {
-    const stage = byId('stage');
-    const stageRect = stage.getBoundingClientRect();
-    const margin = 40;
-    
-    view.scale = Math.min(
-      (stageRect.width - margin) / view.width,
-      (stageRect.height - margin) / view.height
-    );
-    view.x = view.y = 0;
-    updatePreview();
-    showToast('Fitted to view');
+    const rect = byId('stage').getBoundingClientRect(), m = 40;
+    view.scale = Math.min((rect.width - m) / view.width, (rect.height - m) / view.height);
+    view.x = view.y = 0; updatePreview(); showToast('Fitted to view');
   }
-  
   function fillToView() {
-    const stage = byId('stage');
-    const stageRect = stage.getBoundingClientRect();
-    
-    view.scale = Math.max(
-      stageRect.width / view.width,
-      stageRect.height / view.height
-    );
-    view.x = view.y = 0;
-    updatePreview();
-    showToast('Filled viewport');
+    const rect = byId('stage').getBoundingClientRect();
+    view.scale = Math.max(rect.width / view.width, rect.height / view.height);
+    view.x = view.y = 0; updatePreview(); showToast('Filled viewport');
   }
-  
-  function resetView() {
-    view.x = view.y = 0;
-    view.scale = 1;
-    view.rotation = 0;
-    updatePreview();
-    showToast('View reset');
-  }
-  
-  function rotateView() {
-    view.rotation = (view.rotation + 45) % 360;
-    updatePreview();
-    showToast(`Rotated to ${view.rotation}°`);
-  }
+  function resetView(){ view.x=0; view.y=0; view.scale=1; view.rotation=0; updatePreview(); showToast('View reset'); }
+  function rotateView(){ view.rotation=(view.rotation+45)%360; updatePreview(); showToast(`Rotated to ${view.rotation}°`); }
 
-  // Enhanced swatch system
+  // --- swatches --------------------------------------------------------------
   function initSwatches() {
-    const swatchGroups = [
-      { containerId: 'rim_swatches', inputId: 'rim_finish' },
-      { containerId: 'plate_swatches', inputId: 'plate_color' }
-    ];
-    
-    swatchGroups.forEach(({ containerId, inputId }) => {
-      const container = byId(containerId);
-      const input = byId(inputId);
-      
-      if (!container || !input) return;
-      
-      container.addEventListener('click', (e) => {
-        const swatch = e.target.closest('.swatch');
-        if (!swatch) return;
-        
-        // Update swatch states
-        container.querySelectorAll('.swatch').forEach(s => 
-          s.setAttribute('aria-pressed', 'false')
-        );
-        swatch.setAttribute('aria-pressed', 'true');
-        
-        // Update input and regenerate
-        input.value = swatch.dataset.val || '';
+    [{containerId:'rim_swatches',inputId:'rim_finish'},{containerId:'plate_swatches',inputId:'plate_color'}]
+    .forEach(({containerId,inputId}) => {
+      const wrap = byId(containerId), input = byId(inputId);
+      if (!wrap || !input) return;
+      wrap.addEventListener('click', e => {
+        const sw = e.target.closest('.swatch'); if (!sw) return;
+        wrap.querySelectorAll('.swatch').forEach(s => s.setAttribute('aria-pressed','false'));
+        sw.setAttribute('aria-pressed','true');
+        input.value = sw.dataset.val || '';
         debouncedGenerate();
-        
-        showToast(`Applied ${swatch.textContent} preset`);
+        showToast(`Applied ${sw.textContent} preset`);
       });
     });
   }
 
-  // Enhanced export system
+  // --- exports ---------------------------------------------------------------
   function initExports() {
-    // Copy/download text
     byId('copyBtn').addEventListener('click', async () => {
-      const text = byId('out').value;
-      if (!text.trim()) {
-        showToast('No content to copy', 'error');
-        return;
-      }
-      
-      try {
-        await navigator.clipboard.writeText(text);
-        showToast('Prompt copied to clipboard');
-      } catch {
-        showToast('Copy failed', 'error');
-      }
+      const t = byId('out').value; if (!t.trim()) return showToast('No content to copy','error');
+      try { await navigator.clipboard.writeText(t); showToast('Prompt copied to clipboard'); }
+      catch { showToast('Copy failed','error'); }
     });
-    
     byId('downloadBtn').addEventListener('click', () => {
-      const text = byId('out').value;
-      if (!text.trim()) {
-        showToast('No content to download', 'error');
-        return;
-      }
-      
-      const blob = new Blob([text], { type: 'text/plain' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `medallion_prompt_${Date.now()}.txt`;
-      a.click();
-      URL.revokeObjectURL(url);
+      const t = byId('out').value; if (!t.trim()) return showToast('No content to download','error');
+      const blob = new Blob([t], {type:'text/plain'}), url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href=url; a.download=`medallion_prompt_${Date.now()}.txt`; a.click(); URL.revokeObjectURL(url);
       showToast('Prompt downloaded');
     });
-    
-    // SVG export
+
     const getSvgXml = () => {
-      const svg = byId('inner').querySelector('svg');
-      if (!svg) return null;
-      
-      const clone = svg.cloneNode(true);
-      const wrapper = document.createElementNS(NS, 'g');
-      
-      // Move all children to wrapper
-      while (clone.firstChild) {
-        wrapper.appendChild(clone.firstChild);
-      }
-      
-      // Apply current rotation
-      if (view.rotation !== 0) {
-        wrapper.setAttribute('transform', 
-          `rotate(${view.rotation} ${view.width/2} ${view.height/2})`
-        );
-      }
-      
-      clone.appendChild(wrapper);
-      clone.setAttribute('xmlns', NS);
-      
+      const svg = byId('inner').querySelector('svg'); if (!svg) return null;
+      const clone = svg.cloneNode(true), wrap = document.createElementNS(NS,'g');
+      while (clone.firstChild) wrap.appendChild(clone.firstChild);
+      if (view.rotation) wrap.setAttribute('transform', `rotate(${view.rotation} ${view.width/2} ${view.height/2})`);
+      clone.appendChild(wrap); clone.setAttribute('xmlns', NS);
       return `<?xml version="1.0" encoding="UTF-8"?>\n${clone.outerHTML}`;
     };
-    
+
     byId('copySvgBtn').addEventListener('click', async () => {
-      const xml = getSvgXml();
-      if (!xml) {
-        showToast('No SVG to copy', 'error');
-        return;
-      }
-      
-      try {
-        await navigator.clipboard.writeText(xml);
-        showToast('SVG copied to clipboard');
-      } catch {
-        showToast('SVG copy failed', 'error');
-      }
+      const xml = getSvgXml(); if (!xml) return showToast('No SVG to copy','error');
+      try { await navigator.clipboard.writeText(xml); showToast('SVG copied to clipboard'); }
+      catch { showToast('SVG copy failed','error'); }
     });
-    
     byId('downloadSvgBtn').addEventListener('click', () => {
-      const xml = getSvgXml();
-      if (!xml) {
-        showToast('No SVG to export', 'error');
-        return;
-      }
-      
-      const blob = new Blob([xml], { type: 'image/svg+xml' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `medallion_${view.width}x${view.height}.svg`;
-      a.click();
-      URL.revokeObjectURL(url);
+      const xml = getSvgXml(); if (!xml) return showToast('No SVG to export','error');
+      const blob = new Blob([xml], {type:'image/svg+xml'}), url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href=url; a.download=`medallion_${view.width}x${view.height}.svg`; a.click(); URL.revokeObjectURL(url);
       showToast('SVG downloaded');
     });
-    
-    // PNG export
     byId('downloadPngBtn').addEventListener('click', () => {
-      const xml = getSvgXml();
-      if (!xml) {
-        showToast('No image to export', 'error');
-        return;
-      }
-      
-      const blob = new Blob([xml], { type: 'image/svg+xml' });
-      const url = URL.createObjectURL(blob);
-      const img = new Image();
-      
+      const xml = getSvgXml(); if (!xml) return showToast('No image to export','error');
+      const blob = new Blob([xml], {type:'image/svg+xml'}), url = URL.createObjectURL(blob), img = new Image();
       img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const scale = 2; // 2x for high-DPI
-        canvas.width = view.width * scale;
-        canvas.height = view.height * scale;
-        
-        const ctx = canvas.getContext('2d');
-        ctx.scale(scale, scale);
-        ctx.drawImage(img, 0, 0);
-        
+        const canvas = document.createElement('canvas'), scale = 2;
+        canvas.width = view.width * scale; canvas.height = view.height * scale;
+        const ctx = canvas.getContext('2d'); ctx.scale(scale, scale); ctx.drawImage(img, 0, 0);
         URL.revokeObjectURL(url);
-        
-        canvas.toBlob((blob) => {
-          if (!blob) {
-            showToast('PNG export failed', 'error');
-            return;
-          }
-          
-          const pngUrl = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = pngUrl;
-          a.download = `medallion_${view.width}x${view.height}_${Date.now()}.png`;
-          a.click();
-          URL.revokeObjectURL(pngUrl);
+        canvas.toBlob(b => {
+          if (!b) return showToast('PNG export failed','error');
+          const u = URL.createObjectURL(b), a = document.createElement('a');
+          a.href=u; a.download=`medallion_${view.width}x${view.height}_${Date.now()}.png`; a.click(); URL.revokeObjectURL(u);
           showToast('PNG exported successfully');
         }, 'image/png', 0.95);
       };
-      
-      img.onerror = () => {
-        URL.revokeObjectURL(url);
-        showToast('PNG export failed', 'error');
-      };
-      
-      img.crossOrigin = 'anonymous';
-      img.src = url;
+      img.onerror = () => { URL.revokeObjectURL(url); showToast('PNG export failed','error'); };
+      img.crossOrigin = 'anonymous'; img.src = url;
     });
   }
 
-  // Enhanced preset management
+  // --- preset actions --------------------------------------------------------
   function initPresetActions() {
     byId('addPresetBtn').addEventListener('click', () => {
-      const form = readForm();
-      const name = form.text_top.trim() || 'Custom Preset';
-      const shortName = name.split(' ').slice(0, 3).join(' ').substring(0, 25);
-      
+      const form = readForm(); const name = form.text_top.trim() || 'Custom Preset';
+      const short = name.split(' ').slice(0,3).join(' ').substring(0,25);
       const preset = {
-        id: `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-        name: shortName,
-        note: 'Custom design • User created',
-        thumb: shortName.split(' ').map(w => w[0]).join('').toUpperCase().substring(0, 4) || 'CUST',
-        form: { ...form }
+        id:`user_${Date.now()}_${Math.random().toString(36).slice(2,11)}`,
+        name:short, note:'Custom design • User created',
+        thumb:(short.split(' ').map(w=>w[0]).join('') || 'CUST').toUpperCase().slice(0,4),
+        form:{...form}
       };
-      
-      const presets = getPresets();
-      presets.push(preset);
-      setPresets(presets);
-      
-      showToast(`Saved "${shortName}"`);
+      const list = getPresets(); list.push(preset); setPresets(list); showToast(`Saved "${short}"`);
     });
-    
     byId('randBtn').addEventListener('click', () => {
-      const randomize = (options) => options[Math.floor(Math.random() * options.length)];
-      
-      const randomForm = {
+      const pick = a => a[Math.floor(Math.random()*a.length)];
+      const rf = {
         ...getDefaultForm(),
-        text_top: randomize(['COSMIC GUARDIAN', 'STELLAR KNIGHT', 'VOID WALKER', 'STAR FORGE', 'GALAXY DEFENDER']),
-        rim_finish: randomize(['polished steel', 'brushed silver', 'antique gold', 'weathered bronze', 'blackened iron']),
-        plate_color: randomize(['deep obsidian', 'midnight navy', 'crimson red', 'forest green', 'royal purple']),
-        main_symbol: randomize(['stylized phoenix', 'cosmic spiral', 'star constellation', 'dragon insignia', 'celestial crown']),
-        symbol_color: randomize(['gradient gold to crimson', 'electric blue glow', 'silver with shadows', 'prismatic rainbow', 'deep emerald']),
-        flip_arc: randomize(['auto', 'normal', 'flipped']),
-        lighting_mood: randomize(['dramatic', 'soft', 'ethereal', 'moody'])
+        text_top: pick(['COSMIC GUARDIAN','STELLAR KNIGHT','VOID WALKER','STAR FORGE','GALAXY DEFENDER']),
+        rim_finish: pick(['polished steel','brushed silver','antique gold','weathered bronze','blackened iron']),
+        plate_color: pick(['deep obsidian','midnight navy','crimson red','forest green','royal purple']),
+        main_symbol: pick(['stylized phoenix','cosmic spiral','star constellation','dragon insignia','celestial crown']),
+        symbol_color: pick(['gradient gold to crimson','electric blue glow','silver with shadows','prismatic rainbow','deep emerald']),
+        flip_arc: pick(['auto','normal','flipped']),
+        lighting_mood: pick(['dramatic','soft','ethereal','moody'])
       };
-      
-      writeForm(randomForm);
-      generatePreview();
-      showToast('Random configuration generated');
+      writeForm(rf); generatePreview(); showToast('Random configuration generated');
     });
   }
 
-  // Enhanced JSON modal
+  // --- JSON modal ------------------------------------------------------------
   function initJsonModal() {
-    const modal = byId('jsonModal');
-    const textarea = byId('jsonArea');
-    
+    const modal = byId('jsonModal'), textarea = byId('jsonArea');
     byId('exportJsonBtn').addEventListener('click', () => {
-      const exportData = {
-        version: '2.0',
-        timestamp: new Date().toISOString(),
-        form: readForm(),
-        presets: getPresets(),
-        view: view
-      };
-      
-      textarea.value = JSON.stringify(exportData, null, 2);
-      modal.showModal();
-      showToast('Export data prepared');
+      textarea.value = JSON.stringify({ version:'2.0', timestamp:new Date().toISOString(), form:readForm(), presets:getPresets(), view }, null, 2);
+      modal.showModal(); showToast('Export data prepared');
     });
-    
-    byId('importJsonBtn').addEventListener('click', () => {
-      textarea.value = '';
-      textarea.placeholder = 'Paste your configuration JSON here...';
-      modal.showModal();
-    });
-    
+    byId('importJsonBtn').addEventListener('click', () => { textarea.value=''; textarea.placeholder='Paste your configuration JSON here...'; modal.showModal(); });
     byId('validateJson').addEventListener('click', () => {
       try {
-        const data = JSON.parse(textarea.value || '{}');
-        showToast('JSON is valid', 'success');
-        
-        // Show preview of what will be imported
-        const info = [];
-        if (data.form) info.push('Form configuration');
-        if (data.presets) info.push(`${data.presets.length} presets`);
-        if (data.view) info.push('View settings');
-        
-        if (info.length > 0) {
-          showToast(`Will import: ${info.join(', ')}`, 'info');
-        }
-      } catch (error) {
-        showToast(`Invalid JSON: ${error.message}`, 'error');
-      }
+        const d = JSON.parse(textarea.value || '{}'); showToast('JSON is valid','success');
+        const info = []; if (d.form) info.push('Form configuration'); if (d.presets) info.push(`${d.presets.length} presets`); if (d.view) info.push('View settings');
+        if (info.length) showToast(`Will import: ${info.join(', ')}`,'info');
+      } catch (e) { showToast(`Invalid JSON: ${e.message}`,'error'); }
     });
-    
     byId('applyJson').addEventListener('click', () => {
       try {
-        const data = JSON.parse(textarea.value || '{}');
-        
-        if (data.form) {
-          writeForm({ ...getDefaultForm(), ...data.form });
-        }
-        
-        if (Array.isArray(data.presets)) {
-          setPresets(data.presets);
-        }
-        
-        if (data.view) {
-          view = { ...view, ...data.view };
-        }
-        
-        generatePreview();
-        renderPresets();
-        modal.close();
-        showToast('Configuration imported successfully');
-        
-      } catch (error) {
-        showToast(`Import failed: ${error.message}`, 'error');
-      }
+        const d = JSON.parse(textarea.value || '{}');
+        if (d.form) writeForm({ ...getDefaultForm(), ...d.form });
+        if (Array.isArray(d.presets)) setPresets(d.presets);
+        if (d.view) view = { ...view, ...d.view };
+        generatePreview(); renderPresets(); modal.close(); showToast('Configuration imported successfully');
+      } catch (e) { showToast(`Import failed: ${e.message}`,'error'); }
     });
-    
     byId('copyJson').addEventListener('click', async () => {
-      try {
-        await navigator.clipboard.writeText(textarea.value);
-        showToast('JSON copied to clipboard');
-      } catch {
-        showToast('Copy failed', 'error');
-      }
+      try { await navigator.clipboard.writeText(textarea.value); showToast('JSON copied to clipboard'); }
+      catch { showToast('Copy failed','error'); }
     });
-    
     byId('closeJson').addEventListener('click', () => modal.close());
   }
 
-  // Fullscreen preview
+  // --- fullscreen ------------------------------------------------------------
   function initFullscreen() {
-    const modal = byId('fullscreenModal');
-    const fullscreenInner = byId('fullscreenInner');
-    
+    const modal = byId('fullscreenModal'), inner = byId('fullscreenInner');
     byId('fullscreenBtn').addEventListener('click', () => {
-      const currentSvg = byId('inner').querySelector('svg');
-      if (!currentSvg) {
-        showToast('No preview to show', 'error');
-        return;
-      }
-      
-      const clone = currentSvg.cloneNode(true);
-      fullscreenInner.innerHTML = '';
-      fullscreenInner.appendChild(clone);
-      
-      // Center the preview
-      const modalStage = byId('fullscreenStage');
-      const stageSize = 600; // 80vh approximation
-      const scale = Math.min(stageSize / view.width, stageSize / view.height) * 0.9;
-      
-      fullscreenInner.style.transform = `
-        translate(${stageSize/2}px, ${stageSize/2}px)
-        scale(${scale})
-        translate(${-view.width/2}px, ${-view.height/2}px)
-      `;
-      
+      const cur = byId('inner').querySelector('svg'); if (!cur) return showToast('No preview to show','error');
+      const clone = cur.cloneNode(true); inner.innerHTML=''; inner.appendChild(clone);
+      const stageSize = 600, scale = Math.min(stageSize / view.width, stageSize / view.height) * 0.9;
+      inner.style.transform = `translate(${stageSize/2}px, ${stageSize/2}px) scale(${scale}) translate(${-view.width/2}px, ${-view.height/2}px)`;
       modal.showModal();
     });
-    
     byId('closeFullscreen').addEventListener('click', () => modal.close());
   }
 
-  // Animation system
-  let animationId = null;
-  let animating = false;
-  
+  // --- animation -------------------------------------------------------------
+  let animationId = null, animating = false;
   function initAnimation() {
-    byId('animateBtn').addEventListener('click', () => {
-      if (animating) {
-        stopAnimation();
-      } else {
-        startAnimation();
-      }
-    });
+    byId('animateBtn').addEventListener('click', () => { animating ? stopAnimation() : startAnimation(); });
   }
-  
   function startAnimation() {
-    if (animating) return;
-    
-    animating = true;
-    const btn = byId('animateBtn');
-    const icon = btn.querySelector('.material-icons-round');
-    icon.textContent = 'pause_circle';
-    btn.title = 'Stop animation';
-    
-    let startTime = Date.now();
-    const animate = () => {
+    if (animating) return; animating = true;
+    const btn = byId('animateBtn'); btn.querySelector('.material-icons-round').textContent = 'pause_circle'; btn.title = 'Stop animation';
+    let start = Date.now();
+    const loop = () => {
       if (!animating) return;
-      
-      const elapsed = (Date.now() - startTime) / 1000;
-      view.rotation = (elapsed * 30) % 360; // 30 degrees per second
-      updatePreview();
-      
-      animationId = requestAnimationFrame(animate);
+      const t = (Date.now() - start) / 1000;
+      view.rotation = (t * 30) % 360; updatePreview();
+      animationId = requestAnimationFrame(loop);
     };
-    
-    animate();
-    showToast('Animation started');
+    loop(); showToast('Animation started');
   }
-  
   function stopAnimation() {
-    animating = false;
-    if (animationId) {
-      cancelAnimationFrame(animationId);
-      animationId = null;
-    }
-    
-    const btn = byId('animateBtn');
-    const icon = btn.querySelector('.material-icons-round');
-    icon.textContent = 'play_circle';
-    btn.title = 'Start animation';
-    
+    animating = false; if (animationId) cancelAnimationFrame(animationId), animationId = null;
+    const btn = byId('animateBtn'); btn.querySelector('.material-icons-round').textContent = 'play_circle'; btn.title = 'Start animation';
     showToast('Animation stopped');
   }
 
-  // Enhanced form reactivity
-  const debouncedGenerate = (() => {
-    let timeout;
-    return (delay = 300) => {
-      clearTimeout(timeout);
-      timeout = setTimeout(() => {
-        generatePreview();
-      }, delay);
-    };
-  })();
-  
+  // --- reactivity ------------------------------------------------------------
+  const debouncedGenerate = (() => { let t; return (d=300) => { clearTimeout(t); t = setTimeout(() => generatePreview(), d); }; })();
   function initFormReactivity() {
-    FORM_FIELDS.forEach(fieldId => {
-      const element = byId(fieldId);
-      if (!element) return;
-      
-      const events = element.type === 'range' ? ['input'] : ['input', 'change'];
-      
-      events.forEach(eventType => {
-        element.addEventListener(eventType, () => {
-          debouncedGenerate(element.type === 'range' ? 100 : 300);
-        });
-      });
+    FORM_FIELDS.forEach(id => {
+      const el = byId(id); if (!el) return;
+      const evts = el.type === 'range' ? ['input'] : ['input','change'];
+      evts.forEach(e => el.addEventListener(e, () => debouncedGenerate(el.type === 'range' ? 100 : 300)));
     });
-    
-    // Clear/reset functionality
     byId('clearBtn').addEventListener('click', () => {
-      if (confirm('Reset all settings to defaults?')) {
-        writeForm(getDefaultForm());
-        generatePreview();
-        showToast('Settings reset to defaults');
-      }
+      if (confirm('Reset all settings to defaults?')) { writeForm(getDefaultForm()); generatePreview(); showToast('Settings reset to defaults'); }
     });
-    
-    // Generate button
-    byId('gen').addEventListener('click', () => {
-      generatePreview();
-      showToast('Preview regenerated');
-    });
+    byId('gen').addEventListener('click', () => { generatePreview(); showToast('Preview regenerated'); });
   }
 
-  // Keyboard shortcuts
+  // --- keyboard shortcuts (querySelector for singles) ------------------------
   function initKeyboardShortcuts() {
     document.addEventListener('keydown', (e) => {
-      // Global shortcuts
       if ((e.ctrlKey || e.metaKey)) {
-        switch(e.key.toLowerCase()) {
-          case 'enter':
-            e.preventDefault();
-            generatePreview();
-            showToast('Generated via shortcut');
-            break;
-            
-          case 'r':
-            if (e.shiftKey) {
-              e.preventDefault();
-              resetView();
-            }
-            break;
-            
-          case 's':
-            if (e.shiftKey) {
-              e.preventDefault();
-              byId('addPresetBtn').click();
-            }
-            break;
-            
-          case 'f':
-            e.preventDefault();
-            fitToView();
-            break;
+        switch (e.key.toLowerCase()) {
+          case 'enter': e.preventDefault(); generatePreview(); showToast('Generated via shortcut'); break;
+          case 'r': if (e.shiftKey){ e.preventDefault(); resetView(); } break;
+          case 's': if (e.shiftKey){ e.preventDefault(); byId('addPresetBtn').click(); } break;
+          case 'f': e.preventDefault(); fitToView(); break;
         }
       }
-      
-      // Tab navigation improvements
       if (e.key === 'Tab') {
-        const activeTab = $('.tab[aria-selected="true"]');
+        const activeTab = document.querySelector('.tab[aria-selected="true"]');
         if (activeTab && document.activeElement === activeTab) {
-          // Focus first input in active panel
-          const activePanel = $(`.tabpanel:not([hidden])`);
+          const activePanel = document.querySelector('.tabpanel:not([hidden])');
           const firstInput = activePanel?.querySelector('input, select, textarea');
-          if (firstInput) {
-            e.preventDefault();
-            firstInput.focus();
-          }
+          if (firstInput) { e.preventDefault(); firstInput.focus(); }
         }
       }
     });
   }
 
-  // Resize observer for responsive updates
+  // --- responsive ------------------------------------------------------------
   function initResponsive() {
-    const resizeObserver = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        if (entry.target.id === 'stage') {
-          updatePreview();
-        }
-      }
-    });
-    
-    resizeObserver.observe(byId('stage'));
+    const ro = new ResizeObserver(entries => { for (const ent of entries) if (ent.target.id === 'stage') updatePreview(); });
+    ro.observe(byId('stage'));
   }
 
-  // Search functionality
+  // --- search ----------------------------------------------------------------
   function initSearch() {
-    const searchInput = byId('profileSearch');
-    
-    searchInput.addEventListener('input', (e) => {
-      const query = e.target.value.toLowerCase().trim();
-      
-      if (query.length === 0) {
-        renderPresets();
-        return;
-      }
-      
-      // Debounce search
-      clearTimeout(searchInput.searchTimeout);
-      searchInput.searchTimeout = setTimeout(() => {
-        renderPresets();
-      }, 200);
-    });
-    
-    // Clear search on escape
-    searchInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        searchInput.value = '';
-        renderPresets();
-        searchInput.blur();
-      }
-    });
+    const input = byId('profileSearch');
+    input.addEventListener('input', () => { clearTimeout(input.searchTimeout); input.searchTimeout = setTimeout(renderPresets, 200); });
+    input.addEventListener('keydown', e => { if (e.key === 'Escape'){ input.value=''; renderPresets(); input.blur(); } });
   }
 
-  // Initialize everything
+  // --- boot ------------------------------------------------------------------
   function init() {
     try {
       loadViewState();
@@ -1869,35 +703,23 @@ Technical: 4K resolution, physically accurate materials, professional product ph
       initKeyboardShortcuts();
       initResponsive();
       initSearch();
-      
-      // Load saved form and generate initial preview
+
       writeForm(currentForm);
       renderPresets();
-      
-      // Set initial size
+
       const sizeSelect = byId('sizeSelect');
       view.width = view.height = parseInt(sizeSelect.value) || 640;
-      
-      // Generate initial preview
+
       setTimeout(() => {
         generatePreview();
         fitToView();
         showToast('Medallion Forge Enhanced ready');
       }, 100);
-      
-    } catch (error) {
-      console.error('Initialization error:', error);
+    } catch (err) {
+      console.error('Initialization error:', err);
       showToast('Initialization error - check console', 'error');
     }
   }
-
-  // Start the application
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
 </script>
-</body>
-</html>
