@@ -461,87 +461,144 @@
   function MFactory(root){ return (name, attrs={}, parent)=>{ const el=document.createElementNS(NS,name); for(const [k,v] of Object.entries(attrs)){ if(v==null) continue; if(k==='href'){ el.setAttributeNS('http://www.w3.org/1999/xlink','xlink:href',String(v)); el.setAttribute('href',String(v)); } else el.setAttribute(k,String(v)); } (parent||root).appendChild(el); return el; }; }
 
   function buildSvg(v){
-    const D=view.w, R=D/2;
-    const svg=document.createElementNS(NS,'svg');
-    svg.setAttribute('viewBox',`0 0 ${D} ${D}`); svg.setAttribute('width',D); svg.setAttribute('height',D);
-    const M=MFactory(svg);
-    const plate = colorPick(v.plate_color,[['black','#0b1220'],['navy','#0a1e3a'],['crimson','#5b1116'],['gray','#2b2f36'],['white','#f7fafc']], '#0b1220');
-    const rim   = colorPick(v.rim_finish,[['gold','#e9c152'],['silver','#c3cad3'],['steel','#b6bec9'],['bronze','#b6874a'],['polished','#c3cad3']], '#a9b7c7');
-    const tfill = colorPick(v.text_colors,[['white','#fff'],['gold','#e9c152'],['silver','#c3cad3'],['cyan','#7dd3fc'],['red','#ef4444'],['black','#000']], '#fff');
-    const sym   = colorPick(v.symbol_color,[['red','#ef4444'],['silver','#c3cad3'],['gold','#e9c152'],['white','#fff'],['blue','#3b82f6'],['cyan','#7dd3fc']], '#7dd3fc');
-    const oline = colorPick(v.outline_color,[['white','#ffffff'],['gold','#e9c152'],['silver','#c3cad3'],['red','#ef4444'],['blue','#3b82f6']], '#ffffff');
+  const D = Math.round(view.w);         // integral box for crispness
+  const R = D/2;
 
-    const defs=M('defs');
-    const sweepA=R*0.78, y=R-sweepA;
-    M('path',{id:'topArc',d:`M ${R- sweepA} ${y} A ${sweepA} ${sweepA} 0 0 1 ${R+ sweepA} ${y}`},defs);
-    M('path',{id:'topArcRev',d:`M ${R+ sweepA} ${y} A ${sweepA} ${sweepA} 0 0 0 ${R- sweepA} ${y}`},defs);
+  const svg = document.createElementNS(NS,'svg');
+  svg.setAttribute('viewBox',`0 0 ${D} ${D}`);
+  svg.setAttribute('width', D);
+  svg.setAttribute('height', D);
+  svg.setAttribute('shape-rendering','geometricPrecision');
+  svg.setAttribute('text-rendering','optimizeLegibility');
 
-    const gBase=M('g');
-    M('circle',{cx:R,cy:R,r:R*0.94,fill:plate,stroke:rim,'stroke-width':Math.max(8,D*0.015)},gBase);
-    M('circle',{cx:R,cy:R,r:R*0.985,fill:'none',stroke:rim,'stroke-width':Math.max(2,D*0.004)},gBase);
-    M('circle',{cx:R,cy:R,r:R*0.86,fill:'none',stroke:'#ffffff22','stroke-width':Math.max(1.2,D*0.003)},gBase);
+  const M = MFactory(svg);
 
-    if((v.badge_elements||'').toLowerCase().includes('ring')){
-      [0.76,0.64,0.54].forEach((p,i)=>M('circle',{cx:R,cy:R,r:R*p,fill:'none',stroke: i===1 ? '#7dd3fc' : rim,'stroke-width':Math.max(1,D*0.0026),'stroke-dasharray': i===1?'6 6':null},gBase));
-    }
+  // ---- Color picks (stable) ----
+  const plate = colorPick(v.plate_color,[['black','#0b1220'],['navy','#0a1e3a'],['crimson','#5b1116'],['gray','#2b2f36'],['white','#f7fafc']], '#0b1220');
+  const rim   = colorPick(v.rim_finish,[['gold','#e9c152'],['silver','#c3cad3'],['steel','#b6bec9'],['bronze','#b6874a'],['polished','#c3cad3']], '#a9b7c7');
+  const tfill = colorPick(v.text_colors,[['white','#fff'],['gold','#e9c152'],['silver','#c3cad3'],['cyan','#7dd3fc'],['red','#ef4444'],['black','#000']], '#fff');
+  const sym   = colorPick(v.symbol_color,[['red','#ef4444'],['silver','#c3cad3'],['gold','#e9c152'],['white','#fff'],['blue','#3b82f6'],['cyan','#7dd3fc']], '#7dd3fc');
+  const oline = colorPick(v.outline_color,[['white','#ffffff'],['gold','#e9c152'],['silver','#c3cad3'],['red','#ef4444'],['blue','#3b82f6']], '#ffffff');
 
-    if((v.text_top||'').trim()){
-      const wantsOutline=(v.text_colors||'').toLowerCase().includes('outline') || plate==='#0b1220';
-      const t=M('text',{'font-size':Math.max(24,D*0.046),'font-weight':800,fill:tfill,'text-anchor':'middle','letter-spacing':'.6'});
-      if(wantsOutline){ t.setAttribute('stroke','#000'); t.setAttribute('stroke-width',Math.max(1.5,D*0.003)); t.setAttribute('paint-order','stroke'); }
-      const rot=((view.rot%360)+360)%360;
-      const useRev = (v.flip_arc==='flipped') || (v.flip_arc==='auto' && rot>=180);
-      const tp=M('textPath',{href:useRev?'#topArcRev':'#topArc',startOffset:'50%'},t);
-      tp.textContent=(v.text_top.length>42 ? v.text_top.slice(0,41)+'…' : v.text_top).toUpperCase();
-      svg.appendChild(t);
-    }
+  // ---- Defs: gradients, filters, paths ----
+  const defs = M('defs');
 
-    if((v.state_shape||'').toLowerCase().includes('florida')){
-      const path=`M ${R-90} ${R+30} C ${R-40} ${R-10}, ${R+10} ${R-6}, ${R+64} ${R+18}
-                  C ${R+90} ${R+32}, ${R+96} ${R+56}, ${R+122} ${R+80}
-                  C ${R+82} ${R+78}, ${R+70} ${R+64}, ${R+50} ${R+62}
-                  C ${R+28} ${R+60}, ${R+22} ${R+76}, ${R-4} ${R+78}
-                  C ${R-40} ${R+82}, ${R-72} ${R+68}, ${R-90} ${R+58} Z`;
-      M('path',{d:path,fill:'none',stroke:oline,'stroke-width':Math.max(4.5,D*0.007),'stroke-linejoin':'round'});
-    } else {
-      M('circle',{cx:R,cy:R,r:R*0.34,fill:'none',stroke:oline,'stroke-width':Math.max(3,D*0.005)});
-    }
+  // rim gradient (bevel)
+  const rg = M('radialGradient',{id:'rimRG',cx:'50%',cy:'50%',r:'60%'}, defs);
+  M('stop',{offset:'0%','stop-color':'#fff','stop-opacity':.18}, rg);
+  M('stop',{offset:'55%','stop-color':rim,'stop-opacity':1}, rg);
+  M('stop',{offset:'100%','stop-color':'#000','stop-opacity':.28}, rg);
 
-    const g=M('g');
-    const ms=(v.main_symbol||'').toLowerCase();
-    if(ms.includes('death')){
-      M('circle',{cx:R,cy:R,r:R*0.31,fill:sym,stroke:'#222','stroke-width':Math.max(2,D*0.0032)},g);
-      M('line',{x1:R-R*0.31,y1:R,x2:R+R*0.31,y2:R,stroke:'#111','stroke-width':Math.max(8,D*0.0125)},g);
-      M('circle',{cx:R+R*0.11,cy:R-R*0.09,r:R*0.065,fill:'#111',stroke:'#3b3f48','stroke-width':Math.max(1.5,D*0.0023)},g);
-      for(let i=0;i<12;i++){ const a=i*15*Math.PI/180, r1=R*0.16, r2=R*0.31;
-        M('line',{x1:R+r1*Math.cos(a),y1:R+r1*Math.sin(a),x2:R+r2*Math.cos(a),y2:R+r2*Math.sin(a),stroke:'#27303d','stroke-width':Math.max(1.2,D*0.002),'stroke-linecap':'round'},g);
-      }
-      M('path',{d:`M ${R-R*0.2} ${R+R*0.22} A ${R*0.2} ${R*0.2} 0 0 0 ${R+R*0.2} ${R+R*0.22}`,stroke:'#27303d','stroke-width':Math.max(1.2,D*0.002),fill:'none'},g);
-    } else if(ms.includes('jedi')){
-      M('path',{d:`M${R} ${R-0.22*D} L${R+0.035*D} ${R-0.26*D} L${R+0.035*D} ${R}
-        L${R+0.07*D} ${R+0.028*D} L${R+0.035*D} ${R+0.056*D} L${R+0.035*D} ${R+0.29*D}
-        L${R} ${R+0.23*D} L${R-0.035*D} ${R+0.29*D} L${R-0.035*D} ${R+0.056*D}
-        L${R-0.07*D} ${R+0.028*D} L${R-0.035*D} ${R} L${R-0.035*D} ${R-0.26*D} Z`,fill:sym},g);
-    } else {
-      M('polygon',{points:
-        `${R},${R-0.26*D} ${R+0.06*D},${R-0.15*D} ${R+0.11*D},${R-0.14*D} ${R+0.05*D},${R-0.01*D}
-         ${R+0.07*D},${R+0.07*D} ${R},${R+0.03*D} ${R-0.07*D},${R+0.07*D} ${R-0.05*D},${R-0.01*D}
-         ${R-0.11*D},${R-0.14*D} ${R-0.06*D},${R-0.15*D}`, fill:sym},g);
-    }
+  // plate vignette (very subtle)
+  const pg = M('radialGradient',{id:'plateRG',cx:'50%',cy:'45%',r:'80%'}, defs);
+  M('stop',{offset:'0%','stop-color':plate}, pg);
+  M('stop',{offset:'100%','stop-color':'#000','stop-opacity': plate==='#f7fafc' ? .04 : .12}, pg);
 
-    const s=(v.sabers_desc||'').toLowerCase();
-    const saber=(x1,y1,x2,y2)=>{ M('line',{x1,y1,x2,y2,stroke:'#7dd3fc','stroke-opacity':.25,'stroke-width':Math.max(10,D*0.018)}); M('line',{x1,y1,x2,y2,stroke:'#ffffff','stroke-width':Math.max(3,D*0.005)}); };
-    if(s.includes('cross')||/\bx\b/.test(s)){ saber(R-0.28*D,R-0.28*D,R+0.28*D,R+0.28*D); saber(R+0.28*D,R-0.28*D,R-0.28*D,R+0.28*D); }
-    else if(s.includes('three')||/\b3\b/.test(s)){ saber(R-0.31*D,R+0.37*D,R+0.31*D,R+0.37*D); saber(R-0.22*D,R+0.40*D,R+0.12*D,R+0.12*D); saber(R+0.22*D,R+0.40*D,R-0.12*D,R+0.12*D); }
-    else{ saber(R,R-0.12*D,R,R+0.40*D); }
+  // soft glow for sabers/aurebesh (Safari-friendly shadow)
+  const glow = M('filter',{id:'softGlow',x:'-30%',y:'-30%',width:'160%',height:'160%'}, defs);
+  M('feGaussianBlur',{stdDeviation:2,result:'b'}, glow);
+  M('feMerge',{}, glow); M('feMergeNode',{'in':'b'}, glow.lastChild); M('feMergeNode',{'in':'SourceGraphic'}, glow.lastChild);
 
-    const aure=(v.aurebesh_style||'').toLowerCase();
-    if(aure.includes('glow')||aure.includes('aurebesh')||aure.includes('rune')||aure.includes('inscription')){
-      M('circle',{cx:R,cy:R,r:R*0.68,fill:'none',stroke:'#7dd3fc','stroke-width':Math.max(2,D*0.003),'stroke-dasharray':'6 6','stroke-opacity':.7});
-    }
-    return svg;
+  // text arcs (give pathLength to stabilize letter spacing across engines)
+  const sweepA = Math.floor(R*0.78);
+  const y      = Math.floor(R-sweepA);
+  const arc1   = `M ${Math.floor(R- sweepA)} ${y} A ${sweepA} ${sweepA} 0 0 1 ${Math.ceil(R+ sweepA)} ${y}`;
+  const arc2   = `M ${Math.ceil(R+ sweepA)} ${y} A ${sweepA} ${sweepA} 0 0 0 ${Math.floor(R- sweepA)} ${y}`;
+  M('path',{id:'topArc',d:arc1,pathLength:1000}, defs);
+  M('path',{id:'topArcRev',d:arc2,pathLength:1000}, defs);
+
+  // ---- Base discs ----
+  const kRim = Math.max(8, D*0.015);
+  const gBase = M('g');
+
+  // plate with vignette
+  M('circle',{cx:R,cy:R,r:R*0.94,fill:'url(#plateRG)',stroke:'none'}, gBase);
+  // rim stroke over plate (bevel)
+  M('circle',{cx:R,cy:R,r:R*0.94,fill:'none',stroke:'url(#rimRG)','stroke-width':kRim}, gBase);
+  // outer fine ring
+  M('circle',{cx:R,cy:R,r:R*0.985,fill:'none',stroke:rim,'stroke-width':Math.max(2,D*0.004)}, gBase);
+  // decorative inner ring
+  M('circle',{cx:R,cy:R,r:R*0.86,fill:'none',stroke:'#ffffff22','stroke-width':Math.max(1.2,D*0.003)}, gBase);
+
+  // optional concentric rings
+  if((v.badge_elements||'').toLowerCase().includes('ring')){
+    [0.76,0.64,0.54].forEach((p,i)=>M('circle',{cx:R,cy:R,r:R*p,fill:'none',stroke:i===1?'#7dd3fc':rim,'stroke-width':Math.max(1,D*0.0026),'stroke-dasharray': i===1?'6 6':null}, gBase));
   }
 
+  // ---- Arc text (Safari-safe) ----
+  if((v.text_top||'').trim()){
+    const wantsOutline = (v.text_colors||'').toLowerCase().includes('outline') || plate==='#0b1220';
+    const text = M('text',{
+      'font-size':Math.max(24,D*0.046),'font-weight':800,fill:tfill,
+      'text-anchor':'middle','letter-spacing':'.6px','lengthAdjust':'spacingAndGlyphs'
+    });
+    if(wantsOutline){ text.setAttribute('stroke','#000'); text.setAttribute('stroke-width',Math.max(1.5,D*0.003)); text.setAttribute('paint-order','stroke'); }
+    const rot = ((view.rot%360)+360)%360;
+    const useRev = (v.flip_arc==='flipped') || (v.flip_arc==='auto' && rot>=180);
+    const tp = M('textPath',{href:useRev?'#topArcRev':'#topArc',startOffset:'50%'}, text);
+    tp.textContent=(v.text_top.length>42 ? v.text_top.slice(0,41)+'…' : v.text_top).toUpperCase();
+    svg.appendChild(text);
+  }
+
+  // ---- Center outline ----
+  if((v.state_shape||'').toLowerCase().includes('florida')){
+    const path=`M ${R-90} ${R+30} C ${R-40} ${R-10}, ${R+10} ${R-6}, ${R+64} ${R+18}
+                C ${R+90} ${R+32}, ${R+96} ${R+56}, ${R+122} ${R+80}
+                C ${R+82} ${R+78}, ${R+70} ${R+64}, ${R+50} ${R+62}
+                C ${R+28} ${R+60}, ${R+22} ${R+76}, ${R-4} ${R+78}
+                C ${R-40} ${R+82}, ${R-72} ${R+68}, ${R-90} ${R+58} Z`;
+    M('path',{d:path,fill:'none',stroke:oline,'stroke-width':Math.max(4.5,D*0.007),'stroke-linejoin':'round'});
+  } else {
+    M('circle',{cx:R,cy:R,r:R*0.34,fill:'none',stroke:oline,'stroke-width':Math.max(3,D*0.005)});
+  }
+
+  // ---- Symbol block (cleaner “Death Star” with shading) ----
+  const g = M('g');
+  const ms=(v.main_symbol||'').toLowerCase();
+  if(ms.includes('death')){
+    // planet body gradient
+    const id = 'dsrg_'+Math.random().toString(36).slice(2);
+    const ds = M('radialGradient',{id, cx:'40%', cy:'35%', r:'70%'}, defs);
+    M('stop',{offset:'0%','stop-color':sym,'stop-opacity':.95}, ds);
+    M('stop',{offset:'100%','stop-color':'#0a0a0a','stop-opacity':.65}, ds);
+    M('circle',{cx:R,cy:R,r:R*0.31,fill:`url(#${id})`,stroke:'#1f2937','stroke-width':Math.max(1.8,D*0.003)},g);
+    M('line',{x1:R-R*0.31,y1:R,x2:R+R*0.31,y2:R,stroke:'#111','stroke-width':Math.max(7.5,D*0.012)},g);
+    M('circle',{cx:R+R*0.11,cy:R-R*0.09,r:R*0.065,fill:'#101214',stroke:'#3b3f48','stroke-width':Math.max(1.4,D*0.0022)},g);
+    for(let i=0;i<12;i++){ const a=i*15*Math.PI/180, r1=R*0.16, r2=R*0.31;
+      M('line',{x1:R+r1*Math.cos(a),y1:R+r1*Math.sin(a),x2:R+r2*Math.cos(a),y2:R+r2*Math.sin(a),stroke:'#27303d','stroke-width':Math.max(1.1,D*0.0019),'stroke-linecap':'round'},g);
+    }
+    M('path',{d:`M ${R-R*0.2} ${R+R*0.22} A ${R*0.2} ${R*0.2} 0 0 0 ${R+R*0.2} ${R+R*0.22}`,stroke:'#27303d','stroke-width':Math.max(1.1,D*0.0019),fill:'none'},g);
+  } else if(ms.includes('jedi')){
+    M('path',{d:`M${R} ${R-0.22*D} L${R+0.035*D} ${R-0.26*D} L${R+0.035*D} ${R}
+      L${R+0.07*D} ${R+0.028*D} L${R+0.035*D} ${R+0.056*D} L${R+0.035*D} ${R+0.29*D}
+      L${R} ${R+0.23*D} L${R-0.035*D} ${R+0.29*D} L${R-0.035*D} ${R+0.056*D}
+      L${R-0.07*D} ${R+0.028*D} L${R-0.035*D} ${R} L${R-0.035*D} ${R-0.26*D} Z`,fill:sym,filter:'url(#softGlow)'},g);
+  } else {
+    M('polygon',{points:
+      `${R},${R-0.26*D} ${R+0.06*D},${R-0.15*D} ${R+0.11*D},${R-0.14*D} ${R+0.05*D},${R-0.01*D}
+       ${R+0.07*D},${R+0.07*D} ${R},${R+0.03*D} ${R-0.07*D},${R+0.07*D} ${R-0.05*D},${R-0.01*D}
+       ${R-0.11*D},${R-0.14*D} ${R-0.06*D},${R-0.15*D}`, fill:sym,filter:'url(#softGlow)'},g);
+  }
+
+  // ---- Sabers (with soft glow filter) ----
+  const glowLine = (x1,y1,x2,y2)=>{
+    const path = M('g',{filter:'url(#softGlow)'});
+    M('line',{x1,y1,x2,y2,stroke:'#7dd3fc','stroke-opacity':.24,'stroke-width':Math.max(10,D*0.018)},path);
+    M('line',{x1,y1,x2,y2,stroke:'#ffffff','stroke-width':Math.max(3,D*0.005)},path);
+  };
+  const s=(v.sabers_desc||'').toLowerCase();
+  if(s.includes('cross')||/\bx\b/.test(s)){ glowLine(R-0.28*D,R-0.28*D,R+0.28*D,R+0.28*D); glowLine(R+0.28*D,R-0.28*D,R-0.28*D,R+0.28*D); }
+  else if(s.includes('three')||/\b3\b/.test(s)){ glowLine(R-0.31*D,R+0.37*D,R+0.31*D,R+0.37*D); glowLine(R-0.22*D,R+0.40*D,R+0.12*D,R+0.12*D); glowLine(R+0.22*D,R+0.40*D,R-0.12*D,R+0.12*D); }
+  else{ glowLine(R,R-0.12*D,R,R+0.40*D); }
+
+  // ---- Aurebesh ring (lighter) ----
+  const aure=(v.aurebesh_style||'').toLowerCase();
+  if(aure.includes('glow')||aure.includes('aurebesh')||aure.includes('rune')||aure.includes('inscription')){
+    M('circle',{cx:R,cy:R,r:R*0.68,fill:'none',stroke:'#7dd3fc','stroke-width':Math.max(1.8,D*0.003),'stroke-dasharray':'6 6','stroke-opacity':.66,filter:'url(#softGlow)'});
+  }
+
+  return svg;
+}
   function mount(svg){
     svg.querySelectorAll('path,rect,circle,ellipse,line,polyline,polygon').forEach(el=>{
       if(!el.hasAttribute('vector-effect')) el.setAttribute('vector-effect','non-scaling-stroke');
