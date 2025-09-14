@@ -3,583 +3,412 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Medallion – SVG Preview Pro</title>
+<title>Medallion SVG Preview – Responsive</title>
 <style>
   :root{
-    --bg:#0b0e14; --panel:#0f1420; --line:#1e2635; --text:#e8ecf1; --muted:#9aa7bd;
-    --accent:#3aa3ff;
-    --btn:#131a29; --btnBorder:#22304b; --btnHover:#18233a;
+    --bg: #0e0f12;
+    --panel: #151820;
+    --ink: #e7ecf3;
+    --ink-dim: #a9b3c2;
+    --accent: #6aa3ff;
+    --accent-2:#51d0a1;
+    --border: #262b36;
+    --shadow: 0 6px 24px rgba(0,0,0,.35);
+    --radius: 12px;
+    --thumb: #2b3242;
   }
+  @media (prefers-color-scheme: light) {
+    :root{
+      --bg: #f7f8fb; --panel:#ffffff; --ink:#0d1220; --ink-dim:#475066;
+      --border:#e7ebf3; --thumb:#e9edf6;
+    }
+  }
+  *{box-sizing:border-box}
   html,body{height:100%}
   body{
-    margin:0; background:var(--bg); color:var(--text); font:14px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Helvetica Neue",Arial;
-    display:grid; place-items:stretch;
+    margin:0; background:var(--bg); color:var(--ink);
+    font: 14px/1.35 system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
   }
-  .container{max-width:1100px; margin:0 auto; padding:16px}
-  h1{margin:0 0 8px 0; font-size:18px; font-weight:600}
-  .subtitle{color:var(--muted); margin-bottom:16px}
-
-  .panel{background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:12px}
-  .toolbarRow{display:flex; gap:8px; flex-wrap:wrap; align-items:center; justify-content:space-between; margin:8px 0}
-  .left, .right{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
-  .btn, select, input[type="text"]{
-    appearance:none; border-radius:10px; border:1px solid var(--btnBorder); background:var(--btn); color:var(--text);
-    padding:8px 10px; cursor:pointer; font:inherit
+  .wrap{
+    min-height:100dvh; display:grid; gap:12px; padding:12px;
+    grid-template-rows:auto 1fr auto;
   }
-  .btn:hover{background:var(--btnHover)}
-  .btn.primary{border-color:color-mix(in srgb, var(--accent) 35%, var(--btnBorder)); box-shadow:0 0 0 1px color-mix(in srgb, var(--accent) 25%, transparent) inset}
-  .btn.ghost{background:transparent}
-  .badge{padding:4px 8px; border-radius:20px; background:#00000055; border:1px solid #ffffff20; font-size:12px; color:#d7e3f7}
-  .k{font-size:12px; color:var(--muted)}
-
-  .previewTabs{display:flex; gap:8px}
-  .tab{padding:6px 10px; border:1px solid var(--line); border-radius:8px; background:#0b0e14; cursor:pointer}
-  .tab.active{outline:1px solid color-mix(in srgb, var(--accent) 60%, transparent)}
-
-  .stageWrap{position:relative; border:1px solid var(--line); border-radius:12px; overflow:hidden; background:#0b0e14}
-  .checker{
-    --c1:#111418; --c2:#151a22;
-    background:
-      linear-gradient(45deg, var(--c1) 25%, transparent 25%) -8px 0/16px 16px,
-      linear-gradient(-45deg, var(--c1) 25%, transparent 25%) 0px 0/16px 16px,
-      linear-gradient(45deg, transparent 75%, var(--c1) 75%) -8px 8px/16px 16px,
-      linear-gradient(-45deg, transparent 75%, var(--c1) 75%) 0px 8px/16px 16px,
-      var(--c2);
+  header,footer{
+    background:var(--panel); border:1px solid var(--border);
+    border-radius:var(--radius); padding:10px 12px; box-shadow:var(--shadow);
   }
-  .stage{width:100%; aspect-ratio:1/1; touch-action:none; user-select:none; display:block}
-  .overlay{position:absolute; inset:0; pointer-events:none}
-  .badgeBox{
-    position:absolute; bottom:8px; left:8px;
-    padding:6px 8px; border-radius:8px; background:#0008; color:#e8ecf1; font-size:12px
+  header{ display:flex; align-items:center; gap:12px; flex-wrap:wrap}
+  header .title{font-weight:650; letter-spacing:.2px}
+  header .row{display:flex; gap:8px; flex-wrap:wrap; margin-left:auto}
+  button, .seg input[type=range]{
+    -webkit-tap-highlight-color:transparent;
   }
-  .error{position:absolute; inset:0; background:#1b0f12; color:#ffd3d3; display:none; align-items:center; justify-content:center; text-align:center; padding:16px}
-  .error.show{display:flex}
-
-  .grid{display:grid; grid-template-columns:1fr 340px; gap:12px}
-  @media (max-width: 980px){ .grid{grid-template-columns:1fr} }
-
-  .aside .group{display:grid; gap:6px; margin-bottom:10px}
-  .aside label{font-weight:600; font-size:12px; color:var(--muted)}
-  textarea.svgIn{
-    width:100%; min-height:180px; resize:vertical;
-    font:12px/1.35 ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono";
-    background:#0b0e14; color:#e8ecf1; border:1px solid var(--line); border-radius:8px; padding:8px
+  .btn{
+    border:1px solid var(--border); background:#1b2030; color:var(--ink);
+    padding:8px 10px; border-radius:10px; cursor:pointer;
   }
-  .help{font-size:12px; color:#9ab; opacity:0.9}
+  @media (prefers-color-scheme: light){
+    .btn{background:#f3f6ff}
+  }
+  .btn:hover{border-color:#3a4152}
+  .btn[disabled]{opacity:.5; cursor:not-allowed}
+  .seg{display:flex; align-items:center; gap:8px}
+  .seg label{color:var(--ink-dim); font-size:12px}
+
+  .stage{
+    background:var(--panel); border:1px solid var(--border);
+    border-radius:var(--radius); box-shadow:var(--shadow);
+    position:relative; overflow:hidden; min-height:60dvh;
+    /* helpful for very small phones */
+  }
+
+  /* Scrollable container for overflow safety on tiny screens */
+  .viewport{
+    width:100%; height:100%; touch-action:none; /* we implement panning/zooming */
+    position:relative; background:
+      radial-gradient(circle at 25% 25%, #10131a 0 25%, transparent 26%),
+      radial-gradient(circle at 75% 75%, #10131a 0 25%, transparent 26%),
+      linear-gradient(transparent, transparent);
+  }
+  @media (prefers-color-scheme: light){
+    .viewport{background:
+      radial-gradient(circle at 25% 25%, #f3f6ff 0 25%, transparent 26%),
+      radial-gradient(circle at 75% 75%, #f3f6ff 0 25%, transparent 26%);}
+  }
+
+  /* The layer we transform for pan/zoom */
+  .content{
+    position:absolute; top:50%; left:50%;
+    transform-origin: 0 0; /* we reposition manually */
+    will-change: transform;
+  }
+
+  /* Overlay HUD */
+  .hud{
+    position:absolute; right:10px; bottom:10px; display:flex; gap:8px; flex-wrap:wrap;
+  }
+  .hud .chip{
+    background:#10131a; border:1px solid var(--border); color:var(--ink-dim);
+    padding:6px 8px; border-radius:10px; font-size:12px
+  }
+  @media (prefers-color-scheme: light){
+    .hud .chip{background:#fff}
+  }
+
+  .tools{
+    display:flex; gap:8px; flex-wrap:wrap;
+  }
+  .tools .btn{display:flex; align-items:center; gap:6px}
+  .tools .btn .dot{width:6px; height:6px; border-radius:50%; background:var(--accent-2)}
+
+  .seg input[type=range]{
+    appearance:none; width:120px; height:8px; background:var(--thumb);
+    border-radius:999px; outline:none;
+  }
+  .seg input[type=range]::-webkit-slider-thumb{
+    appearance:none; width:18px; height:18px; border-radius:50%;
+    background:var(--accent); border:0; box-shadow:0 2px 6px rgba(0,0,0,.35)
+  }
+  .seg output{
+    min-width:3ch; text-align:right; color:var(--ink-dim); font-variant-numeric:tabular-nums;
+  }
+
+  footer{
+    display:flex; align-items:center; justify-content:space-between; gap:10px; color:var(--ink-dim)
+  }
+  .badge{color:var(--accent)}
 </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Medallion Preview</h1>
-    <div class="subtitle">High-fidelity inline + canvas preview, zoom/pan, outline QA, checkerboard transparency.</div>
-
-    <div class="grid">
-      <section class="panel">
-        <div class="toolbarRow">
-          <div class="left previewTabs">
-            <button class="tab active" id="tabInline" aria-pressed="true">Inline SVG</button>
-            <button class="tab" id="tabCanvas" aria-pressed="false">Canvas</button>
-            <span class="badge" id="renderBadge">Ready</span>
-          </div>
-          <div class="right">
-            <select id="fitMode" class="btn" title="Scale mode">
-              <option value="fit">Fit</option>
-              <option value="contain">Contain</option>
-              <option value="cover">Cover</option>
-              <option value="1x">1×</option>
-              <option value="2x">2×</option>
-            </select>
-            <button class="btn" id="toggleChecker" title="Toggle checkerboard background">Checkerboard</button>
-            <button class="btn" id="toggleOutline" title="Force strokes for QA">Outline</button>
-            <button class="btn" id="resetView" title="Reset pan/zoom">Reset View</button>
-          </div>
+  <div class="wrap">
+    <header>
+      <div class="title">Medallion Preview</div>
+      <div class="row">
+        <div class="tools">
+          <button class="btn" id="fit">Fit</button>
+          <button class="btn" id="fill">Fill</button>
+          <button class="btn" id="reset">Reset</button>
+          <button class="btn" id="export">Export PNG</button>
         </div>
-
-        <div class="stageWrap checker" id="stageWrap">
-          <div class="stage" id="inlineStage" aria-label="Inline SVG preview"></div>
-          <canvas class="stage" id="canvasStage" aria-label="Canvas preview" style="display:none"></canvas>
-          <div class="overlay">
-            <div class="badgeBox" id="metaBox">—</div>
-          </div>
-          <div class="error" id="errBox"><div id="errMsg">Preview error.</div></div>
+        <div class="seg">
+          <label for="zoom">Zoom</label>
+          <input id="zoom" type="range" min="10" max="800" value="100" />
+          <output id="zoomOut">100%</output>
         </div>
+      </div>
+    </header>
 
-        <div class="toolbarRow">
-          <div class="k" id="vbInfo">viewBox: — • size: —</div>
-          <div class="k">Tip: drag to pan · wheel to zoom · Shift+wheel slows zoom</div>
+    <main class="stage">
+      <div class="viewport" id="viewport" aria-label="SVG preview surface">
+        <div class="content" id="content">
+          <!-- Your SVG goes here. Make sure it has a proper viewBox. -->
+          <svg id="medallion" viewBox="0 0 1024 1024" width="1024" height="1024" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Medallion sample" preserveAspectRatio="xMidYMid meet">
+            <defs>
+              <radialGradient id="g" cx=".5" cy=".5" r=".55">
+                <stop offset="0" stop-color="#ffffff"/>
+                <stop offset=".55" stop-color="#d8e7ff"/>
+                <stop offset="1" stop-color="#9cc0ff"/>
+              </radialGradient>
+              <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+                <feGaussianBlur stdDeviation="1.2" />
+              </filter>
+            </defs>
+            <rect x="0" y="0" width="1024" height="1024" fill="#0d1020"/>
+            <g transform="translate(512,512)">
+              <circle r="360" fill="url(#g)" />
+              <g filter="url(#soft)">
+                <circle r="330" fill="none" stroke="#1c2a5f" stroke-width="8"/>
+                <circle r="270" fill="none" stroke="#1c2a5f" stroke-width="6" stroke-dasharray="8 12"/>
+                <circle r="180" fill="none" stroke="#1c2a5f" stroke-width="5" stroke-dasharray="4 8"/>
+              </g>
+              <!-- sample emblem -->
+              <g aria-label="emblem">
+                <path d="M0 -220 L40 -40 L220 -40 L70 30 L110 210 L0 110 L-110 210 L-70 30 L-220 -40 L-40 -40 Z"
+                      fill="#172045" stroke="#0c132e" stroke-width="8"/>
+                <path d="M0 -190 L33 -45 L185 -45 L60 20 L95 165 L0 90 L-95 165 L-60 20 L-185 -45 L-33 -45 Z"
+                      fill="#243568" />
+              </g>
+            </g>
+          </svg>
         </div>
-      </section>
+        <div class="hud" aria-hidden="true">
+          <div class="chip" id="hud-size">–</div>
+          <div class="chip" id="hud-zoom">–</div>
+        </div>
+      </div>
+    </main>
 
-      <aside class="panel aside">
-        <div class="group">
-          <label for="svgInput">SVG input (optional). Paste raw SVG here to preview/sanitize.</label>
-          <textarea id="svgInput" class="svgIn" placeholder="&lt;svg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'&gt;...&lt;/svg&gt;"></textarea>
-          <div class="help">If you don’t paste SVG, the built-in <code>buildSvg()</code> demo medallion is used. In production, call <code>setExternalSvg(svgElement)</code> with your generator’s output.</div>
-          <div class="left">
-            <button id="btnPreview" class="btn primary">Render</button>
-            <button id="btnLoadDemo" class="btn ghost">Load demo medallion</button>
-          </div>
-        </div>
-      </aside>
-    </div>
+    <footer>
+      <div>Drag to pan • Wheel/Pinch to zoom • <span class="badge">Mobile & Desktop</span></div>
+      <div id="msg"></div>
+    </footer>
   </div>
 
 <script>
-(() => {
-  // --------------- DOM ---------------
-  const wrap = document.getElementById('stageWrap');
-  const inlineStage = document.getElementById('inlineStage');
-  const canvas = document.getElementById('canvasStage');
-  const ctx = canvas.getContext('2d', { alpha:true });
-  const metaBox = document.getElementById('metaBox');
-  const errBox = document.getElementById('errBox');
-  const errMsg = document.getElementById('errMsg');
-  const vbInfo = document.getElementById('vbInfo');
-  const badge = document.getElementById('renderBadge');
+(function(){
+  const viewport = document.getElementById('viewport');
+  const content  = document.getElementById('content');
+  const svg      = document.getElementById('medallion');
+  const btnFit   = document.getElementById('fit');
+  const btnFill  = document.getElementById('fill');
+  const btnReset = document.getElementById('reset');
+  const btnExport= document.getElementById('export');
+  const zoomRange= document.getElementById('zoom');
+  const zoomOut  = document.getElementById('zoomOut');
+  const hudSize  = document.getElementById('hud-size');
+  const hudZoom  = document.getElementById('hud-zoom');
+  const msg      = document.getElementById('msg');
 
-  const tabInline = document.getElementById('tabInline');
-  const tabCanvas = document.getElementById('tabCanvas');
-  const fitModeSel = document.getElementById('fitMode');
-  const toggleChecker = document.getElementById('toggleChecker');
-  const toggleOutline = document.getElementById('toggleOutline');
-  const resetViewBtn = document.getElementById('resetView');
-
-  const svgInput = document.getElementById('svgInput');
-  const btnPreview = document.getElementById('btnPreview');
-  const btnLoadDemo = document.getElementById('btnLoadDemo');
-
-  // --------------- State ---------------
-  let currentSvgEl = null;          // sanitized SVG element
-  let originalSvgEl = null;         // unsanitized (never attached)
-  let outlineMode = false;
-  let checkerOn = true;
-  let activeTab = 'inline';         // 'inline' | 'canvas'
-  let fitMode = 'fit';              // 'fit'|'contain'|'cover'|'1x'|'2x'
-  let view = { x:0, y:0, k:1 };     // pan/zoom
-  let isPanning = false;
-  let lastPt = { x:0, y:0 };
-
-  // --------------- Utilities ---------------
-  const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
-  const debounce = (fn, ms=120) => {
-    let t; return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
+  // --- Utilities ------------------------------------------------------------
+  const state = {
+    x: 0, y: 0, scale: 1,
+    minScale: .05, maxScale: 8,
+    contentW: 1024, contentH: 1024
   };
 
-  function setBadge(text, ok=true){
-    badge.textContent = text;
-    badge.style.background = ok ? '#063d1f' : '#4d1218';
-    badge.style.border = '1px solid ' + (ok ? '#1b6f3f' : '#8a2631');
-    badge.style.color = ok ? '#bff2d4' : '#ffd3d3';
-  }
-
-  // ---------- SVG sanitizer (very strict) ----------
-  const FORBIDDEN = new Set([
-    'script','foreignobject','iframe','object','embed','audio','video','canvas','image' // 'image' optional; keep blocked for safety
-  ]);
-  const FORBIDDEN_ATTR_PREFIX = ['on']; // onload, onclick...
-  const FORBIDDEN_ATTRS = new Set(['href','xlink:href']); // remove external references
-
-  function sanitizeSvg(svg){
-    const clone = svg.cloneNode(true);
-    const walker = document.createTreeWalker(clone, NodeFilter.SHOW_ELEMENT, null);
-    const toRemove = [];
-    while(walker.nextNode()){
-      const el = walker.currentNode;
-      const tag = el.tagName.toLowerCase();
-      if(FORBIDDEN.has(tag)){ toRemove.push(el); continue; }
-
-      // Remove event handlers and dangerous URL-bearing attrs
-      for(const attr of [...el.attributes]){
-        const nm = attr.name.toLowerCase();
-        if(FORBIDDEN_ATTR_PREFIX.some(p => nm.startsWith(p))) el.removeAttribute(attr.name);
-        if(FORBIDDEN_ATTRS.has(nm)) el.removeAttribute(attr.name);
-
-        // url() sanitization within style attrs
-        if(nm === 'style' && /url\s*\(/i.test(attr.value)){
-          el.removeAttribute('style');
-        }
-        // external references in fill/stroke/filter via url(#id) are allowed
-        // but any absolute/relative URL (url(http...)) are stripped above
-      }
-      // Ensure vector-effect for crisp strokes on zoom
-      if(!el.hasAttribute('vector-effect')) el.setAttribute('vector-effect','non-scaling-stroke');
-      // Snap strokes to pixel grid for common shapes
-      if(['path','rect','circle','line','polyline','polygon'].includes(tag)){
-        const sw = parseFloat(el.getAttribute('stroke-width') || '1');
-        if(!Number.isNaN(sw)) el.setAttribute('shape-rendering','geometricPrecision');
-      }
+  // Ensure the SVG has a viewBox; it’s critical for crisp scaling.
+  function ensureViewBox(el){
+    const vb = el.getAttribute('viewBox');
+    if(!vb){
+      const w = parseFloat(el.getAttribute('width')) || 1024;
+      const h = parseFloat(el.getAttribute('height')) || 1024;
+      el.setAttribute('viewBox', `0 0 ${w} ${h}`);
     }
-    for(const el of toRemove) el.remove();
+    const [x,y,w,h] = el.getAttribute('viewBox').split(/\s+/).map(Number);
+    state.contentW = w; state.contentH = h;
+  }
+  ensureViewBox(svg);
 
-    // Ensure xmlns + viewBox present
-    clone.setAttribute('xmlns','http://www.w3.org/2000/svg');
-    if(!clone.getAttribute('viewBox')){
-      // derive from width/height if possible
-      let w = parseFloat(clone.getAttribute('width') || '0');
-      let h = parseFloat(clone.getAttribute('height') || '0');
-      if(!(w>0 && h>0)){ w = 100; h = 100; }
-      clone.setAttribute('viewBox', `0 0 ${w} ${h}`);
-    }
-    // Remove any external stylesheet links
-    clone.removeAttribute('style'); // top-level inline styles can reintroduce urls
-    return clone;
+  const ro = new ResizeObserver(updateFitBounds);
+  ro.observe(viewport);
+
+  let view = { w:0, h:0, cx:0, cy:0 };
+
+  function updateFitBounds(){
+    const rect = viewport.getBoundingClientRect();
+    view.w = rect.width; view.h = rect.height;
+    view.cx = view.w/2; view.cy = view.h/2;
+    hudSize.textContent = `${Math.round(view.w)}×${Math.round(view.h)}px`;
+    render();
   }
 
-  // ---------- Demo medallion generator (replace with your buildSvg) ----------
-  function buildSvg(){
-    // Simple concentric, golden-angle petals — parametric demo
-    const NS = 'http://www.w3.org/2000/svg';
-    const W = 1024, H = 1024;
-    const g = document.createElementNS(NS,'svg');
-    g.setAttribute('viewBox', `0 0 ${W} ${H}`);
-    g.setAttribute('width', W); g.setAttribute('height', H);
-
-    const bg = document.createElementNS(NS,'rect');
-    bg.setAttribute('x','0'); bg.setAttribute('y','0'); bg.setAttribute('width',W); bg.setAttribute('height',H);
-    bg.setAttribute('fill','transparent');
-    g.appendChild(bg);
-
-    const root = document.createElementNS(NS,'g');
-    root.setAttribute('transform', `translate(${W/2},${H/2})`);
-    g.appendChild(root);
-
-    const TAU = Math.PI*2;
-    const GOLD = Math.PI*(3 - Math.sqrt(5)); // golden angle
-    const R = 440;
-    for(let i=0;i<420;i++){
-      const t = i*GOLD;
-      const r = Math.sqrt(i/420)*R;
-      const x = Math.cos(t)*r, y = Math.sin(t)*r;
-      const p = document.createElementNS(NS,'circle');
-      p.setAttribute('cx', x.toFixed(2));
-      p.setAttribute('cy', y.toFixed(2));
-      p.setAttribute('r', (2 + 2.5*Math.sin(i*0.17)) .toFixed(2));
-      p.setAttribute('fill', `hsl(${(i*0.9)%360} 60% 55% / 0.9)`);
-      p.setAttribute('stroke', 'hsl(210 20% 15% / 0.25)');
-      p.setAttribute('stroke-width','0.75');
-      root.appendChild(p);
-    }
-
-    // ring + star outlines (to test outline mode)
-    const ring = document.createElementNS(NS,'circle');
-    ring.setAttribute('cx','0'); ring.setAttribute('cy','0'); ring.setAttribute('r','470');
-    ring.setAttribute('fill','none'); ring.setAttribute('stroke','#dbe7ff'); ring.setAttribute('stroke-width','4');
-    root.appendChild(ring);
-
-    // tiny star
-    const star = document.createElementNS(NS,'path');
-    const spikes=8, outer=520, inner=495;
-    let d = '';
-    for(let i=0;i<spikes*2;i++){
-      const ang = i*Math.PI/spikes;
-      const rr = (i%2===0? outer:inner);
-      const xx = Math.cos(ang)*rr, yy = Math.sin(ang)*rr;
-      d += (i===0?'M':'L') + xx.toFixed(1) + ' ' + yy.toFixed(1);
-    }
-    d += 'Z';
-    star.setAttribute('d',d);
-    star.setAttribute('fill','none');
-    star.setAttribute('stroke','#9cc0ff');
-    star.setAttribute('stroke-width','2');
-    root.appendChild(star);
-
-    return g;
+  function setTransform(x,y,scale){
+    state.x = x; state.y = y; state.scale = clamp(scale, state.minScale, state.maxScale);
+    render();
   }
 
-  // Allow external integration to inject a prebuilt SVG element
-  window.setExternalSvg = function(svgEl){
-    originalSvgEl = svgEl;
-    scheduleRender();
-  };
-
-  // ---------- Render pipeline ----------
-  function clearStage(){
-    inlineStage.innerHTML = '';
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-  }
-
-  function updateMeta(){
-    if(!currentSvgEl){ metaBox.textContent = '—'; vbInfo.textContent = 'viewBox: — • size: —'; return; }
-    const vb = (currentSvgEl.getAttribute('viewBox')||'').trim();
-    const w = currentSvgEl.getAttribute('width') || 'auto';
-    const h = currentSvgEl.getAttribute('height') || 'auto';
-    vbInfo.textContent = `viewBox: ${vb || '—'} • size: ${w} × ${h}`;
-    const nodeCount = currentSvgEl.querySelectorAll('*').length;
-    metaBox.textContent = `${nodeCount} nodes • zoom ${view.k.toFixed(2)}× • pan ${view.x.toFixed(0)},${view.y.toFixed(0)}`;
-  }
-
-  function mountInline(){
-    inlineStage.style.display = '';
-    canvas.style.display = 'none';
-    const holder = document.createElement('div');
-    holder.style.width = '100%';
-    holder.style.height = '100%';
-    holder.style.display = 'grid';
-    holder.style.placeItems = 'center';
-    // a wrapper to apply pan/zoom via CSS transform
-    const inner = document.createElement('div');
-    inner.style.transform = `translate(${view.x}px,${view.y}px) scale(${view.k})`;
-    inner.style.transformOrigin = '50% 50%';
-    inner.style.willChange = 'transform';
-    inner.appendChild(currentSvgEl);
-    holder.appendChild(inner);
-    inlineStage.appendChild(holder);
-  }
-
-  function drawOnCanvas(){
-    inlineStage.style.display = 'none';
-    canvas.style.display = '';
-    const dpr = window.devicePixelRatio || 1;
-    const { width: cw, height: ch } = wrap.getBoundingClientRect();
-    canvas.width = Math.max(1, Math.round(cw * dpr));
-    canvas.height = Math.max(1, Math.round(ch * dpr));
-    canvas.style.width = '100%';
-    canvas.style.height = '100%';
-
-    // Serialize sanitized SVG -> Blob -> Image -> draw
-    const ser = new XMLSerializer();
-    const svgStr = ser.serializeToString(currentSvgEl);
-    const blob = new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const img = new Image();
-    img.onload = () => {
-      ctx.save();
-      ctx.setTransform(dpr,0,0,dpr,0,0);
-      ctx.clearRect(0,0,cw,ch);
-
-      // Compute fit/crop
-      const vb = (currentSvgEl.getAttribute('viewBox') || '0 0 100 100').split(/\s+/).map(Number);
-      const vbW = vb[2]||100, vbH = vb[3]||100;
-      let scale = 1, dx = 0, dy = 0;
-
-      if(fitMode === '1x' || fitMode === '2x'){
-        scale = (fitMode === '2x') ? 2 : 1;
-        // center
-        dx = (cw - vbW*scale)/2 + view.x;
-        dy = (ch - vbH*scale)/2 + view.y;
-      } else {
-        const sx = cw / vbW, sy = ch / vbH;
-        if(fitMode === 'fit' || fitMode === 'contain') scale = Math.min(sx, sy);
-        if(fitMode === 'cover') scale = Math.max(sx, sy);
-        scale *= view.k;
-        dx = (cw - vbW*scale)/2 + view.x;
-        dy = (ch - vbH*scale)/2 + view.y;
-      }
-
-      // Half-pixel align for crisper strokes
-      const half = (Math.round(scale) % 2 === 1) ? 0.5 : 0;
-      ctx.translate(Math.round(dx)+half, Math.round(dy)+half);
-      ctx.scale(scale, scale);
-      ctx.drawImage(img, 0, 0);
-      ctx.restore();
-      URL.revokeObjectURL(url);
-      updateMeta();
-      setBadge('Rendered');
-    };
-    img.onerror = e => {
-      URL.revokeObjectURL(url);
-      showError('Canvas draw failed. (Possibly a blocked external reference.)');
-    };
-    img.src = url;
-  }
-
-  function applyOutlineMode(svg){
-    if(!outlineMode) return;
-    const walker = document.createTreeWalker(svg, NodeFilter.SHOW_ELEMENT, null);
-    while(walker.nextNode()){
-      const el = walker.currentNode;
-      const tag = el.tagName.toLowerCase();
-      if(['path','rect','circle','ellipse','line','polyline','polygon','g','text'].includes(tag)){
-        el.setAttribute('fill','none');
-        el.setAttribute('stroke','#87b7ff');
-        el.setAttribute('stroke-width', el.getAttribute('stroke-width') || '1');
-      }
-    }
-  }
-
-  function computeViewForFit(svg){
-    const vb = (svg.getAttribute('viewBox') || '0 0 100 100').split(/\s+/).map(Number);
-    const vbW = vb[2]||100, vbH = vb[3]||100;
-    const { width: cw, height: ch } = wrap.getBoundingClientRect();
-    const sx = cw / vbW, sy = ch / vbH;
-    let k = 1;
-    if(fitMode === 'fit' || fitMode === 'contain') k = Math.min(sx, sy);
-    if(fitMode === 'cover') k = Math.max(sx, sy);
-    if(fitMode === '1x') k = 1;
-    if(fitMode === '2x') k = 2;
-    return { x: 0, y: 0, k };
-  }
+  function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
 
   function render(){
+    content.style.transform = `translate(${view.cx + state.x}px, ${view.cy + state.y}px) scale(${state.scale}) translate(${-state.contentW/2}px, ${-state.contentH/2}px)`;
+    const pct = Math.round(state.scale*100);
+    zoomRange.value = pct; zoomOut.value = pct + '%';
+    hudZoom.textContent = `Zoom ${pct}%`;
+  }
+
+  // Fit and Fill compute scales based on viewBox → viewport
+  function scaleForFit(){
+    return Math.min(view.w/state.contentW, view.h/state.contentH);
+  }
+  function scaleForFill(){
+    return Math.max(view.w/state.contentW, view.h/state.contentH);
+  }
+  function center(){
+    setTransform(0,0,state.scale);
+  }
+
+  // Public actions
+  function doFit(){ setTransform(0,0, scaleForFit()); }
+  function doFill(){ setTransform(0,0, scaleForFill()); }
+  function doReset(){ setTransform(0,0, 1); }
+
+  btnFit.addEventListener('click', doFit);
+  btnFill.addEventListener('click', doFill);
+  btnReset.addEventListener('click', doReset);
+
+  // Zoom via range
+  zoomRange.addEventListener('input', (e)=>{
+    const targetScale = parseInt(e.target.value,10)/100;
+    // zoom to center, keep current pan roughly consistent
+    const k = targetScale/state.scale;
+    setTransform(state.x*k, state.y*k, targetScale);
+  });
+
+  // --- Interaction: mouse/touch/trackpad -----------------------------------
+  let dragging=false, lastX=0, lastY=0;
+  viewport.addEventListener('pointerdown', (e)=>{
+    dragging=true; viewport.setPointerCapture(e.pointerId);
+    lastX=e.clientX; lastY=e.clientY;
+  });
+  viewport.addEventListener('pointermove', (e)=>{
+    if(!dragging) return;
+    const dx=e.clientX-lastX, dy=e.clientY-lastY;
+    lastX=e.clientX; lastY=e.clientY;
+    setTransform(state.x+dx, state.y+dy, state.scale);
+  });
+  const stopDrag=()=>{dragging=false};
+  viewport.addEventListener('pointerup', stopDrag);
+  viewport.addEventListener('pointercancel', stopDrag);
+  viewport.addEventListener('pointerleave', stopDrag);
+
+  // Wheel/trackpad zoom (Ctrl/Cmd+wheel or pinch on trackpads)
+  viewport.addEventListener('wheel', (e)=>{
+    e.preventDefault();
+    // zoom toward cursor
+    const zoomIntensity = (e.ctrlKey || e.metaKey) ? 0.0025 : 0.0015;
+    const delta = -e.deltaY * zoomIntensity;
+    const newScale = clamp(state.scale * (1 + delta), state.minScale, state.maxScale);
+
+    const rect = viewport.getBoundingClientRect();
+    const mx = e.clientX - rect.left - view.cx - state.x;
+    const my = e.clientY - rect.top  - view.cy - state.y;
+
+    // adjust pan so the point under cursor stays under cursor
+    const k = newScale/state.scale;
+    const nx = state.x - mx*(k-1);
+    const ny = state.y - my*(k-1);
+    setTransform(nx, ny, newScale);
+  }, {passive:false});
+
+  // Pinch zoom on touch (two-finger)
+  let pinchDist = 0, pinchMid = null;
+  viewport.addEventListener('touchstart', (e)=>{
+    if(e.touches.length===2){
+      pinchDist = dist(e.touches[0], e.touches[1]);
+      pinchMid  = mid(e.touches[0], e.touches[1]);
+    }
+  }, {passive:true});
+  viewport.addEventListener('touchmove', (e)=>{
+    if(e.touches.length===2){
+      e.preventDefault();
+      const d = dist(e.touches[0], e.touches[1]);
+      const rect = viewport.getBoundingClientRect();
+      const m = mid(e.touches[0], e.touches[1]);
+      const mx = m.x - rect.left - view.cx - state.x;
+      const my = m.y - rect.top  - view.cy - state.y;
+      const k = d/pinchDist;
+      const newScale = clamp(state.scale*k, state.minScale, state.maxScale);
+      const adj = newScale/state.scale;
+      const nx = state.x - mx*(adj-1);
+      const ny = state.y - my*(adj-1);
+      setTransform(nx, ny, newScale);
+      pinchDist = d;
+    }
+  }, {passive:false});
+
+  function dist(a,b){const dx=a.clientX-b.clientX, dy=a.clientY-b.clientY; return Math.hypot(dx,dy)}
+  function mid(a,b){return {x:(a.clientX+b.clientX)/2, y:(a.clientY+b.clientY)/2}}
+
+  // --- Export PNG (hi-DPI aware) -------------------------------------------
+  btnExport.addEventListener('click', async ()=>{
     try{
-      setBadge('Rendering…');
-      errBox.classList.remove('show');
-      clearStage();
+      const {width, height} = svg.viewBox.baseVal;
+      const scale = Math.min(4096/Math.max(width,height), 4); // keep PNG sane
+      const pxW = Math.round(width * scale * (window.devicePixelRatio || 1));
+      const pxH = Math.round(height* scale * (window.devicePixelRatio || 1));
 
-      // Source priority: textarea SVG -> external provided -> demo build
-      let sourceSvg = null;
-      if(svgInput.value.trim()){
-        sourceSvg = stringToSvg(svgInput.value.trim());
-      } else if(originalSvgEl){
-        sourceSvg = originalSvgEl;
-      } else {
-        sourceSvg = buildSvg();
-      }
-      if(!sourceSvg || sourceSvg.tagName?.toLowerCase() !== 'svg'){
-        throw new Error('No <svg> element found.');
-      }
-      // sanitize
-      currentSvgEl = sanitizeSvg(sourceSvg);
-      if(outlineMode) applyOutlineMode(currentSvgEl);
+      // serialize SVG
+      const s = new XMLSerializer().serializeToString(svg);
+      const blob = new Blob([s], {type:'image/svg+xml;charset=utf-8'});
+      const url = URL.createObjectURL(blob);
 
-      // reset view when fit mode changes or no pan established
-      if(render._first || render._fitChanged){
-        view = computeViewForFit(currentSvgEl);
-        render._fitChanged = false;
-        render._first = false;
-      }
-
-      // mount / draw
-      if(activeTab === 'inline'){
-        mountInline();
-      } else {
-        drawOnCanvas();
-      }
-      updateMeta();
-      setBadge('Rendered');
-    } catch(err){
-      showError(err.message || String(err));
-    }
-  }
-  render._first = true;
-  const scheduleRender = debounce(render, 50);
-  window.scheduleRender = scheduleRender; // expose for external controls
-
-  function showError(msg){
-    errMsg.textContent = msg;
-    errBox.classList.add('show');
-    setBadge('Error', false);
-  }
-
-  function stringToSvg(str){
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(str, 'image/svg+xml');
-    const svg = doc.documentElement;
-    if(svg.nodeName === 'parsererror') throw new Error('Invalid SVG XML.');
-    return svg;
-  }
-
-  // --------------- Interactions ---------------
-  // Tabs
-  function setTab(which){
-    activeTab = which;
-    tabInline.classList.toggle('active', which==='inline');
-    tabCanvas.classList.toggle('active', which==='canvas');
-    tabInline.setAttribute('aria-pressed', String(which==='inline'));
-    tabCanvas.setAttribute('aria-pressed', String(which==='canvas'));
-    scheduleRender();
-  }
-  tabInline.addEventListener('click', () => setTab('inline'));
-  tabCanvas.addEventListener('click', () => setTab('canvas'));
-
-  // Fit mode
-  fitModeSel.addEventListener('change', () => {
-    fitMode = fitModeSel.value;
-    render._fitChanged = true;
-    scheduleRender();
-  });
-
-  // Checkerboard
-  toggleChecker.addEventListener('click', () => {
-    checkerOn = !checkerOn;
-    wrap.classList.toggle('checker', checkerOn);
-  });
-
-  // Outline
-  toggleOutline.addEventListener('click', () => {
-    outlineMode = !outlineMode;
-    scheduleRender();
-  });
-
-  // Reset
-  resetViewBtn.addEventListener('click', () => {
-    if(currentSvgEl){
-      view = computeViewForFit(currentSvgEl);
-      scheduleRender();
+      const img = new Image();
+      // important for cross-origin gradient/filter correctness
+      img.decoding = 'async';
+      img.onload = ()=>{
+        const c = document.createElement('canvas');
+        c.width = pxW; c.height = pxH;
+        const ctx = c.getContext('2d', {alpha:false});
+        ctx.imageSmoothingQuality = 'high';
+        ctx.drawImage(img, 0, 0, pxW, pxH);
+        URL.revokeObjectURL(url);
+        c.toBlob((pngBlob)=>{
+          const a = document.createElement('a');
+          a.href = URL.createObjectURL(pngBlob);
+          a.download = 'medallion.png';
+          a.click();
+          setMsg('Exported PNG', 1800);
+        }, 'image/png');
+      };
+      img.onerror = ()=>{ URL.revokeObjectURL(url); setMsg('Export failed', 2500) };
+      img.src = url;
+    }catch(err){
+      console.error(err); setMsg('Export failed', 2500);
     }
   });
 
-  // Pan/zoom (both tabs)
-  function stageEl(){ return activeTab==='inline' ? inlineStage : canvas; }
-  function pointerToLocal(ev){
-    const r = wrap.getBoundingClientRect();
-    return { x: ev.clientX - r.left, y: ev.clientY - r.top };
+  function setMsg(text, ms=1500){
+    msg.textContent = text;
+    if(ms){
+      setTimeout(()=>{ if(msg.textContent===text) msg.textContent=''; }, ms);
+    }
   }
-  wrap.addEventListener('pointerdown', (ev) => {
-    isPanning = true;
-    wrap.setPointerCapture(ev.pointerId);
-    lastPt = pointerToLocal(ev);
+
+  // Initial fit on load
+  window.addEventListener('load', ()=>{
+    doFit();
+    // If you inject a new SVG at runtime, call ensureViewBox(newSvg); doFit();
   });
-  wrap.addEventListener('pointermove', (ev) => {
-    if(!isPanning) return;
-    const pt = pointerToLocal(ev);
-    const dx = pt.x - lastPt.x;
-    const dy = pt.y - lastPt.y;
-    lastPt = pt;
-    view.x += dx;
-    view.y += dy;
-    if(activeTab==='inline'){
-      // update transform live
-      const inner = inlineStage.firstElementChild?.firstElementChild;
-      if(inner){
-        inner.style.transform = `translate(${view.x}px,${view.y}px) scale(${view.k})`;
-      }
-      updateMeta();
-    } else {
-      scheduleRender();
+
+  // Keyboard helpers
+  window.addEventListener('keydown', (e)=>{
+    if(e.key==='0'){ doFit(); }
+    if(e.key==='1'){ doReset(); }
+    if(e.key==='f'){ doFill(); }
+    if(e.key==='=' || e.key==='+'){ nudgeZoom(1.1) }
+    if(e.key==='-' ){ nudgeZoom(1/1.1) }
+    if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)){
+      const step = 20;
+      const dx = (e.key==='ArrowLeft'?-step: e.key==='ArrowRight'?step:0);
+      const dy = (e.key==='ArrowUp'?-step: e.key==='ArrowDown'?step:0);
+      setTransform(state.x+dx, state.y+dy, state.scale);
     }
   });
-  window.addEventListener('pointerup', () => { isPanning = false; });
-
-  wrap.addEventListener('wheel', (ev) => {
-    ev.preventDefault();
-    const delta = -ev.deltaY;
-    const factor = (ev.shiftKey ? 0.001 : 0.0025) * delta;
-    const k = clamp(view.k * (1 + factor), 0.05, 20);
-
-    // Zoom towards cursor
-    const r = wrap.getBoundingClientRect();
-    const cx = ev.clientX - r.left;
-    const cy = ev.clientY - r.top;
-    const scale = k / view.k;
-    view.x = cx - scale * (cx - view.x);
-    view.y = cy - scale * (cy - view.y);
-    view.k = k;
-
-    if(activeTab==='inline'){
-      const inner = inlineStage.firstElementChild?.firstElementChild;
-      if(inner){
-        inner.style.transform = `translate(${view.x}px,${view.y}px) scale(${view.k})`;
-      }
-      updateMeta();
-    } else {
-      scheduleRender();
-    }
-  }, { passive:false });
-
-  // Textarea actions
-  btnPreview.addEventListener('click', () => scheduleRender());
-  btnLoadDemo.addEventListener('click', () => {
-    svgInput.value = new XMLSerializer().serializeToString(buildSvg());
-    scheduleRender();
-  });
-
-  // Initial render
-  scheduleRender();
-
-  // Resize observer for responsive redraw
-  const ro = new ResizeObserver(debounce(() => scheduleRender(), 80));
-  ro.observe(wrap);
+  function nudgeZoom(k){
+    const newScale = clamp(state.scale*k, state.minScale, state.maxScale);
+    const sMul = newScale/state.scale;
+    setTransform(state.x*sMul, state.y*sMul, newScale);
+  }
 })();
 </script>
 </body>
