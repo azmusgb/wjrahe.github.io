@@ -2,413 +2,502 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Medallion SVG Preview – Responsive</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Medallion Forge — Dynamic Builder</title>
 <style>
   :root{
-    --bg: #0e0f12;
-    --panel: #151820;
-    --ink: #e7ecf3;
-    --ink-dim: #a9b3c2;
-    --accent: #6aa3ff;
-    --accent-2:#51d0a1;
-    --border: #262b36;
-    --shadow: 0 6px 24px rgba(0,0,0,.35);
-    --radius: 12px;
-    --thumb: #2b3242;
+    --bg:#0e1016; --panel:#121826; --ink:#e8ecf1; --muted:#9aa3b2; --line:#242c3b;
+    --accent:#6ee7ff; --accent2:#7c8cff; --ok:#38d39f; --warn:#ffb84d; --bad:#ff5c5c;
+    --btn:#0f1421; --btnHover:#141b2b;
+    --radius:12px; --shadow:0 6px 28px rgba(0,0,0,.35);
+    --mono:ui-monospace,Menlo,Consolas,monospace; --sans:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;
   }
-  @media (prefers-color-scheme: light) {
+  @media (prefers-color-scheme: light){
     :root{
-      --bg: #f7f8fb; --panel:#ffffff; --ink:#0d1220; --ink-dim:#475066;
-      --border:#e7ebf3; --thumb:#e9edf6;
+      --bg:#f6f7fb; --panel:#ffffff; --ink:#0d121a; --muted:#505a6d; --line:#e6ebf3;
+      --btn:#f2f5ff; --btnHover:#e9f0ff; --accent:#0ea5e9; --accent2:#6366f1;
     }
   }
-  *{box-sizing:border-box}
-  html,body{height:100%}
-  body{
-    margin:0; background:var(--bg); color:var(--ink);
-    font: 14px/1.35 system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  *{box-sizing:border-box} html,body{height:100%}
+  body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 var(--sans)}
+  .wrap{display:grid;gap:12px;padding:12px;grid-template-columns:360px 1fr;max-width:1300px;margin:0 auto}
+  header{grid-column:1/-1;display:flex;gap:10px;align-items:center;justify-content:space-between}
+  h1{margin:0;font-size:18px;letter-spacing:.2px}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:12px}
+  .controls{display:grid;gap:10px;align-content:start}
+  .section{border:1px dashed var(--line);border-radius:10px;padding:10px}
+  .section h3{margin:0 0 8px 0;font-size:12px;color:var(--muted);letter-spacing:.2px}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+  .field{display:flex;flex-direction:column;gap:6px}
+  label{font-size:12px;color:var(--muted)}
+  input[type="text"],input[type="number"],select,textarea{
+    background:var(--btn);color:var(--ink);border:1px solid var(--line);border-radius:9px;padding:9px 10px;outline:none
   }
-  .wrap{
-    min-height:100dvh; display:grid; gap:12px; padding:12px;
-    grid-template-rows:auto 1fr auto;
-  }
-  header,footer{
-    background:var(--panel); border:1px solid var(--border);
-    border-radius:var(--radius); padding:10px 12px; box-shadow:var(--shadow);
-  }
-  header{ display:flex; align-items:center; gap:12px; flex-wrap:wrap}
-  header .title{font-weight:650; letter-spacing:.2px}
-  header .row{display:flex; gap:8px; flex-wrap:wrap; margin-left:auto}
-  button, .seg input[type=range]{
-    -webkit-tap-highlight-color:transparent;
-  }
-  .btn{
-    border:1px solid var(--border); background:#1b2030; color:var(--ink);
-    padding:8px 10px; border-radius:10px; cursor:pointer;
-  }
-  @media (prefers-color-scheme: light){
-    .btn{background:#f3f6ff}
-  }
-  .btn:hover{border-color:#3a4152}
-  .btn[disabled]{opacity:.5; cursor:not-allowed}
-  .seg{display:flex; align-items:center; gap:8px}
-  .seg label{color:var(--ink-dim); font-size:12px}
-
-  .stage{
-    background:var(--panel); border:1px solid var(--border);
-    border-radius:var(--radius); box-shadow:var(--shadow);
-    position:relative; overflow:hidden; min-height:60dvh;
-    /* helpful for very small phones */
-  }
-
-  /* Scrollable container for overflow safety on tiny screens */
-  .viewport{
-    width:100%; height:100%; touch-action:none; /* we implement panning/zooming */
-    position:relative; background:
-      radial-gradient(circle at 25% 25%, #10131a 0 25%, transparent 26%),
-      radial-gradient(circle at 75% 75%, #10131a 0 25%, transparent 26%),
-      linear-gradient(transparent, transparent);
-  }
-  @media (prefers-color-scheme: light){
-    .viewport{background:
-      radial-gradient(circle at 25% 25%, #f3f6ff 0 25%, transparent 26%),
-      radial-gradient(circle at 75% 75%, #f3f6ff 0 25%, transparent 26%);}
-  }
-
-  /* The layer we transform for pan/zoom */
-  .content{
-    position:absolute; top:50%; left:50%;
-    transform-origin: 0 0; /* we reposition manually */
-    will-change: transform;
-  }
-
-  /* Overlay HUD */
-  .hud{
-    position:absolute; right:10px; bottom:10px; display:flex; gap:8px; flex-wrap:wrap;
-  }
-  .hud .chip{
-    background:#10131a; border:1px solid var(--border); color:var(--ink-dim);
-    padding:6px 8px; border-radius:10px; font-size:12px
-  }
-  @media (prefers-color-scheme: light){
-    .hud .chip{background:#fff}
-  }
-
-  .tools{
-    display:flex; gap:8px; flex-wrap:wrap;
-  }
-  .tools .btn{display:flex; align-items:center; gap:6px}
-  .tools .btn .dot{width:6px; height:6px; border-radius:50%; background:var(--accent-2)}
-
-  .seg input[type=range]{
-    appearance:none; width:120px; height:8px; background:var(--thumb);
-    border-radius:999px; outline:none;
-  }
-  .seg input[type=range]::-webkit-slider-thumb{
-    appearance:none; width:18px; height:18px; border-radius:50%;
-    background:var(--accent); border:0; box-shadow:0 2px 6px rgba(0,0,0,.35)
-  }
-  .seg output{
-    min-width:3ch; text-align:right; color:var(--ink-dim); font-variant-numeric:tabular-nums;
-  }
-
-  footer{
-    display:flex; align-items:center; justify-content:space-between; gap:10px; color:var(--ink-dim)
-  }
-  .badge{color:var(--accent)}
+  input[type="color"]{height:36px;padding:0;border-radius:8px;border:1px solid var(--line);background:var(--btn)}
+  input[type="checkbox"]{transform:translateY(2px)}
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:9px 12px;border-radius:10px;border:1px solid var(--line);background:var(--btn);color:var(--ink);cursor:pointer}
+  .btn:hover{background:var(--btnHover)}
+  .btn.primary{background:linear-gradient(180deg,var(--accent),var(--accent2));color:#fff;border-color:transparent}
+  .stack{display:flex;gap:8px;flex-wrap:wrap}
+  .profiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .card{padding:10px;border:1px solid var(--line);border-radius:10px;background:linear-gradient(180deg,#0f1421,#0f1727)}
+  .card:hover{outline:1px solid color-mix(in srgb, var(--accent) 60%, transparent);cursor:pointer}
+  .card h4{margin:0 0 4px 0;font-size:13px}
+  .card p{margin:0;color:var(--muted);font-size:12px}
+  .previewWrap{position:relative;display:grid;gap:10px}
+  .toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+  #stage{position:relative;border:1px solid var(--line);border-radius:12px;background:#0b0e14;min-height:58dvh;overflow:hidden}
+  #inner{position:absolute;top:50%;left:50%;transform-origin:0 0;will-change:transform}
+  .hud{position:absolute;right:10px;bottom:10px;display:flex;gap:8px;flex-wrap:wrap;pointer-events:none}
+  .chip{background:#0008;color:#eef;padding:6px 8px;border-radius:10px;font-size:12px;border:1px solid #ffffff20}
+  .toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);padding:9px 12px;background:#0b0e14;color:var(--ink);border:1px solid var(--line);border-radius:999px;box-shadow:0 10px 30px #0008;opacity:0;pointer-events:none;transition:.25s}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(-6px)}
+  @media(max-width:980px){.wrap{grid-template-columns:1fr}}
+  @media(max-width:420px){.row,.row-3{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
   <div class="wrap">
-    <header>
-      <div class="title">Medallion Preview</div>
-      <div class="row">
-        <div class="tools">
-          <button class="btn" id="fit">Fit</button>
-          <button class="btn" id="fill">Fill</button>
-          <button class="btn" id="reset">Reset</button>
-          <button class="btn" id="export">Export PNG</button>
-        </div>
-        <div class="seg">
-          <label for="zoom">Zoom</label>
-          <input id="zoom" type="range" min="10" max="800" value="100" />
-          <output id="zoomOut">100%</output>
-        </div>
+    <header class="panel">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:26px;height:26px;border-radius:50%;background:radial-gradient(circle at 30% 30%,var(--accent),var(--accent2));box-shadow:0 0 0 2px #0004,inset 0 0 16px #0006"></div>
+        <h1>Medallion Forge — Dynamic Builder</h1>
+      </div>
+      <div class="stack">
+        <button class="btn" id="toggleTheme">Theme</button>
+        <button class="btn" id="resetAll">Reset</button>
       </div>
     </header>
 
-    <main class="stage">
-      <div class="viewport" id="viewport" aria-label="SVG preview surface">
-        <div class="content" id="content">
-          <!-- Your SVG goes here. Make sure it has a proper viewBox. -->
-          <svg id="medallion" viewBox="0 0 1024 1024" width="1024" height="1024" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Medallion sample" preserveAspectRatio="xMidYMid meet">
-            <defs>
-              <radialGradient id="g" cx=".5" cy=".5" r=".55">
-                <stop offset="0" stop-color="#ffffff"/>
-                <stop offset=".55" stop-color="#d8e7ff"/>
-                <stop offset="1" stop-color="#9cc0ff"/>
-              </radialGradient>
-              <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
-                <feGaussianBlur stdDeviation="1.2" />
-              </filter>
-            </defs>
-            <rect x="0" y="0" width="1024" height="1024" fill="#0d1020"/>
-            <g transform="translate(512,512)">
-              <circle r="360" fill="url(#g)" />
-              <g filter="url(#soft)">
-                <circle r="330" fill="none" stroke="#1c2a5f" stroke-width="8"/>
-                <circle r="270" fill="none" stroke="#1c2a5f" stroke-width="6" stroke-dasharray="8 12"/>
-                <circle r="180" fill="none" stroke="#1c2a5f" stroke-width="5" stroke-dasharray="4 8"/>
-              </g>
-              <!-- sample emblem -->
-              <g aria-label="emblem">
-                <path d="M0 -220 L40 -40 L220 -40 L70 30 L110 210 L0 110 L-110 210 L-70 30 L-220 -40 L-40 -40 Z"
-                      fill="#172045" stroke="#0c132e" stroke-width="8"/>
-                <path d="M0 -190 L33 -45 L185 -45 L60 20 L95 165 L0 90 L-95 165 L-60 20 L-185 -45 L-33 -45 Z"
-                      fill="#243568" />
-              </g>
-            </g>
-          </svg>
+    <!-- LEFT: controls -->
+    <aside class="panel controls" aria-label="Controls">
+      <div class="section">
+        <h3>Profile presets</h3>
+        <div class="profiles" id="profiles"></div>
+      </div>
+
+      <div class="section">
+        <h3>Text & Rings</h3>
+        <div class="row">
+          <div class="field">
+            <label for="titleText">Top text</label>
+            <input id="titleText" type="text" value="SAINT CLOUD JEDI" placeholder="TOP TEXT">
+          </div>
+          <div class="field">
+            <label for="titleSize">Font size (px)</label>
+            <input id="titleSize" type="number" min="10" max="120" value="28">
+          </div>
         </div>
-        <div class="hud" aria-hidden="true">
-          <div class="chip" id="hud-size">–</div>
-          <div class="chip" id="hud-zoom">–</div>
+        <div class="row">
+          <div class="field">
+            <label for="rimText">Aurebesh rim (optional)</label>
+            <input id="rimText" type="text" placeholder="AUREBESH • IMPERIAL • INSIGNIA">
+          </div>
+          <div class="field">
+            <label for="rimSize">Aurebesh size (px)</label>
+            <input id="rimSize" type="number" min="8" max="40" value="12">
+          </div>
+        </div>
+        <div class="row-3">
+          <div class="field"><label>Rim color</label><input id="rimColor" type="color" value="#ffffff"></div>
+          <div class="field"><label>Plate color</label><input id="plateColor" type="color" value="#0b0e14"></div>
+          <div class="field"><label>Ink color</label><input id="inkColor" type="color" value="#ffffff"></div>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label for="diameter">Diameter (px)</label>
+            <input id="diameter" type="number" min="240" max="1600" value="640">
+          </div>
+          <div class="field" style="display:flex;align-items:center;gap:10px;margin-top:20px">
+            <label><input id="showBail" type="checkbox" checked> Bail loop</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h3>Center motif</h3>
+        <div class="row">
+          <div class="field">
+            <label for="motif">Preset</label>
+            <select id="motif">
+              <option value="deathstar">Death Star + Florida</option>
+              <option value="deathstar_basic">Death Star only</option>
+              <option value="custom">Custom SVG upload</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="motifScale">Motif scale (%)</label>
+            <input id="motifScale" type="number" min="30" max="120" value="72">
+          </div>
+        </div>
+        <div class="row-3">
+          <div class="field"><label>Death Star color</label><input id="dsColor" type="color" value="#ff2a2a"></div>
+          <div class="field"><label>Dish/lines</label><input id="dsStroke" type="color" value="#111111"></div>
+          <div class="field"><label>Florida outline</label><input id="flColor" type="color" value="#ffffff"></div>
+        </div>
+        <div class="row">
+          <div class="field" style="display:flex;align-items:center;gap:10px;margin-top:6px">
+            <label><input id="showArmyStar" type="checkbox" checked> U.S. Army star overlay</label>
+          </div>
+          <div class="field">
+            <label for="customSvg">Custom center SVG (if chosen)</label>
+            <input id="customSvg" type="file" accept=".svg">
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h3>Lightsabers</h3>
+        <div class="row">
+          <div class="field">
+            <label for="saberCount">Count</label>
+            <select id="saberCount"><option>0</option><option>1</option><option>2</option><option selected>3</option></select>
+          </div>
+          <div class="field">
+            <label for="saberGlow">Glow strength</label>
+            <input id="saberGlow" type="number" min="0" max="16" value="6">
+          </div>
+        </div>
+        <div class="row-3">
+          <div class="field"><label>Core</label><input id="sCore" type="color" value="#ffffff"></div>
+          <div class="field"><label>Aura 1</label><input id="sAura" type="color" value="#ff2a2a"></div>
+          <div class="field"><label>Aura 2</label><input id="sAura2" type="color" value="#ffdede"></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h3>Export</h3>
+        <div class="stack">
+          <button class="btn" id="copySvg">Copy SVG</button>
+          <button class="btn" id="downloadSvg">Download SVG</button>
+          <button class="btn" id="downloadPng">Download PNG</button>
+        </div>
+        <p style="color:var(--muted);font-size:12px;margin:8px 0 0">PNG export renders at device pixel ratio for crisp results.</p>
+      </div>
+    </aside>
+
+    <!-- RIGHT: preview -->
+    <main class="panel previewWrap" aria-label="Preview">
+      <div class="toolbar">
+        <div class="stack">
+          <button class="btn" id="fit">Fit</button>
+          <button class="btn" id="fill">Fill</button>
+          <button class="btn" id="resetView">Reset</button>
+        </div>
+        <div class="stack">
+          <span class="btn" id="meta">—</span>
+        </div>
+      </div>
+      <div id="stage">
+        <div id="inner"><!-- SVG injected here --></div>
+        <div class="hud">
+          <div class="chip" id="hudZoom">—</div>
+          <div class="chip" id="hudSize">—</div>
         </div>
       </div>
     </main>
-
-    <footer>
-      <div>Drag to pan • Wheel/Pinch to zoom • <span class="badge">Mobile & Desktop</span></div>
-      <div id="msg"></div>
-    </footer>
   </div>
 
-<script>
-(function(){
-  const viewport = document.getElementById('viewport');
-  const content  = document.getElementById('content');
-  const svg      = document.getElementById('medallion');
-  const btnFit   = document.getElementById('fit');
-  const btnFill  = document.getElementById('fill');
-  const btnReset = document.getElementById('reset');
-  const btnExport= document.getElementById('export');
-  const zoomRange= document.getElementById('zoom');
-  const zoomOut  = document.getElementById('zoomOut');
-  const hudSize  = document.getElementById('hud-size');
-  const hudZoom  = document.getElementById('hud-zoom');
-  const msg      = document.getElementById('msg');
+  <div class="toast" id="toast">Done</div>
 
-  // --- Utilities ------------------------------------------------------------
+<script>
+(()=> {
+  // ---------- Mini framework ----------
+  const $ = sel => document.querySelector(sel);
+  const $$ = sel => Array.from(document.querySelectorAll(sel));
+  const clamp = (n,a,b)=>Math.max(a,Math.min(b,n));
+  const toRad = d => d*Math.PI/180;
+
   const state = {
-    x: 0, y: 0, scale: 1,
-    minScale: .05, maxScale: 8,
-    contentW: 1024, contentH: 1024
+    customCenterSvgText: null,
+    profiles: [
+      { id:'imperial', name:'Imperial Badge', note:'Aurebesh + 3 sabers',
+        values:{ titleText:'SAINT CLOUD JEDI', titleSize:28, rimText:'AUREBESH • IMPERIAL • INSIGNIA', rimSize:12,
+          rimColor:'#ffffff', plateColor:'#0b0e14', inkColor:'#ffffff', diameter:640, showBail:true,
+          motif:'deathstar', motifScale:72, dsColor:'#ff2a2a', dsStroke:'#111111', flColor:'#ffffff', showArmyStar:true,
+          saberCount:'3', saberGlow:6, sCore:'#ffffff', sAura:'#ff2a2a', sAura2:'#ffdede' } },
+      { id:'detroit', name:'Detroit Jedi', note:'Red theme, bold sabers',
+        values:{ titleText:'DETROIT JEDI', titleSize:30, rimText:'', rimSize:12,
+          rimColor:'#ffffff', plateColor:'#0b0e14', inkColor:'#ffffff', diameter:720, showBail:true,
+          motif:'deathstar_basic', motifScale:70, dsColor:'#ff2a2a', dsStroke:'#0f1320', flColor:'#ffffff', showArmyStar:false,
+          saberCount:'3', saberGlow:10, sCore:'#ffffff', sAura:'#ff2a2a', sAura2:'#ffd2d2' } },
+      { id:'armyfl', name:'Army • Florida', note:'Gold star overlay',
+        values:{ titleText:'SAINT CLOUD JEDI', titleSize:26, rimText:'SERVICE • HONOR • DUTY', rimSize:12,
+          rimColor:'#ffffff', plateColor:'#0b0e14', inkColor:'#ffffff', diameter:640, showBail:true,
+          motif:'deathstar', motifScale:68, dsColor:'#e52424', dsStroke:'#111111', flColor:'#ffffff', showArmyStar:true,
+          saberCount:'2', saberGlow:6, sCore:'#ffffff', sAura:'#ffcc00', sAura2:'#ffe9a6' } },
+    ]
   };
 
-  // Ensure the SVG has a viewBox; it’s critical for crisp scaling.
-  function ensureViewBox(el){
-    const vb = el.getAttribute('viewBox');
-    if(!vb){
-      const w = parseFloat(el.getAttribute('width')) || 1024;
-      const h = parseFloat(el.getAttribute('height')) || 1024;
-      el.setAttribute('viewBox', `0 0 ${w} ${h}`);
+  // Build profile cards
+  const pHost = $('#profiles');
+  state.profiles.forEach(p=>{
+    const el = document.createElement('div'); el.className = 'card';
+    el.innerHTML = `<h4>${p.name}</h4><p>${p.note}</p>`;
+    el.addEventListener('click', ()=>applyProfile(p.values));
+    pHost.appendChild(el);
+  });
+
+  // Map inputs
+  const C = {
+    titleText: $('#titleText'), titleSize: $('#titleSize'), rimText: $('#rimText'), rimSize: $('#rimSize'),
+    rimColor: $('#rimColor'), plateColor: $('#plateColor'), inkColor: $('#inkColor'),
+    diameter: $('#diameter'), showBail: $('#showBail'),
+    motif: $('#motif'), motifScale: $('#motifScale'), dsColor: $('#dsColor'), dsStroke: $('#dsStroke'), flColor: $('#flColor'),
+    showArmyStar: $('#showArmyStar'), customSvg: $('#customSvg'),
+    saberCount: $('#saberCount'), saberGlow: $('#saberGlow'), sCore: $('#sCore'), sAura: $('#sAura'), sAura2: $('#sAura2')
+  };
+  Object.values(C).forEach(inp => inp.addEventListener('input', scheduleRender));
+  C.customSvg.addEventListener('change', async e=>{
+    const f=e.target.files?.[0]; if(!f) return;
+    if(f.type!=='image/svg+xml'){ toast('Upload an .svg'); return; }
+    state.customCenterSvgText = await f.text();
+    scheduleRender();
+  });
+
+  // Theme + Reset
+  $('#toggleTheme').addEventListener('click', () => {
+    const dark = document.documentElement.dataset.theme !== 'light';
+    document.documentElement.dataset.theme = dark ? 'light' : 'dark';
+  });
+  $('#resetAll').addEventListener('click', ()=>applyProfile(state.profiles[0].values));
+
+  // ---------- SVG Generator ----------
+  function buildSvg(v){
+    const D=+v.diameter, R=D/2;
+    const svgns='http://www.w3.org/2000/svg';
+    const svg = el('svg', {xmlns:svgns, viewBox:`0 0 ${D} ${D}`, width:D, height:D, 'preserveAspectRatio':'xMidYMid meet'});
+
+    // defs
+    const defs = el('defs');
+    const gf = el('filter', {id:'saberGlow', x:'-50%', y:'-50%', width:'200%', height:'200%'});
+    gf.appendChild(el('feGaussianBlur',{in:'SourceGraphic', stdDeviation:v.saberGlow||6, result:'blur'}));
+    const mg = el('feMerge'); mg.appendChild(el('feMergeNode',{in:'blur'}));
+    gf.appendChild(mg); defs.appendChild(gf);
+
+    // Top arc paths
+    const arcTopId='arcTop', arcSubId='arcSub';
+    defs.appendChild(el('path',{id:arcTopId, d:describeArc(R,R,R*0.72,200,-20)}));
+    if(v.rimText) defs.appendChild(el('path',{id:arcSubId, d:describeArc(R,R,R*0.86,210,-30)}));
+
+    svg.appendChild(defs);
+
+    // Rim + plate
+    svg.appendChild(el('circle',{cx:R, cy:R, r:R*0.98, fill:v.rimColor}));
+    svg.appendChild(el('circle',{cx:R, cy:R, r:R*0.9,  fill:v.plateColor}));
+
+    // Bail
+    if(v.showBail){
+      svg.appendChild(el('rect',{x:R-18,y:8,width:36,height:24,rx:6,fill:v.rimColor}));
+      svg.appendChild(el('circle',{cx:R,cy:20,r:8,fill:v.plateColor}));
     }
-    const [x,y,w,h] = el.getAttribute('viewBox').split(/\s+/).map(Number);
-    state.contentW = w; state.contentH = h;
+
+    // Top text
+    if(v.titleText){
+      const t=el('text',{fill:v.inkColor,'font-size':+v.titleSize,'font-family':'Arial,Helvetica,sans-serif','letter-spacing':1.5,'text-anchor':'middle'});
+      const tp=el('textPath',{'href':'#'+arcTopId,startOffset:'50%'}); tp.textContent=(v.titleText||'').toUpperCase();
+      t.appendChild(tp); svg.appendChild(t);
+    }
+    // Rim text
+    if(v.rimText){
+      const st=el('text',{fill:v.inkColor,'font-size':+v.rimSize,'font-family':'Arial,Helvetica,sans-serif','letter-spacing':2,'text-anchor':'middle',opacity:.85});
+      const tp=el('textPath',{'href':'#'+arcSubId,startOffset:'50%'}); tp.textContent=v.rimText;
+      st.appendChild(tp); svg.appendChild(st);
+    }
+
+    // Center motif
+    const g = el('g',{transform:`translate(${R},${R}) scale(${(+v.motifScale||70)/100})`});
+    if(v.motif==='deathstar' || v.motif==='deathstar_basic'){
+      g.appendChild(deathStar(v));
+      if(v.motif==='deathstar') g.appendChild(floridaOutline(v));
+    } else if (v.motif==='custom' && state.customCenterSvgText){
+      const frag = stringToNode(sanitizeSvgText(state.customCenterSvgText));
+      if(frag) g.appendChild(frag);
+    }
+    if(v.showArmyStar) g.appendChild(armyStar());
+    svg.appendChild(g);
+
+    // Lightsabers
+    const sabers = parseInt(v.saberCount||0,10);
+    if(sabers>0){
+      const sgroup = el('g',{'filter':'url(#saberGlow)'});
+      const angles = sabers===1?[0]: sabers===2?[-22,22]:[-28,0,28];
+      angles.forEach((ang,i)=>sgroup.appendChild(lightsaber(ang,i,v,D)));
+      svg.appendChild(sgroup);
+    }
+
+    return svg;
+
+    // --- helpers ---
+    function el(name, attrs){const node=document.createElementNS(svgns,name); for(const[k,val]of Object.entries(attrs||{})) node.setAttribute(k,val); return node;}
+    function deathStar(o){
+      const s=el('g',{transform:'translate(0,10)'});
+      s.appendChild(el('circle',{cx:0,cy:0,r:120,fill:o.dsColor,stroke:o.dsStroke,'stroke-width':4}));
+      [80,40,-10].forEach((y,i)=>s.appendChild(el('ellipse',{cx:0,cy:y*0.7,rx:120-i*10,ry:14,fill:'none',stroke:o.dsStroke,'stroke-width':3,opacity:.9})));
+      s.appendChild(el('rect',{x:-120,y:-8,width:240,height:16,fill:o.dsStroke,opacity:.9}));
+      s.appendChild(el('circle',{cx:36,cy:-36,r:28,fill:'#00000020',stroke:o.dsStroke,'stroke-width':3}));
+      s.appendChild(el('circle',{cx:36,cy:-36,r:12,fill:'#00000010',stroke:o.dsStroke,'stroke-width':2}));
+      return s;
+    }
+    function floridaOutline(o){
+      const path="M -110,-90 C -80,-120, -30,-110, 10,-90 C 40,-70, 60,-20, 80,10 C 45,5, 35,-5, 18,-8 C 2,-10, -5,5, -18,8 C -38,12, -64,2, -92,-8 Z";
+      const g=el('g',{opacity:.92});
+      g.appendChild(el('path',{d:path,fill:'none',stroke:o.flColor,'stroke-width':5}));
+      return g;
+    }
+    function armyStar(){
+      const g=el('g',{transform:'translate(0,-6) scale(0.7)'});
+      const poly = starPoints(0,0,80,38,5);
+      g.appendChild(el('polygon',{points:poly,fill:'none',stroke:'#d4af37','stroke-width':6}));
+      return g;
+    }
+    function starPoints(cx,cy,outerR,innerR,points){
+      let str=''; const step=Math.PI/points;
+      for(let i=0;i<points*2;i++){const r=(i%2===0)?outerR:innerR; const a=i*step-Math.PI/2; const x=cx+r*Math.cos(a), y=cy+r*Math.sin(a); str+=`${x},${y} `;}
+      return str.trim();
+    }
+    function lightsaber(angleDeg, idx, o, D){
+      const g=el('g',{transform:`translate(${D*0.22},${D*0.78}) rotate(${angleDeg})`});
+      g.appendChild(el('rect',{x:-16,y:-10,width:32,height:20,rx:3,fill:'#9aa3af'}));
+      g.appendChild(el('rect',{x:16,y:-8,width:16,height:16,rx:3,fill:'#606874'}));
+      const bladeLen = D*0.55;
+      g.appendChild(el('rect',{x:32,y:-4,width:bladeLen,height:8,rx:4,fill:o.sCore,stroke:o.sAura,'stroke-width':6}));
+      return g;
+    }
+    function describeArc(cx,cy,r,startAngle,endAngle){
+      const start=polar(cx,cy,r,endAngle), end=polar(cx,cy,r,startAngle), large=endAngle-startAngle<=180?0:1;
+      return `M ${start.x} ${start.y} A ${r} ${r} 0 ${large} 0 ${end.x} ${end.y}`;
+    }
+    function polar(cx,cy,r,angle){const a=toRad(angle);return {x:cx+r*Math.cos(a),y:cy+r*Math.sin(a)}}
   }
-  ensureViewBox(svg);
 
-  const ro = new ResizeObserver(updateFitBounds);
-  ro.observe(viewport);
+  // ---------- PREVIEW (pan / pinch / zoom) ----------
+  const stage = $('#stage'), inner = $('#inner'), meta = $('#meta'), hudZoom=$('#hudZoom'), hudSize=$('#hudSize');
+  let view={x:0,y:0,k:1,min:.05,max:8, w:640,h:640};
+  const ro = new ResizeObserver(()=>{ const r=stage.getBoundingClientRect(); hudSize.textContent=`${Math.round(r.width)}×${Math.round(r.height)}px`; renderPreview(); });
+  ro.observe(stage);
 
-  let view = { w:0, h:0, cx:0, cy:0 };
-
-  function updateFitBounds(){
-    const rect = viewport.getBoundingClientRect();
-    view.w = rect.width; view.h = rect.height;
-    view.cx = view.w/2; view.cy = view.h/2;
-    hudSize.textContent = `${Math.round(view.w)}×${Math.round(view.h)}px`;
-    render();
+  function mount(svg){
+    // ensure non-scaling stroke for crisp zoom
+    svg.querySelectorAll('path,rect,circle,ellipse,line,polyline,polygon').forEach(el=>{ if(!el.hasAttribute('vector-effect')) el.setAttribute('vector-effect','non-scaling-stroke'); });
+    inner.innerHTML=''; inner.appendChild(svg);
   }
+  function fit(){ const r=stage.getBoundingClientRect(); const k=Math.min(r.width/view.w, r.height/view.h); view={x:0,y:0,k}; renderPreview(); }
+  function fill(){ const r=stage.getBoundingClientRect(); const k=Math.max(r.width/view.w, r.height/view.h); view={x:0,y:0,k}; renderPreview(); }
+  function resetView(){ view={x:0,y:0,k:1}; renderPreview(); }
 
-  function setTransform(x,y,scale){
-    state.x = x; state.y = y; state.scale = clamp(scale, state.minScale, state.maxScale);
-    render();
+  function renderPreview(){
+    inner.style.transform = `translate(${(stage.clientWidth/2)+view.x}px, ${(stage.clientHeight/2)+view.y}px) scale(${view.k}) translate(${-view.w/2}px, ${-view.h/2}px)`;
+    hudZoom.textContent = `Zoom ${Math.round(view.k*100)}%`;
   }
+  $('#fit').addEventListener('click', fit);
+  $('#fill').addEventListener('click', fill);
+  $('#resetView').addEventListener('click', resetView);
 
-  function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
+  // Pointer interactions
+  let dragging=false, lx=0, ly=0;
+  stage.addEventListener('pointerdown',e=>{dragging=true;stage.setPointerCapture(e.pointerId);lx=e.clientX;ly=e.clientY;});
+  stage.addEventListener('pointermove',e=>{
+    if(!dragging) return;
+    view.x+=e.clientX-lx; view.y+=e.clientY-ly; lx=e.clientX; ly=e.clientY; renderPreview();
+  });
+  window.addEventListener('pointerup',()=>dragging=false);
+  stage.addEventListener('wheel',e=>{
+    e.preventDefault();
+    const factor = (e.ctrlKey||e.metaKey)?0.0025:0.0015;
+    const delta = -e.deltaY*factor;
+    const k = clamp(view.k*(1+delta), view.min, view.max);
+
+    const rect=stage.getBoundingClientRect(), cx=e.clientX-rect.left - stage.clientWidth/2 - view.x, cy=e.clientY-rect.top - stage.clientHeight/2 - view.y;
+    const ratio = k/view.k; view.x -= cx*(ratio-1); view.y -= cy*(ratio-1); view.k = k; renderPreview();
+  }, {passive:false});
+
+  // ---------- Data flow ----------
+  function read(){
+    return {
+      titleText:C.titleText.value, titleSize:+C.titleSize.value, rimText:C.rimText.value, rimSize:+C.rimSize.value,
+      rimColor:C.rimColor.value, plateColor:C.plateColor.value, inkColor:C.inkColor.value,
+      diameter:+C.diameter.value, showBail:C.showBail.checked,
+      motif:C.motif.value, motifScale:+C.motifScale.value, dsColor:C.dsColor.value, dsStroke:C.dsStroke.value, flColor:C.flColor.value,
+      showArmyStar:C.showArmyStar.checked,
+      saberCount:C.saberCount.value, saberGlow:+C.saberGlow.value, sCore:C.sCore.value, sAura:C.sAura.value, sAura2:C.sAura2.value
+    };
+  }
 
   function render(){
-    content.style.transform = `translate(${view.cx + state.x}px, ${view.cy + state.y}px) scale(${state.scale}) translate(${-state.contentW/2}px, ${-state.contentH/2}px)`;
-    const pct = Math.round(state.scale*100);
-    zoomRange.value = pct; zoomOut.value = pct + '%';
-    hudZoom.textContent = `Zoom ${pct}%`;
+    const v = read();
+    const svg = buildSvg(v);
+    view.w = v.diameter; view.h = v.diameter;
+    mount(svg);
+    meta.textContent = `${v.diameter}×${v.diameter} • live`;
+    renderPreview();
+  }
+  let raf=0; function scheduleRender(){ cancelAnimationFrame(raf); raf=requestAnimationFrame(render); }
+
+  function applyProfile(vals){
+    Object.entries(vals).forEach(([k,val])=>{
+      if(!(k in C)) return;
+      if(C[k].type==='checkbox') C[k].checked=!!val; else C[k].value=val;
+    });
+    scheduleRender(); toast('Profile loaded');
   }
 
-  // Fit and Fill compute scales based on viewBox → viewport
-  function scaleForFit(){
-    return Math.min(view.w/state.contentW, view.h/state.contentH);
+  // ---------- Export ----------
+  let lastXml='';
+  function currentSvg(){
+    const svg = inner.querySelector('svg'); return svg?svg:null;
   }
-  function scaleForFill(){
-    return Math.max(view.w/state.contentW, view.h/state.contentH);
+  function toXml(svg){
+    const clone=svg.cloneNode(true); clone.setAttribute('xmlns','http://www.w3.org/2000/svg');
+    const xml = `<?xml version="1.0" encoding="UTF-8"?>\n` + clone.outerHTML;
+    lastXml = xml; return xml;
   }
-  function center(){
-    setTransform(0,0,state.scale);
+  $('#copySvg').addEventListener('click', async ()=>{
+    const svg=currentSvg(); if(!svg) return;
+    const xml=toXml(svg);
+    try{ await navigator.clipboard.writeText(xml); toast('SVG copied'); } catch{ toast('Copy blocked'); }
+  });
+  $('#downloadSvg').addEventListener('click', ()=>{
+    const svg=currentSvg(); if(!svg) return; const xml=toXml(svg);
+    download('medallion.svg', new Blob([xml],{type:'image/svg+xml'}));
+  });
+  $('#downloadPng').addEventListener('click', ()=>{
+    const svg=currentSvg(); if(!svg) return; const xml=toXml(svg);
+    const url=URL.createObjectURL(new Blob([xml],{type:'image/svg+xml'}));
+    const img=new Image(); const dpr=clamp(window.devicePixelRatio||1,1,3);
+    img.onload=()=>{
+      const w=svg.viewBox.baseVal.width, h=svg.viewBox.baseVal.height;
+      const c=document.createElement('canvas'); c.width=w*dpr; c.height=h*dpr;
+      const ctx=c.getContext('2d'); ctx.drawImage(img,0,0,c.width,c.height);
+      URL.revokeObjectURL(url);
+      c.toBlob(b=>download('medallion.png', b), 'image/png');
+    };
+    img.src=url;
+  });
+  function download(name, blob){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),500);}
+
+  // ---------- Sanitize (custom SVG upload) ----------
+  function sanitizeSvgText(txt){
+    return txt
+      .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi,'')
+      .replace(/\son[a-z]+\s*=\s*(['"]).*?\1/gi,'')
+      .replace(/<foreignObject[\s\S]*?<\/foreignObject>/gi,'');
   }
-
-  // Public actions
-  function doFit(){ setTransform(0,0, scaleForFit()); }
-  function doFill(){ setTransform(0,0, scaleForFill()); }
-  function doReset(){ setTransform(0,0, 1); }
-
-  btnFit.addEventListener('click', doFit);
-  btnFill.addEventListener('click', doFill);
-  btnReset.addEventListener('click', doReset);
-
-  // Zoom via range
-  zoomRange.addEventListener('input', (e)=>{
-    const targetScale = parseInt(e.target.value,10)/100;
-    // zoom to center, keep current pan roughly consistent
-    const k = targetScale/state.scale;
-    setTransform(state.x*k, state.y*k, targetScale);
-  });
-
-  // --- Interaction: mouse/touch/trackpad -----------------------------------
-  let dragging=false, lastX=0, lastY=0;
-  viewport.addEventListener('pointerdown', (e)=>{
-    dragging=true; viewport.setPointerCapture(e.pointerId);
-    lastX=e.clientX; lastY=e.clientY;
-  });
-  viewport.addEventListener('pointermove', (e)=>{
-    if(!dragging) return;
-    const dx=e.clientX-lastX, dy=e.clientY-lastY;
-    lastX=e.clientX; lastY=e.clientY;
-    setTransform(state.x+dx, state.y+dy, state.scale);
-  });
-  const stopDrag=()=>{dragging=false};
-  viewport.addEventListener('pointerup', stopDrag);
-  viewport.addEventListener('pointercancel', stopDrag);
-  viewport.addEventListener('pointerleave', stopDrag);
-
-  // Wheel/trackpad zoom (Ctrl/Cmd+wheel or pinch on trackpads)
-  viewport.addEventListener('wheel', (e)=>{
-    e.preventDefault();
-    // zoom toward cursor
-    const zoomIntensity = (e.ctrlKey || e.metaKey) ? 0.0025 : 0.0015;
-    const delta = -e.deltaY * zoomIntensity;
-    const newScale = clamp(state.scale * (1 + delta), state.minScale, state.maxScale);
-
-    const rect = viewport.getBoundingClientRect();
-    const mx = e.clientX - rect.left - view.cx - state.x;
-    const my = e.clientY - rect.top  - view.cy - state.y;
-
-    // adjust pan so the point under cursor stays under cursor
-    const k = newScale/state.scale;
-    const nx = state.x - mx*(k-1);
-    const ny = state.y - my*(k-1);
-    setTransform(nx, ny, newScale);
-  }, {passive:false});
-
-  // Pinch zoom on touch (two-finger)
-  let pinchDist = 0, pinchMid = null;
-  viewport.addEventListener('touchstart', (e)=>{
-    if(e.touches.length===2){
-      pinchDist = dist(e.touches[0], e.touches[1]);
-      pinchMid  = mid(e.touches[0], e.touches[1]);
-    }
-  }, {passive:true});
-  viewport.addEventListener('touchmove', (e)=>{
-    if(e.touches.length===2){
-      e.preventDefault();
-      const d = dist(e.touches[0], e.touches[1]);
-      const rect = viewport.getBoundingClientRect();
-      const m = mid(e.touches[0], e.touches[1]);
-      const mx = m.x - rect.left - view.cx - state.x;
-      const my = m.y - rect.top  - view.cy - state.y;
-      const k = d/pinchDist;
-      const newScale = clamp(state.scale*k, state.minScale, state.maxScale);
-      const adj = newScale/state.scale;
-      const nx = state.x - mx*(adj-1);
-      const ny = state.y - my*(adj-1);
-      setTransform(nx, ny, newScale);
-      pinchDist = d;
-    }
-  }, {passive:false});
-
-  function dist(a,b){const dx=a.clientX-b.clientX, dy=a.clientY-b.clientY; return Math.hypot(dx,dy)}
-  function mid(a,b){return {x:(a.clientX+b.clientX)/2, y:(a.clientY+b.clientY)/2}}
-
-  // --- Export PNG (hi-DPI aware) -------------------------------------------
-  btnExport.addEventListener('click', async ()=>{
-    try{
-      const {width, height} = svg.viewBox.baseVal;
-      const scale = Math.min(4096/Math.max(width,height), 4); // keep PNG sane
-      const pxW = Math.round(width * scale * (window.devicePixelRatio || 1));
-      const pxH = Math.round(height* scale * (window.devicePixelRatio || 1));
-
-      // serialize SVG
-      const s = new XMLSerializer().serializeToString(svg);
-      const blob = new Blob([s], {type:'image/svg+xml;charset=utf-8'});
-      const url = URL.createObjectURL(blob);
-
-      const img = new Image();
-      // important for cross-origin gradient/filter correctness
-      img.decoding = 'async';
-      img.onload = ()=>{
-        const c = document.createElement('canvas');
-        c.width = pxW; c.height = pxH;
-        const ctx = c.getContext('2d', {alpha:false});
-        ctx.imageSmoothingQuality = 'high';
-        ctx.drawImage(img, 0, 0, pxW, pxH);
-        URL.revokeObjectURL(url);
-        c.toBlob((pngBlob)=>{
-          const a = document.createElement('a');
-          a.href = URL.createObjectURL(pngBlob);
-          a.download = 'medallion.png';
-          a.click();
-          setMsg('Exported PNG', 1800);
-        }, 'image/png');
-      };
-      img.onerror = ()=>{ URL.revokeObjectURL(url); setMsg('Export failed', 2500) };
-      img.src = url;
-    }catch(err){
-      console.error(err); setMsg('Export failed', 2500);
-    }
-  });
-
-  function setMsg(text, ms=1500){
-    msg.textContent = text;
-    if(ms){
-      setTimeout(()=>{ if(msg.textContent===text) msg.textContent=''; }, ms);
-    }
+  function stringToNode(s){
+    const div=document.createElement('div'); div.innerHTML=s.trim();
+    const node = div.querySelector('svg') || div.firstElementChild;
+    return node;
   }
 
-  // Initial fit on load
-  window.addEventListener('load', ()=>{
-    doFit();
-    // If you inject a new SVG at runtime, call ensureViewBox(newSvg); doFit();
-  });
+  // ---------- Toast ----------
+  const toastEl=$('#toast');
+  function toast(msg){ toastEl.textContent=msg; toastEl.classList.add('show'); setTimeout(()=>toastEl.classList.remove('show'),1300); }
 
-  // Keyboard helpers
-  window.addEventListener('keydown', (e)=>{
-    if(e.key==='0'){ doFit(); }
-    if(e.key==='1'){ doReset(); }
-    if(e.key==='f'){ doFill(); }
-    if(e.key==='=' || e.key==='+'){ nudgeZoom(1.1) }
-    if(e.key==='-' ){ nudgeZoom(1/1.1) }
-    if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)){
-      const step = 20;
-      const dx = (e.key==='ArrowLeft'?-step: e.key==='ArrowRight'?step:0);
-      const dy = (e.key==='ArrowUp'?-step: e.key==='ArrowDown'?step:0);
-      setTransform(state.x+dx, state.y+dy, state.scale);
-    }
-  });
-  function nudgeZoom(k){
-    const newScale = clamp(state.scale*k, state.minScale, state.maxScale);
-    const sMul = newScale/state.scale;
-    setTransform(state.x*sMul, state.y*sMul, newScale);
-  }
+  // Init
+  applyProfile(state.profiles[0].values);
+  // after first paint, fit to viewport
+  setTimeout(fit, 60);
 })();
 </script>
 </body>
