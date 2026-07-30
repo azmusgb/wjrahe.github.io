@@ -32,7 +32,7 @@ jobs:
           curl --fail-with-body --silent --show-error \
             --request POST \
             --form "zip=@thoughtful-start.zip;type=application/zip" \
-            "https://netlify-mcp.netlify.app/proxy/eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..WdxsmOnDmz5A1M_O.kVNdkG16VRa9UPZ_EvjJSt0fychaFvhY-Bhb6eYPH0GdsIM-bZJm_mYwUy7sjrINvqHp_GiHr6PgqCXhmAsc4fje6cX6V6K_gEKY44C_lrbKUppyLj9cnt08Ws5yeJiuE3ElODkRTJuFR8I14PQ-Qi01AWTKZ_bU32ZN1gquIsHehsJzNr2eWYrEH3_ivX1PKCLZ8-jpv4xJFM_xUA6SY5DAKcXYOZtBTA2Z1GIygoCZ4-wRdJXnha-2PAlqHOG_bdlrfajQWs27JVD7FBauHlWzs6g7vhMmaVfYfhTkkj7aGVqiZJ2qaSE5SMY16l2RS8gyxJiZG0hDGqPLFO_rJHMcwR9wO5Mg8uGBCx2o4eJEMow6K3Lb52WFLpRd6wd9nR60TnSV.Uu7fu2vHdR3SLDQ40CWT3A" \
+            "https://netlify-mcp.netlify.app/proxy/eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..WdxsmOnDmz5A1M_O.kVNdkG16VRa9UPZ_EvjJSt0fychaFvhY-Bhb6eYPH0GdsIM-bZJm_mYwUy7sjrINvqHp_GiHr6PgqCXhmAsc4fje6cX6V6K_gEKY44C_lrbKUppyLj9cnt08Ws5yeJiuE3ElODkRTJuFR8I14PQ-Qi01AWTKZ_bU32ZN1gquIsHehsJzNr2eWYrEH3_ivX1PKCLZ8-jpv4xJFM_xUA6SY5DAKcXYOZtBTA2Z1GIygoCZ4-wRdJXnha-2PAlqHOG_bdlrfajQWs27JVD7FBauHlWzs6g7vhMmaVfYfhTkkj7aGVqiZJ2qaSE5SMY16l2RS8gyxJiZG0hDGqPLFO_rJHMcwR9wO5Mg8uGBCx2o4eJEMow6K3Lb52WFLpRd6wd9nR60TnSV.Uu7fu2vHdR3SLDQ40CWT3A/api/v1/sites/2afd084b-4c7c-462b-939e-856b6828ef53/builds" \
             | tee deploy-response.json
           python - <<'PY'
           import json
