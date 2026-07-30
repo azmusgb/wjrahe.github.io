@@ -1,11 +1,12 @@
 name: Temporary Deploy Thoughtful Start
 
 on:
-  push:
+  pull_request:
     branches:
       - main
-    paths:
-      - .github/workflows/deploy-thoughtful-start.yml
+    types:
+      - opened
+      - synchronize
 
 permissions:
   contents: read
@@ -31,7 +32,7 @@ jobs:
           curl --fail-with-body --silent --show-error \
             --request POST \
             --form "zip=@thoughtful-start.zip;type=application/zip" \
-            "https://netlify-mcp.netlify.app/proxy/eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..6VJA2ujayVMDdUsz.aip20_B8WeGhvpQXZEPtWEpIWxhPrW0_Ojfj0gwApJ7TAxcLB9SzvZR6KSKo5hz3kongNr9e6WIyJw3uEvAAGzXazOpl2MSY7yVqt8-gEtW7y6h9MNijRnZj4kcnthyLdAQPKLO3x0NPHAe_5KkB3a07EoGKqSjtTcDZ4MVdw950sEugqpA6yBluOU_l-LKQnu0-kBNbs7cYdVAJrXkuaGFVYHUM9pTCVDHZc_8kwfw6vZhRCNC-AXjkw6sdBJRl006DsKi7j3_non1GxAv5rc-6drzT1i8QIXSlXV8NYmsLRHws1eqiuIf1CnZhb35gAHUHxQzM5ZEK8X5FHoPKuA0H1soCgip2jJqooHSg-A8DIwb9l67jrANi1P32WSOqC0fSlCHV.v9muqJaRtC0TMg-OYGJI4g" \
+            "https://netlify-mcp.netlify.app/proxy/eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..WdxsmOnDmz5A1M_O.kVNdkG16VRa9UPZ_EvjJSt0fychaFvhY-Bhb6eYPH0GdsIM-bZJm_mYwUy7sjrINvqHp_GiHr6PgqCXhmAsc4fje6cX6V6K_gEKY44C_lrbKUppyLj9cnt08Ws5yeJiuE3ElODkRTJuFR8I14PQ-Qi01AWTKZ_bU32ZN1gquIsHehsJzNr2eWYrEH3_ivX1PKCLZ8-jpv4xJFM_xUA6SY5DAKcXYOZtBTA2Z1GIygoCZ4-wRdJXnha-2PAlqHOG_bdlrfajQWs27JVD7FBauHlWzs6g7vhMmaVfYfhTkkj7aGVqiZJ2qaSE5SMY16l2RS8gyxJiZG0hDGqPLFO_rJHMcwR9wO5Mg8uGBCx2o4eJEMow6K3Lb52WFLpRd6wd9nR60TnSV.Uu7fu2vHdR3SLDQ40CWT3A" \
             | tee deploy-response.json
           python - <<'PY'
           import json
@@ -44,5 +45,3 @@ jobs:
               raise SystemExit(f"Netlify did not return a deploy identifier: {payload}")
           print("Netlify deploy accepted.")
           PY
-
-# Second push intentionally triggers the workflow after registration on main.
