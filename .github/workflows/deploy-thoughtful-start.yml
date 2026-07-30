@@ -1,0 +1,46 @@
+name: Temporary Deploy Thoughtful Start
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/deploy-thoughtful-start.yml
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Download production archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --location --silent --show-error \
+            "https://at.adobe.com/K5Sp9UihGQzAwdLd" \
+            --output thoughtful-start.zip
+          unzip -t thoughtful-start.zip
+
+      - name: Deploy archive to Netlify
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail-with-body --silent --show-error \
+            --request POST \
+            --form "zip=@thoughtful-start.zip;type=application/zip" \
+            "https://netlify-mcp.netlify.app/proxy/eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..6VJA2ujayVMDdUsz.aip20_B8WeGhvpQXZEPtWEpIWxhPrW0_Ojfj0gwApJ7TAxcLB9SzvZR6KSKo5hz3kongNr9e6WIyJw3uEvAAGzXazOpl2MSY7yVqt8-gEtW7y6h9MNijRnZj4kcnthyLdAQPKLO3x0NPHAe_5KkB3a07EoGKqSjtTcDZ4MVdw950sEugqpA6yBluOU_l-LKQnu0-kBNbs7cYdVAJrXkuaGFVYHUM9pTCVDHZc_8kwfw6vZhRCNC-AXjkw6sdBJRl006DsKi7j3_non1GxAv5rc-6drzT1i8QIXSlXV8NYmsLRHws1eqiuIf1CnZhb35gAHUHxQzM5ZEK8X5FHoPKuA0H1soCgip2jJqooHSg-A8DIwb9l67jrANi1P32WSOqC0fSlCHV.v9muqJaRtC0TMg-OYGJI4g" \
+            | tee deploy-response.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          payload = json.loads(Path("deploy-response.json").read_text())
+          if isinstance(payload, list):
+              payload = payload[0] if payload else {}
+          if not (payload.get("deploy_id") or payload.get("id")):
+              raise SystemExit(f"Netlify did not return a deploy identifier: {payload}")
+          print("Netlify deploy accepted.")
+          PY
