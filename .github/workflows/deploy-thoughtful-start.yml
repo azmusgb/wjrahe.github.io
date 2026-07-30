@@ -1,4 +1,4 @@
-name: Temporary Deploy Thoughtful Start
+name: Temporary Deploy Thoughtful Start Final
 
 on:
   pull_request:
@@ -16,32 +16,51 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Download production archive
+      - name: Restore production archive
         shell: bash
         run: |
           set -euo pipefail
-          curl --fail --location --silent --show-error \
-            "https://at.adobe.com/K5Sp9UihGQzAwdLd" \
-            --output thoughtful-start.zip
+          cat <<'B64' | base64 --decode > thoughtful-start.zip
+          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
+          B64
           unzip -t thoughtful-start.zip
 
       - name: Deploy archive to Netlify
         shell: bash
         run: |
           set -euo pipefail
+          PROXY="https://netlify-mcp.netlify.app/proxy/eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..voSct3Uslzlzlb--.9bbeL_URZbAeCAcMS-bEYmCuJ1aymxBPW1OhPi0joi8Rm4HCiGnPFfrb7WN7xYil2gfQnuU3B88OFwHXImDgcNNJ3M207G31qKT1fd9ZAWm8_KJ3pBoJO_IpFVPjKDC9zmjERQde3KuZj3MlvaDqxZLJHRJWqXSLovXg0Dl0sD08cGMr9NRMt-0OXLY_0Gxerphg4LICDqAfd0PjQ8SucHc7pfvDNzrsw91BiLNYAXjWooGv5Q-_niN6UWVNUEl_WQ5sdXVxS9RxZbOZCpgsW0J5whxkvkSjn6BWPCofAXGXoz9km-AjIm8s5Cri0k5ThWuOd3UIrVWiCXsb8jhhgD45gdEdsy4QsIL3SbuF0OmvirnXXrwNuIM3VR-lqViDXOEdc1BO.5pppKzjDiY3J1ov4YUczhQ"
+          SITE_ID="8e07aecf-f8bd-4ead-87d5-f9ef853e2c2e"
           curl --fail-with-body --silent --show-error \
             --request POST \
             --form "zip=@thoughtful-start.zip;type=application/zip" \
-            "https://netlify-mcp.netlify.app/proxy/eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..WdxsmOnDmz5A1M_O.kVNdkG16VRa9UPZ_EvjJSt0fychaFvhY-Bhb6eYPH0GdsIM-bZJm_mYwUy7sjrINvqHp_GiHr6PgqCXhmAsc4fje6cX6V6K_gEKY44C_lrbKUppyLj9cnt08Ws5yeJiuE3ElODkRTJuFR8I14PQ-Qi01AWTKZ_bU32ZN1gquIsHehsJzNr2eWYrEH3_ivX1PKCLZ8-jpv4xJFM_xUA6SY5DAKcXYOZtBTA2Z1GIygoCZ4-wRdJXnha-2PAlqHOG_bdlrfajQWs27JVD7FBauHlWzs6g7vhMmaVfYfhTkkj7aGVqiZJ2qaSE5SMY16l2RS8gyxJiZG0hDGqPLFO_rJHMcwR9wO5Mg8uGBCx2o4eJEMow6K3Lb52WFLpRd6wd9nR60TnSV.Uu7fu2vHdR3SLDQ40CWT3A/api/v1/sites/2afd084b-4c7c-462b-939e-856b6828ef53/builds" \
+            "$PROXY/api/v1/sites/$SITE_ID/builds" \
             | tee deploy-response.json
-          python - <<'PY'
+          DEPLOY_ID=$(python - <<'PY'
           import json
           from pathlib import Path
-
-          payload = json.loads(Path("deploy-response.json").read_text())
+          payload = json.loads(Path('deploy-response.json').read_text())
           if isinstance(payload, list):
               payload = payload[0] if payload else {}
-          if not (payload.get("deploy_id") or payload.get("id")):
-              raise SystemExit(f"Netlify did not return a deploy identifier: {payload}")
-          print("Netlify deploy accepted.")
+          deploy_id = payload.get('deploy_id') or payload.get('id')
+          if not deploy_id:
+              raise SystemExit(f'Netlify did not return a deploy identifier: {payload}')
+          print(deploy_id)
           PY
+          )
+          echo "Deploy accepted: $DEPLOY_ID"
+          for attempt in $(seq 1 36); do
+            curl --fail --silent --show-error "$PROXY/api/v1/deploys/$DEPLOY_ID" > deploy-status.json
+            STATE=$(python - <<'PY'
+          import json
+          from pathlib import Path
+          print(json.loads(Path('deploy-status.json').read_text()).get('state','unknown'))
+          PY
+            )
+            echo "Deploy state: $STATE"
+            if [ "$STATE" = "ready" ]; then exit 0; fi
+            if [ "$STATE" = "error" ]; then cat deploy-status.json; exit 1; fi
+            sleep 5
+          done
+          echo "Timed out waiting for Netlify deploy" >&2
+          exit 1
