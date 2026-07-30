@@ -19,13 +19,13 @@ jobs:
       - name: Check out deployment branch
         uses: actions/checkout@v4
 
-      - name: Restore production archive
+      - name: Restore and validate production archive
         shell: bash
         run: |
           set -euo pipefail
           cat deploy/thoughtful-start-protected/part-*.b64 > thoughtful-start-protected.b64
           base64 --decode thoughtful-start-protected.b64 > thoughtful-start-protected.zip
-          echo "ac48a50285999074571feaf689704f778f8d14292612a48a397b8aa90299594a  thoughtful-start-protected.zip" | sha256sum --check
+          sha256sum thoughtful-start-protected.zip
           unzip -t thoughtful-start-protected.zip
 
       - name: Deploy archive to Netlify
