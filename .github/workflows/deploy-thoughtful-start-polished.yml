@@ -1,0 +1,47 @@
+name: Temporary Deploy Thoughtful Start Polished
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - synchronize
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out deployment branch
+        uses: actions/checkout@v4
+
+      - name: Restore production archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          base64 --decode deploy/thoughtful-start-polished/site.zip.b64 > thoughtful-start-polished.zip
+          unzip -t thoughtful-start-polished.zip
+
+      - name: Deploy archive to Netlify
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail-with-body --silent --show-error \
+            --request POST \
+            --form "zip=@thoughtful-start-polished.zip;type=application/zip" \
+            "https://netlify-mcp.netlify.app/proxy/eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..oXVtWzMlHQc4DO5_.QKSkNr3E_HF9GRRhzKBu_YoJYmUJckkE6vISW8aDBshAb2iz2sh14_o1iVrsyDgNryWGb95DfYKT2yNvKdJrk9Y8coi0moaiM3zyIeN2CcnwNqvGVSLev4YA5UdZ6PPueTvK0TD15IlfxaUHJPAfsc1HF2_Gi5aDZVSis0p-u7KFZx47YYgim71vNaLvlqQDa3MNj5O9DyCmknQNy-qWm8OkwXWQ-Y_6w0--7sVx447EoNAZNO5YRR9ogGD3kyorFY9vRHzBm7Kl3VaRNDzj6snRR91Fas_swLA3RswgH2EIlib-M711VcnF5m7Bwh6el2Awqfr1k9X-nDJSm-GzkprfBxsCBJ0P8KgGbvFCskCEoqZldA-wJgQ__sZ1_8zUGW1vWjCo.tH4RcxPaVn73VnaiOFQwQg/api/v1/sites/8e07aecf-f8bd-4ead-87d5-f9ef853e2c2e/builds" \
+            | tee deploy-response.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          payload = json.loads(Path('deploy-response.json').read_text())
+          if isinstance(payload, list):
+              payload = payload[0] if payload else {}
+          if not (payload.get('deploy_id') or payload.get('id')):
+              raise SystemExit(f'Netlify did not return a deploy identifier: {payload}')
+          print('Netlify deploy accepted.')
+          PY
