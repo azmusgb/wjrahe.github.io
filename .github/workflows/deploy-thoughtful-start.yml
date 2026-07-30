@@ -44,3 +44,5 @@ jobs:
               raise SystemExit(f"Netlify did not return a deploy identifier: {payload}")
           print("Netlify deploy accepted.")
           PY
+
+# Second push intentionally triggers the workflow after registration on main.
